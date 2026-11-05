@@ -141,3 +141,62 @@ h1 span { display: block; white-space: nowrap; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
 }
+
+/* Shared, native-HTML language navigation. */
+.header-actions { display: flex; align-items: center; gap: 34px; }
+.hero-main, .project-detail, .about-detail { min-width: 0; }
+.project-links { flex-wrap: wrap; }
+.language-switcher { position: relative; z-index: 5; flex-shrink: 0; font-size: 14px; }
+.language-switcher summary { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); background: var(--paper); font-family: var(--sans); font-size: inherit; font-weight: 600; line-height: 1.5; cursor: pointer; list-style: none; user-select: none; }
+.language-switcher summary::-webkit-details-marker { display: none; }
+.language-switcher summary::marker { content: ""; }
+.language-switcher summary:hover { border-color: var(--blue); color: var(--blue); }
+.language-switcher summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+.language-chevron { width: 14px; height: 14px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform 180ms ease; }
+.language-switcher[open] .language-chevron { transform: rotate(180deg); }
+.language-menu { position: absolute; right: 0; top: calc(100% + 8px); min-width: 145px; padding: 6px; border: 1px solid var(--line); background: var(--paper); box-shadow: 0 8px 24px rgb(0 0 0 / 6%); }
+.language-menu a { display: block; min-height: 44px; padding: 11px 14px; font-family: var(--sans); font-size: 14px; line-height: 22px; white-space: nowrap; }
+.language-menu a:hover, .language-menu a[aria-current="page"] { color: var(--blue); background: var(--project); }
+.language-menu a[aria-current="page"] { font-weight: 650; }
+html[lang="ja"] { --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK JP", "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif; }
+
+@media (max-width: 1100px) {
+  .header-actions { gap: 24px; }
+  .site-header nav { gap: 24px; }
+}
+
+@media (min-width: 641px) and (max-width: 800px) {
+  .brand { font-size: 30px; }
+  .header-actions { gap: 18px; }
+  .site-header nav { gap: 20px; }
+  .site-header nav a { font-size: 16px; }
+  .language-switcher { font-size: 13px; }
+  .language-switcher summary { padding-inline: 10px; }
+  .project-identity h3 { font-size: clamp(48px, 7.8vw, 60px); letter-spacing: -2px; }
+}
+
+@media (max-width: 640px) {
+  .site-header { height: auto; flex-wrap: wrap; gap: 12px; padding-block: 24px 16px; }
+  .brand { flex-basis: 100%; }
+  .header-actions { width: 100%; justify-content: space-between; gap: 12px; }
+  .site-header nav { gap: 17px; }
+  .language-switcher { font-size: 13px; }
+  .language-switcher summary { padding-inline: 10px; }
+  html[lang="en"] h1 { font-size: clamp(30px, 8.5vw, 54px); }
+  html[lang="ja"] h1 { font-size: clamp(29px, 8.4vw, 52px); }
+  html[lang="en"] .about-headline { font-size: clamp(26px, 7.4vw, 33px); }
+  html[lang="ja"] .about-headline { font-size: clamp(27px, 7.7vw, 33px); }
+}
+
+@media (max-width: 360px) {
+  .site-header nav { gap: 10px; }
+  .site-header nav a { font-size: 12px; }
+  .language-switcher { font-size: 12px; }
+  .language-switcher summary { padding-inline: 9px; }
+}
+
+@media (max-width: 480px) {
+  html[lang="en"] .section-note,
+  html[lang="ja"] .section-note { display: none; }
+}
+

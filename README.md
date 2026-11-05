@@ -1,28 +1,42 @@
 # Denis Wen · 个人主页
 
-纯 HTML / CSS 的响应式个人主页，面向 GitHub Pages。无需安装依赖或执行构建，关闭 JavaScript 仍可使用。
+纯静态、响应式的个人主页，发布在 GitHub Pages。支持中文、英文和日文，所有页面均无需 JavaScript 即可阅读与切换语言。
 
-目标地址：<https://biubiuqiu.github.io/>
+| 语言 | 地址 |
+| --- | --- |
+| 中文 | <https://biubiuqiu.github.io/> |
+| English | <https://biubiuqiu.github.io/en/> |
+| 日本語 | <https://biubiuqiu.github.io/ja/> |
 
-## 发布
-
-1. 在 GitHub 账号 `biubiuqiu` 下新建公开仓库 `biubiuqiu.github.io`。
-2. 把本目录中的 `index.html`、`styles.css`、`favicon.svg`、`.nojekyll` 和本文件放在仓库根目录并提交到 `main`。
-3. 打开 **Settings → Pages → Build and deployment**，Source 选择 **Deploy from a branch**，Branch 选择 **main**，目录选择 **/(root)**，点击 **Save**。
-4. 等待 Pages 部署完成，打开页面上返回的网站地址。以后向 `main` 提交修改即可更新。
-
-官方说明：<https://docs.github.com/en/pages/quickstart>
+每个版本都有对应的 HTML 语言标记、页面标题、简介、canonical、hreflang 和社交分享信息。页头的原生 HTML 菜单提供语言切换；根地址默认中文，不强制重定向访客。
 
 ## 修改内容
 
-- `index.html`：名字、介绍、项目、技术关注、兴趣、GitHub 链接和 SEO 信息。
-- `styles.css`：`:root` 中的颜色与字体变量；下方包含平板、手机和减少动态效果的样式。
-- `favicon.svg`：浏览器标签页图标。
+- `src/locales.json`：三种语言的文案，使用统一的翻译字段。
+- `src/template.html`：共享页面结构。
+- `styles.css`：共享样式与各语言的响应式排版。
+- `scripts/build.py`：仅依赖 Python 标准库的生成脚本，同时检查翻译字段是否完整。
+- `index.html`、`en/index.html`、`ja/index.html`、`sitemap.xml`：生成后的发布文件。
+- `favicon.svg`：标签页图标。
 
-链接统一指向已核实的公开 GitHub 主页、Lester 仓库与文档，不包含邮箱、公司内部数据或第三方统计脚本。
+修改模板或翻译后，在仓库根目录运行：
 
-如换用其他账号或自定义域名，同步修改 HTML 中的 canonical、og:url 以及所有 GitHub 链接。
+```bash
+python3 scripts/build.py
+```
+
+将源文件和生成的 HTML 一起提交到 `main`，GitHub Pages 会自动发布。没有包管理依赖或前端构建工具。
 
 ## 本地预览
 
-在本目录执行 `python3 -m http.server 8000`，然后访问 <http://localhost:8000>。
+在仓库根目录运行 `python3 -m http.server 8000`，然后访问 <http://localhost:8000>。
+
+## 发布配置
+
+GitHub Pages 使用 **Deploy from a branch → main → /(root)**；`.nojekyll` 跳过 Jekyll 处理。
+
+本仓库仅包含公开主页内容，不包含密码、邮箱、公司内部数据或第三方统计脚本。网站展示的 HTML/CSS 可由访客查看。仓库是否私有与已发布网站是否公开是不同的设置；GitHub Free 的 Pages 需要公开仓库。
+
+官方说明：<https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site>
+
+如更换账号或自定义域名，同步更新 `scripts/build.py` 的 `BASE_URL`、模板中的 GitHub 链接，再重新生成页面。
