@@ -1,6 +1,6 @@
 # Denis Wen · 个人主页
 
-个人工作室风格的响应式静态主页。支持中文、英文、日文，以及浅色、深色和跟随系统三种外观。正文和语言切换无需 JavaScript；手动主题切换使用小型脚本。
+围绕 Lester、AI Agent 探索、高原徒步和 F1 的响应式静态个人主页。支持中文、英文、日文，以及浅色、深色和跟随系统三种外观。正文和语言切换无需 JavaScript；手动主题切换使用小型脚本。
 
 | 语言 | 地址 |
 | --- | --- |
@@ -37,7 +37,7 @@ python3 scripts/build.py
 
 GitHub Pages 使用 **Deploy from a branch → main → /(root)**；`.nojekyll` 跳过 Jekyll 处理。
 
-本仓库仅包含公开主页内容，不包含密码、邮箱、公司内部数据或第三方统计脚本。网站展示的 HTML/CSS 可由访客查看。仓库是否私有与已发布网站是否公开是不同的设置；GitHub Free 的 Pages 需要公开仓库。
+本仓库仅包含个人公开内容，不包含任职经历、内部项目、密码、邮箱或第三方统计脚本。网站展示的 HTML/CSS 可由访客查看。仓库是否私有与已发布网站是否公开是不同的设置；GitHub Free 的 Pages 需要公开仓库。
 
 官方说明：<https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site>
 
@@ -49,3 +49,13 @@ GitHub Pages 使用 **Deploy from a branch → main → /(root)**；`.nojekyll` 
 
 衬线字体使用系统字库，不同设备的中文字形可能略有差异。不加载第三方字体或统计脚本。
 
+
+## 内容结构
+
+- 简介与兴趣导航。
+- Lester：项目介绍、协作、执行与成果预览。
+- AI Agent：产品体验与设计问题。
+- 高原徒步：梅里北坡、虎跳峡、阿布吉措、哈巴西坡、麦理浩径。
+- F1：红牛车队与 Max Verstappen。
+
+三种语言共享模板与字号体系，兴趣段落使用自然换行，不包含虚构文章或游记链接。
