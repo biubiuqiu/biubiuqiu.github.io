@@ -16,7 +16,7 @@ LANGUAGES = {
     "ja": {"label": "日本語", "path": "ja", "og_locale": "ja_JP"},
 }
 TOKENS = re.compile(r"\{\{([a-z_0-9]+)\}\}")
-RAW_KEYS = {"alternates", "og_alternates", "locale_menu"}
+RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap"}
 SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale"}
 
 
@@ -43,10 +43,26 @@ def menu_for(current: str, copy: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
+def theme_menu_for(copy: dict[str, str]) -> str:
+    accessible = html.escape(copy["theme_label"], quote=True)
+    lines = [
+        f'            <details class="theme-switcher" data-theme-control data-theme-menu-label="{accessible}" hidden>',
+        f'              <summary aria-label="{accessible}" title="{accessible}"><svg class="appearance-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" stroke="none" fill="currentColor"/></svg></summary>',
+        f'              <div class="theme-menu" role="group" aria-label="{accessible}">',
+    ]
+    for choice in ("system", "light", "dark"):
+        label = html.escape(copy["theme_" + choice])
+        lines.append(
+            f'                <button type="button" data-theme-choice="{choice}" aria-pressed="false"><span>{label}</span><svg class="theme-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg></button>'
+        )
+    lines.extend(['              </div>', '            </details>'])
+    return "\n".join(lines)
+
+
 def build() -> None:
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
-    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"switch_label"}
+    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"switch_label", "theme_label", "theme_system", "theme_light", "theme_dark"}
     if set(translations) != set(LANGUAGES):
         raise ValueError("Translations and configured language routes must match")
     for language, meta in LANGUAGES.items():
@@ -73,6 +89,8 @@ def build() -> None:
             "alternates": "\n".join(alternates),
             "og_alternates": "\n".join(og_alternates),
             "locale_menu": menu_for(language, copy),
+            "theme_menu": theme_menu_for(copy),
+            "theme_bootstrap": (ROOT / "src" / "theme-init.js").read_text(encoding="utf-8"),
         }
         def substitute(match: re.Match[str]) -> str:
             key = match.group(1)
@@ -95,4 +113,5 @@ def build() -> None:
 
 if __name__ == "__main__":
     build()
+
 

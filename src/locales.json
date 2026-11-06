@@ -34,7 +34,11 @@
     "about_line_3": "我享受不断探索的过程。",
     "about_link": "去 GitHub 打个招呼",
     "footer_note": "用好奇心构建。",
-    "switch_label": "语言"
+    "switch_label": "语言",
+    "theme_label": "外观",
+    "theme_system": "跟随系统",
+    "theme_light": "浅色",
+    "theme_dark": "深色"
   },
   "en": {
     "page_title": "Denis Wen — AI Application Engineer",
@@ -71,7 +75,11 @@
     "about_line_3": "I enjoy the process of exploring.",
     "about_link": "Say hello on GitHub",
     "footer_note": "Built with curiosity.",
-    "switch_label": "Language"
+    "switch_label": "Language",
+    "theme_label": "Appearance",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark"
   },
   "ja": {
     "page_title": "Denis Wen — AIアプリケーションエンジニア",
@@ -108,7 +116,11 @@
     "about_line_3": "新しいことを探究する過程を楽しんでいます。",
     "about_link": "GitHubで気軽にどうぞ",
     "footer_note": "好奇心から、つくる。",
-    "switch_label": "言語"
+    "switch_label": "言語",
+    "theme_label": "外観",
+    "theme_system": "システムに合わせる",
+    "theme_light": "ライト",
+    "theme_dark": "ダーク"
   }
 }
 

@@ -1,6 +1,6 @@
 # Denis Wen · 个人主页
 
-纯静态、响应式的个人主页，发布在 GitHub Pages。支持中文、英文和日文，所有页面均无需 JavaScript 即可阅读与切换语言。
+个人工作室风格的响应式静态主页。支持中文、英文、日文，以及浅色、深色和跟随系统三种外观。正文和语言切换无需 JavaScript；手动主题切换使用小型脚本。
 
 | 语言 | 地址 |
 | --- | --- |
@@ -14,7 +14,9 @@
 
 - `src/locales.json`：三种语言的文案，使用统一的翻译字段。
 - `src/template.html`：共享页面结构。
-- `styles.css`：共享样式与各语言的响应式排版。
+- `styles.css`：暖白/森林绿与炭绿/鼠尾草绿主题，以及响应式排版。
+- `theme.js`：外观菜单、系统外观变化与跨标签页同步。
+- `src/theme-init.js`：首屏渲染前恢复主题，避免跨语言导航时闪烁。
 - `scripts/build.py`：仅依赖 Python 标准库的生成脚本，同时检查翻译字段是否完整。
 - `index.html`、`en/index.html`、`ja/index.html`、`sitemap.xml`：生成后的发布文件。
 - `favicon.svg`：标签页图标。
@@ -40,3 +42,10 @@ GitHub Pages 使用 **Deploy from a branch → main → /(root)**；`.nojekyll` 
 官方说明：<https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site>
 
 如更换账号或自定义域名，同步更新 `scripts/build.py` 的 `BASE_URL`、模板中的 GitHub 链接，再重新生成页面。
+
+## 外观行为
+
+点击页头半圆图标，选择「跟随系统」「浅色」「深色」。选择保存在 localStorage（`denis-theme`），刷新和切换语言后保留。跟随系统时响应系统外观变化；标签页间同步选择。存储不可用时仍可切换当前页面。禁用 JavaScript 时隐藏手动外观菜单，使用系统配色，正文和语言导航照常可用。
+
+衬线字体使用系统字库，不同设备的中文字形可能略有差异。不加载第三方字体或统计脚本。
+
