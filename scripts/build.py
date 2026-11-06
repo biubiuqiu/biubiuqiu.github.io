@@ -30,7 +30,7 @@ def menu_for(current: str, copy: dict[str, str]) -> str:
     accessible = html.escape(copy["switch_label"] + ": " + LANGUAGES[current]["label"], quote=True)
     lines = [
         '          <details class="language-switcher">',
-        f'            <summary aria-label="{accessible}"><span>{label}</span><svg class="language-chevron" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg></summary>',
+        f'            <summary aria-label="{accessible}"><span>{label}</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>',
         '            <div class="language-menu">',
     ]
     for language, meta in LANGUAGES.items():
@@ -47,13 +47,13 @@ def theme_menu_for(copy: dict[str, str]) -> str:
     accessible = html.escape(copy["theme_label"], quote=True)
     lines = [
         f'            <details class="theme-switcher" data-theme-control data-theme-menu-label="{accessible}" hidden>',
-        f'              <summary aria-label="{accessible}" title="{accessible}"><svg class="appearance-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17Z" stroke="none" fill="currentColor"/></svg></summary>',
+        f'              <summary aria-label="{accessible}" title="{accessible}"><span class="icon icon-appearance" aria-hidden="true"></span></summary>',
         f'              <div class="theme-menu" role="group" aria-label="{accessible}">',
     ]
     for choice in ("system", "light", "dark"):
         label = html.escape(copy["theme_" + choice])
         lines.append(
-            f'                <button type="button" data-theme-choice="{choice}" aria-pressed="false"><span>{label}</span><svg class="theme-check" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="m4 10 4 4 8-8"/></svg></button>'
+            f'                <button type="button" data-theme-choice="{choice}" aria-pressed="false"><span>{label}</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>'
         )
     lines.extend(['              </div>', '            </details>'])
     return "\n".join(lines)

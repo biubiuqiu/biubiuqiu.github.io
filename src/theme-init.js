@@ -1,5 +1,5 @@
 (function () {
-  var preference = "system";
+  var preference = "dark";
   try {
     var stored = localStorage.getItem("denis-theme");
     if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
@@ -11,7 +11,7 @@
   root.dataset.theme = theme;
   root.dataset.themePreference = preference;
   root.style.colorScheme = theme;
-  var color = theme === "dark" ? "#161b19" : "#f2eee7";
+  var color = theme === "dark" ? "#242326" : "#f6f3ef";
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
 })();
 

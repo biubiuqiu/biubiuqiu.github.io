@@ -3,7 +3,7 @@
   var root = document.documentElement;
   var storageKey = "denis-theme";
   var choices = ["system", "light", "dark"];
-  var preference = choices.indexOf(root.dataset.themePreference) >= 0 ? root.dataset.themePreference : "system";
+  var preference = choices.indexOf(root.dataset.themePreference) >= 0 ? root.dataset.themePreference : "dark";
   var media = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : { matches: false };
   var controls = Array.from(document.querySelectorAll("[data-theme-control]"));
   var menus = Array.from(document.querySelectorAll(".language-switcher, .theme-switcher"));
@@ -13,7 +13,7 @@
     root.dataset.theme = effective;
     root.dataset.themePreference = preference;
     root.style.colorScheme = effective;
-    var color = effective === "dark" ? "#161b19" : "#f2eee7";
+    var color = effective === "dark" ? "#242326" : "#f6f3ef";
     document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
     controls.forEach(function (control) {
       var selectedLabel = "";
@@ -60,7 +60,7 @@
 
   window.addEventListener("storage", function (event) {
     if (event.key !== storageKey && event.key !== null) return;
-    preference = choices.indexOf(event.newValue) >= 0 ? event.newValue : "system";
+    preference = choices.indexOf(event.newValue) >= 0 ? event.newValue : "dark";
     applyTheme();
   });
 
