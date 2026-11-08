@@ -65,3 +65,7 @@ GitHub Pages 使用 **Deploy from a branch → main → /(root)**；`.nojekyll` 
 三个兴趣章节使用原生 HTML details，全部带 open 属性，进入页面时完整展开，可以自然向下滚动阅读；也可手动收起。关闭 JavaScript 时正文、章节开合和语言导航仍然可用。
 
 图标使用 Phosphor Icons；本地 SVG 及 MIT 许可位于 assets/icons/，无需外部字体或图标服务。
+
+## 徒步相册
+
+8 张真实旅行照片保存在 assets/hiking/，WebP 版本按原比例展示，不添加未经确认的地名。src/photos.json 维护三语言图注与图片尺寸。图片懒加载；点击打开原生 dialog，Escape 或关闭按钮退出。不支持 dialog 时保留图片链接。

@@ -41,7 +41,10 @@
     "theme_label": "外观",
     "theme_light": "浅色",
     "theme_system": "跟随系统",
-    "work_link": "认识 Lester"
+    "work_link": "认识 Lester",
+    "gallery_title": "沿途所见",
+    "gallery_hint": "点击照片查看大图",
+    "gallery_close": "关闭大图"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -85,7 +88,10 @@
     "theme_label": "Appearance",
     "theme_light": "Light",
     "theme_system": "System",
-    "work_link": "Meet Lester"
+    "work_link": "Meet Lester",
+    "gallery_title": "Along the trail",
+    "gallery_hint": "Select a photo to view it larger",
+    "gallery_close": "Close photo"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -129,6 +135,9 @@
     "theme_label": "外観",
     "theme_light": "ライト",
     "theme_system": "システムに合わせる",
-    "work_link": "Lesterを見る"
+    "work_link": "Lesterを見る",
+    "gallery_title": "道中の風景",
+    "gallery_hint": "写真を選ぶと大きく表示します",
+    "gallery_close": "写真を閉じる"
   }
 }

@@ -16,7 +16,7 @@ LANGUAGES = {
     "ja": {"label": "日本語", "path": "ja", "og_locale": "ja_JP"},
 }
 TOKENS = re.compile(r"\{\{([a-z_0-9]+)\}\}")
-RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap"}
+RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery"}
 SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale"}
 
 
@@ -59,10 +59,22 @@ def theme_menu_for(copy: dict[str, str]) -> str:
     return "\n".join(lines)
 
 
+def gallery_for(language, copy):
+    prefix = "../" if LANGUAGES[language]["path"] else "./"
+    items = json.loads((ROOT / "src" / "photos.json").read_text())
+    rows = [' <section class="hiking-gallery" id="hiking-photos" aria-label="'+html.escape(copy["gallery_title"],quote=True)+'">', '<p class="gallery-heading">'+html.escape(copy["gallery_title"])+'</p><p class="gallery-hint">'+html.escape(copy["gallery_hint"])+'</p><div class="photo-grid">']
+    for i, item in enumerate(items):
+        caption=html.escape(item[language],quote=True)
+        path=prefix+"assets/hiking/"+item["file"]
+        rows.append(f'<a class="photo-link" href="{path}" data-caption="{caption}"><figure><img src="{path}" alt="{caption}" width="{item["width"]}" height="{item["height"]}" loading="lazy" decoding="async"><figcaption>{caption}</figcaption></figure></a>')
+    rows.append("</div></section>")
+    return "\n".join(rows)
+
+
 def build() -> None:
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
-    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"switch_label", "theme_label", "theme_system", "theme_light", "theme_dark"}
+    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark"}
     if set(translations) != set(LANGUAGES):
         raise ValueError("Translations and configured language routes must match")
     for language, meta in LANGUAGES.items():
@@ -90,6 +102,7 @@ def build() -> None:
             "og_alternates": "\n".join(og_alternates),
             "locale_menu": menu_for(language, copy),
             "theme_menu": theme_menu_for(copy),
+            "hiking_gallery": gallery_for(language, copy),
             "theme_bootstrap": (ROOT / "src" / "theme-init.js").read_text(encoding="utf-8"),
         }
         def substitute(match: re.Match[str]) -> str:
