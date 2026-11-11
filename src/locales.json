@@ -64,7 +64,14 @@
     "tlou_text": "乔尔与艾莉穿越末世的旅程。生存之外，故事也围绕人与人之间的关系和艰难选择展开。",
     "tlou_alt": "《最后生还者 Part I》官方游戏画面",
     "official_link": "官方介绍与图片来源",
-    "game_credits": "游戏配图来自官方宣传素材；图片及相关作品版权归各自权利人所有。"
+    "game_credits": "游戏配图来自官方宣传素材；图片及相关作品版权归各自权利人所有。",
+    "gallery_loading": "正在加载图片…",
+    "gallery_error": "图片暂时无法加载，可以尝试单独打开。",
+    "gallery_open": "单独打开",
+    "gallery_prev": "上一张图片",
+    "gallery_next": "下一张图片",
+    "gallery_keys": "← → 切换图片 · Esc 关闭",
+    "gallery_swipe": "左右滑动切换图片"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -131,7 +138,14 @@
     "tlou_text": "Joel and Ellie's journey through a devastated world. Alongside survival, the story explores human bonds and difficult choices.",
     "tlou_alt": "Official The Last of Us Part I screenshot",
     "official_link": "Official overview & image source",
-    "game_credits": "Game images are official promotional materials. All images and related works belong to their respective rights holders."
+    "game_credits": "Game images are official promotional materials. All images and related works belong to their respective rights holders.",
+    "gallery_loading": "Loading photo…",
+    "gallery_error": "This photo could not load. Try opening it in a new tab.",
+    "gallery_open": "Open image",
+    "gallery_prev": "Previous image",
+    "gallery_next": "Next image",
+    "gallery_keys": "← → Browse · Esc Close",
+    "gallery_swipe": "Swipe left or right to browse"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -198,6 +212,13 @@
     "tlou_text": "荒廃した世界を旅するジョエルとエリー。生き抜くこととともに、人とのつながりや難しい選択を描く物語です。",
     "tlou_alt": "The Last of Us Part Iの公式ゲーム画像",
     "official_link": "公式紹介・画像出典",
-    "game_credits": "ゲーム画像は公式プロモーション素材です。画像および関連作品の権利は各権利者に帰属します。"
+    "game_credits": "ゲーム画像は公式プロモーション素材です。画像および関連作品の権利は各権利者に帰属します。",
+    "gallery_loading": "画像を読み込み中…",
+    "gallery_error": "画像を読み込めません。別のタブで開いてみてください。",
+    "gallery_open": "画像を開く",
+    "gallery_prev": "前の画像",
+    "gallery_next": "次の画像",
+    "gallery_keys": "← → 切り替え · Esc 閉じる",
+    "gallery_swipe": "左右にスワイプして切り替え"
   }
 }
