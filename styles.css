@@ -1,4 +1,5 @@
 @charset "UTF-8";
+.project-detail>.project-name-story{margin-top:14px;font-size:16px;line-height:1.9}
 :root {
  color-scheme:dark;
  --paper:#242326;--surface:#302c2f;--ink:#f0eae5;--muted:#beb5af;--accent:#de8d6c;--line:#9e9187;--soft-line:#51494a;--hover:#2c292c;--button-ink:#251c18;--selected:#44332d;

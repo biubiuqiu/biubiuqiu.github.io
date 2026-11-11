@@ -24,7 +24,7 @@
     "page_title": "Denis Wen — Lester、AI Agent 与山野",
     "project_kicker": "正在做的项目 / 01",
     "project_link": "查看源码",
-    "project_summary": "Lester 是我目前正在做的开源 AI Agent 工作空间。",
+    "project_summary": "Lester 是我正在做的开源 AI Agent 工作空间，可以自己部署，通过对话处理任务、文件与代码。",
     "route_abuji": "阿布吉措",
     "route_haba": "哈巴西坡",
     "route_maclehose": "麦理浩径",
@@ -71,7 +71,8 @@
     "gallery_prev": "上一张图片",
     "gallery_next": "下一张图片",
     "gallery_keys": "← → 切换图片 · Esc 关闭",
-    "gallery_swipe": "左右滑动切换图片"
+    "gallery_swipe": "左右滑动切换图片",
+    "project_name_story": "名字来自《GTA V》里的幕后高手 Lester Crest。希望它也能冷静、机敏地理解目标、找到办法，把事情做出来。"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -98,7 +99,7 @@
     "page_title": "Denis Wen — Lester, AI Agents & the Outdoors",
     "project_kicker": "CURRENT PROJECT / 01",
     "project_link": "View source",
-    "project_summary": "Lester is the open-source AI agent workspace I'm currently building.",
+    "project_summary": "Lester is an open-source AI agent workspace I'm building. You can self-host it and work on tasks, files, and code through conversation.",
     "route_abuji": "Abuji Lake",
     "route_haba": "Haba West Slope",
     "route_maclehose": "MacLehose Trail",
@@ -145,7 +146,8 @@
     "gallery_prev": "Previous image",
     "gallery_next": "Next image",
     "gallery_keys": "← → Browse · Esc Close",
-    "gallery_swipe": "Swipe left or right to browse"
+    "gallery_swipe": "Swipe left or right to browse",
+    "project_name_story": "The name comes from Lester Crest, the resourceful mind behind the scenes in GTA V. I hope it can bring that same calm, practical approach to understanding a goal and getting things done."
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -172,7 +174,7 @@
     "page_title": "Denis Wen — Lester、AIエージェントと山歩き",
     "project_kicker": "いま制作中 / 01",
     "project_link": "ソースを見る",
-    "project_summary": "Lesterは、いま開発しているオープンソースのAIエージェント・ワークスペースです。",
+    "project_summary": "Lesterは、いま開発しているオープンソースのAIエージェント・ワークスペースです。セルフホストでき、対話を通じてタスク、ファイル、コードを扱えます。",
     "route_abuji": "阿布吉措",
     "route_haba": "哈巴西坡",
     "route_maclehose": "マクリホース・トレイル",
@@ -219,6 +221,7 @@
     "gallery_prev": "前の画像",
     "gallery_next": "次の画像",
     "gallery_keys": "← → 切り替え · Esc 閉じる",
-    "gallery_swipe": "左右にスワイプして切り替え"
+    "gallery_swipe": "左右にスワイプして切り替え",
+    "project_name_story": "名前はGTA Vの舞台裏で活躍するLester Crestに由来します。彼のように冷静に目標を理解し、機転を利かせて方法を見つけ、形にする助手を目指しています。"
   }
 }
