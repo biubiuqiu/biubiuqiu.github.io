@@ -31,8 +31,8 @@ nav a{display:inline-flex;align-items:center;gap:5px;min-height:44px;font-size:1
 nav a:hover{color:var(--accent)}
 .header-controls{gap:28px;padding-left:28px;border-left:1px solid var(--line)}
 .hero{padding-block:54px 48px;border-bottom:1px solid var(--line)}
-h1{font-size:clamp(36px,3.8vw,54px);font-weight:650;line-height:1.25;letter-spacing:-.025em}
-.intro{margin-top:14px;max-width:49em;font-size:24px;line-height:1.75;color:var(--muted)}
+h1{font-size:clamp(28px,3vw,40px);font-weight:650;line-height:1.25;letter-spacing:-.025em}
+.intro{margin-top:14px;max-width:49em;font-size:18px;line-height:1.75;color:var(--muted)}
 .button{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:54px;margin-top:26px;padding:10px 30px;border:1px solid var(--accent);background:var(--accent);color:var(--button-ink);font-size:22px;font-weight:600;line-height:1.4}
 .button:hover{filter:brightness(1.07)}
 .text-link{display:inline-flex;align-items:center;gap:7px;min-height:44px;font-size:20px;line-height:1.6;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:7px}
@@ -83,18 +83,18 @@ summary::marker{content:""}
 .theme-menu button[aria-pressed="true"] .theme-check{opacity:1}
 html[lang="ja"]{--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK JP","Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif}
 @media(max-width:1100px){
- .page-shell{width:calc(100% - 80px)}.brand{font-size:25px}.header-actions{gap:24px}nav{gap:24px}nav a{font-size:16px}.header-controls{gap:20px;padding-left:24px}.intro{font-size:20px}
+ .page-shell{width:calc(100% - 80px)}.brand{font-size:25px}.header-actions{gap:24px}nav{gap:24px}nav a{font-size:16px}.header-controls{gap:20px;padding-left:24px}.intro{font-size:17px}
  .project{grid-template-columns:minmax(0,19%) minmax(0,30%) minmax(0,51%)}.project-kicker{font-size:14px}.project-identity{padding-left:32px}.project-identity h2{font-size:58px}.project-detail{padding-left:32px}.project-detail>p{font-size:17px}.project-links{gap:10px 24px}.text-link{font-size:16px}
  .interest-story>summary{grid-template-columns:210px minmax(0,1fr) 26px;gap:30px}.interest-title{font-size:24px;padding-left:28px}.interest-summary{font-size:17px}.interest-copy{margin-left:240px;max-width:calc(100% - 240px);padding-right:40px}
 }
 @media(max-width:900px){
- .page-shell{width:calc(100% - 64px)}.site-header{flex-wrap:wrap;gap:14px;min-height:0;padding-block:24px 18px}.brand{flex-basis:100%;font-size:26px}.header-actions{width:100%;justify-content:space-between}.header-controls{border-left:0;padding-left:0}nav{gap:26px}.hero{padding-block:42px}.intro{font-size:19px}
+ .page-shell{width:calc(100% - 64px)}.site-header{flex-wrap:wrap;gap:14px;min-height:0;padding-block:24px 18px}.brand{flex-basis:100%;font-size:26px}.header-actions{width:100%;justify-content:space-between}.header-controls{border-left:0;padding-left:0}nav{gap:26px}.hero{padding-block:42px}.intro{font-size:16px}
  .project{grid-template-columns:minmax(0,33%) minmax(0,67%);padding-block:34px}.project-kicker{grid-column:1/-1;padding:0 0 22px}.project-identity{border-left:0;padding-left:0}.project-identity h2{font-size:56px}.project-detail{padding-left:30px}
  .interest-story>summary{grid-template-columns:180px minmax(0,1fr) 24px;gap:24px;min-height:100px}.interest-title{padding-left:22px;font-size:22px}.interest-copy{margin-left:204px;max-width:calc(100% - 204px);padding-right:24px;font-size:16px}.interest-summary{font-size:16px}.site-footer{font-size:12px}
 }
 @media(max-width:640px){
  html{scroll-padding-top:20px}.page-shell{width:calc(100% - 40px)}.site-header{padding-block:22px 14px}.brand{font-size:24px;gap:10px}.brand-mark{width:16px;height:16px}.header-actions{gap:14px}nav{gap:20px}nav a{font-size:15px}.nav-github{display:none}.header-controls{gap:12px}.language-switcher>summary{min-height:40px;font-size:14px;padding-inline:9px;gap:6px}.language-chevron{width:15px;height:15px}.theme-switcher>summary{width:38px;height:40px}.icon-appearance{width:28px;height:28px}
- .hero{padding-block:34px 36px}h1{font-size:clamp(28px,7vw,36px);line-height:1.5;letter-spacing:-.025em}.intro{font-size:16px;line-height:1.9;margin-top:17px}.button{min-height:48px;margin-top:24px;padding:10px 19px;font-size:17px;gap:10px}.button .icon{width:20px;height:20px}
+ .hero{padding-block:34px 36px}h1{font-size:clamp(23px,6vw,28px);line-height:1.5;letter-spacing:-.025em}.intro{font-size:15px;line-height:1.9;margin-top:17px}.button{min-height:48px;margin-top:24px;padding:10px 19px;font-size:17px;gap:10px}.button .icon{width:20px;height:20px}
  .project{grid-template-columns:1fr;padding-block:30px;gap:0}.project-kicker{grid-column:auto;padding:0 0 18px;font-size:12px}.project-identity{padding:0}.project-identity h2{font-size:52px;line-height:1.1}.project-identity p{font-size:12px;margin-top:5px;letter-spacing:.11em}.project-detail{border-left:0;padding:24px 0 0}.project-detail>p{font-size:16px;line-height:1.9}.project-links{gap:10px 28px;margin-top:12px}.text-link{font-size:16px}.text-link .icon{width:20px;height:20px}
  .interests{padding-top:8px}.interest-story{scroll-margin-top:20px}.interest-story>summary{grid-template-columns:minmax(0,1fr) 24px;gap:10px 18px;min-height:0;padding-block:26px}.interest-title{font-size:22px;padding-left:20px;border-left-width:3px}.interest-summary{grid-row:2;grid-column:1;padding-left:23px;font-size:15px;line-height:1.8}.disclosure-icon{grid-column:2;grid-row:1/3;width:22px;height:22px}.interest-copy{margin-left:23px;max-width:calc(100% - 23px);padding:0 0 32px;font-size:16px;line-height:1.9}.interest-copy p+p{margin-top:15px}.interest-copy .route-label{font-size:12px;margin-top:22px}.route-list{gap:8px}.route-list li{font-size:13px;padding:4px 9px}
  .site-footer{margin-top:30px;min-height:90px;gap:12px;font-size:11px}.site-footer>span{text-align:right;max-width:60%}.footer-github{font-size:11px;margin-left:12px}.language-menu,.theme-menu{top:calc(100% + 9px)}
