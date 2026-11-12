@@ -1,0 +1,28 @@
+<p class="article-lead">一次 Spark 集成遇到了反复的依赖冲突。最终的选择，是把执行能力拆成独立服务，通过接口调用。</p>
+<h2>从集成需求开始</h2>
+<p>这次实践希望在已有的数据处理场景中引入 Spark SQL。原文记录的目标，是尝试改善部分 SQL 计算的执行方式，并为后续计算场景保留扩展空间。</p>
+<p>真正开始集成后，首先遇到的却是依赖问题：项目里已经有 Hive、Hadoop 等相关依赖，再引入 Spark 的依赖，会出现版本冲突；解决一处，又可能影响原先的代码。</p>
+<h2>把执行能力单独拆出来</h2>
+<p>当时采用的方案是，把 Spark 相关代码放到独立项目中，由调用方通过接口提交 SQL，并接收执行结果。这样，Spark 的依赖可以在自己的服务中管理，调用方与它之间通过请求和结果建立边界。</p>
+<ol><li>调用方提供数据库、SQL 和是否需要返回查询结果等信息。</li><li>执行服务初始化 <code>SparkSession</code>，连接 Hive Metastore。</li><li>执行 SQL，将结果转换为字段名与行数据，或者返回执行状态。</li></ol>
+<h2>SparkSession 的初始化</h2>
+<p>原文使用的初始化方式如下。具体配置值由外部参数提供：</p>
+<pre><code>SparkSession sparkSession = SparkSession.builder()
+    .appName(sparkProperties.getAppName())
+    .config("spark.ui.port", sparkProperties.getUiPort())
+    .config("hive.metastore.uris", sparkProperties.getMetastoreUris())
+    .config("spark.master", sparkProperties.getMaster())
+    .config("spark.sql.hive.metastore.version", sparkProperties.getHiveVersion())
+    .config("spark.sql.hive.metastore.jars", sparkProperties.getHiveJarsPath())
+    .enableHiveSupport()
+    .getOrCreate();</code></pre>
+<p>原文特别记录了 Hive Metastore 的版本兼容问题：遇到 <code>Invalid method name: 'get_table_req'</code> 时，需要检查所连接的 Metastore 版本及对应的客户端 JAR 配置，而不是只看 SQL 本身。</p>
+<h2>如何返回结果</h2>
+<p>查询结果是 <code>Dataset&lt;Row&gt;</code>。原文从中取出列名，将每行转成字符串列表，最终封装成字段列表、数据列表和执行状态返回。示例限制最多收集五千行结果：</p>
+<pre><code>Dataset&lt;Row&gt; result = sparkSession.sql(sql).limit(5000);
+String[] columns = result.columns();
+List&lt;Row&gt; rows = result.collectAsList();</code></pre>
+<p>这里保留的是原文的核心实现思路。独立服务还需要考虑鉴权、可执行语句范围、并发会话、超时和结果大小等边界，原文并未完整覆盖这些部分。</p>
+<h2>这次方案的取舍</h2>
+<p>拆分服务把依赖隔离了出去，也带来了额外的服务部署、接口约定与运行维护。它没有让复杂度消失，而是让复杂度集中到了更明确的边界内。</p>
+<p>对这段实践来说，值得保留的判断是：当集成的阻力主要来自运行环境和依赖耦合时，可以重新考虑能力应该放在哪里，以及调用方究竟需要知道多少实现细节。</p>

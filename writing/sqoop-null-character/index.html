@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff">
+<title>一个不可见字符，为什么让数据同步字段错位？ — Denis Wen</title><meta name="description" content="从二分定位问题数据，到追踪解析器状态机，记录一次 NUL 字符引起的同步异常。"><link rel="canonical" href="https://biubiuqiu.github.io/writing/sqoop-null-character/"><meta property="og:type" content="article"><meta property="og:title" content="一个不可见字符，为什么让数据同步字段错位？"><meta property="og:description" content="从二分定位问题数据，到追踪解析器状态机，记录一次 NUL 字符引起的同步异常。"><meta property="og:url" content="https://biubiuqiu.github.io/writing/sqoop-null-character/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=1"><script src="/theme.js?v=6" defer></script></head>
+<body class="writing-page"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><a href="/">首页 ↗</a>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外观" hidden>
+              <summary aria-label="外观" title="外观"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外观">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>跟随系统</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>浅色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>深色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header><main class="writing-width writing-main" id="main"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a></nav><header class="article-header"><p class="writing-eyebrow">问题排查 / 旧文整理</p><h1>一个不可见字符，为什么让数据同步字段错位？</h1><p class="article-date">原文发表于 <time datetime="2022-02-09T18:21:56">2022-02-09</time><span> · Denis Wen</span></p><p class="article-context">Sqoop 1.4.7 / Hive 2.1.1 · 历史实践记录</p></header><article class="article-body"><p class="article-lead">相同的同步命令，大部分表都正常，只有几张表不断报类型转换错误。最后，线索落在了一个平时看不见的字符上。</p>
+<h2>问题：相同配置，字段却发生了错位</h2>
+<p>这次记录使用的是 Sqoop 1.4.7 和 Hive 2.1.1。从 Hive 向 MySQL 同步数据时，几张特定的表出现字段错位，继而报出类型转换错误。其他表使用相同配置可以正常同步，于是排查方向转向了数据本身。</p>
+<h2>先把问题缩小到一条数据</h2>
+<p>定位问题数据花了两天。方法很朴素：手工二分。假设有一万条记录，先尝试同步其中五千条，再根据结果继续缩小范围，直到找到能复现错误的数据。</p>
+<p>把 Hive 在 HDFS 上的数据文件取下来后，用 <code>cat</code> 查看，内容看起来正常。换成 <code>vim</code>，却发现其中夹着一个显示为 <code>^@</code> 的字符。继续对比发现，包含这个字符的记录会同步失败，不包含它的记录则正常。</p>
+<p>这里的 <code>^@</code> 对应 NUL 字符，也就是 Unicode 的 <code>U+0000</code>。它与空字符串是不同的概念：字符串里实际存在一个字符，只是通常不可见。</p>
+<h2>为什么不是普通的字符串内容？</h2>
+<p>最初的疑问是：既然已经通过 <code>--fields-terminated-by</code> 指定了字段分隔符，NUL 为什么没有被当作普通内容，而是影响了解析结果？</p>
+<p>为了解答这个问题，我查看了 Sqoop 1.4.7 的源码。记录解析器使用状态机处理输入，涉及四类字符：</p>
+<table><thead><tr><th>参数</th><th>解析器里的作用</th></tr></thead><tbody><tr><td><code>--enclosed-by</code></td><td>字段包围字符</td></tr><tr><td><code>--escaped-by</code></td><td>转义字符</td></tr><tr><td><code>--fields-terminated-by</code></td><td>字段分隔符</td></tr><tr><td><code>--lines-terminated-by</code></td><td>记录分隔符</td></tr></tbody></table>
+<p>关键线索在获取字段包围字符的方法注释里。未指定时，它用 <code>\000</code> 表示“无”。而输入数据中的 NUL，在 Java 中可以写成 <code>\u0000</code>。两种写法表示的是同一个字符：</p>
+<pre><code>char a = '\u0000';
+char b = '\000';
+System.out.println(a == b); // true</code></pre>
+<p>原文通过读取问题文件、调试字符值，结合状态机中对包围字符和转义字符的判断，将字段错位定位到了输入字符与这些默认值的冲突上。</p>
+<h2>当时的处理办法</h2>
+<p>原文采用的处理方式是显式指定 <code>--enclosed-by</code> 和 <code>--escaped-by</code>，避免沿用与问题数据冲突的默认值。实际取值需要结合输入格式验证，不能任意挑一个字符就认为不会再发生冲突。</p>
+<h2>留下来的排查思路</h2>
+<p>这次经历里，最有用的是逐步缩小问题的过程：先对比正常与异常数据，再从显示差异找到不可见字符，最后进入解析器的状态转换逻辑。错误信息指向类型转换，原因却藏在更早的数据解析阶段。</p>
+<p class="article-reference">原文涉及源码：<a href="https://github.com/apache/sqoop/tree/branch-1.4.7" target="_blank" rel="noopener noreferrer">Apache Sqoop · branch-1.4.7 ↗</a></p>
+</article><aside class="article-notice"><strong>关于这篇旧文</strong><p>日期沿用原博客。本文保留当时的实践过程，整理了结构并补充适用范围说明，移除了具体环境信息和外部截图。原题：sqoop1.4.7从hive同步至mysql的特殊字符错误解决。文中的示例不代表已经按当前环境重新验证。</p></aside><nav class="article-related" aria-label="更多文章"><h2>继续阅读</h2><a href="/writing/spark-remote-service/">从依赖冲突到服务拆分：一次 Spark 集成实践 →</a><a href="/writing/linux-mining-process/">一次伪装成 sshd 的挖矿进程排查 →</a><a href="/writing/">全部文章 →</a></nav></main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>保持好奇，持续探索。</span><a href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer></body></html>

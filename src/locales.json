@@ -86,7 +86,11 @@
     "film_forrest_text": "时代不断变迁，真诚与坚持始终相伴。",
     "film_poster_label": "电影海报",
     "douban_list_label": "豆瓣 Top 250",
-    "film_credits": "经典片单选摘。海报来源：TMDB；电影及海报版权归各自权利人所有。"
+    "film_credits": "经典片单选摘。海报来源：TMDB；电影及海报版权归各自权利人所有。",
+    "writing_nav": "文章",
+    "writing_title": "文章与笔记",
+    "writing_all": "全部文章",
+    "writing_intro": "从旧博客整理的一些技术实践与问题排查记录，日期保留原始发表时间。"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -175,7 +179,11 @@
     "film_forrest_text": "An ordinary life moving through extraordinary times.",
     "film_poster_label": "film poster",
     "douban_list_label": "Douban Top 250",
-    "film_credits": "A selection of classics. Posters via TMDB; film and poster rights belong to their respective owners."
+    "film_credits": "A selection of classics. Posters via TMDB; film and poster rights belong to their respective owners.",
+    "writing_nav": "Writing",
+    "writing_title": "Writing & notes",
+    "writing_all": "All articles",
+    "writing_intro": "Technical notes and investigations from my earlier blog, with their original publication dates. Articles are in Chinese."
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -264,6 +272,10 @@
     "film_forrest_text": "移りゆく時代を、誠実に生きるひとりの人生。",
     "film_poster_label": "映画ポスター",
     "douban_list_label": "豆瓣 Top 250",
-    "film_credits": "名作リストからのセレクション。ポスター出典：TMDB。作品・画像の権利は各権利者に帰属します。"
+    "film_credits": "名作リストからのセレクション。ポスター出典：TMDB。作品・画像の権利は各権利者に帰属します。",
+    "writing_nav": "記事",
+    "writing_title": "記事とノート",
+    "writing_all": "すべての記事",
+    "writing_intro": "以前のブログから整理した技術実践と問題調査の記録。初公開の日付を残しています。記事本文は中国語です。"
   }
 }

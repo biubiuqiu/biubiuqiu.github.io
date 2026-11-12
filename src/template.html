@@ -17,7 +17,8 @@
     <meta property="og:url" content="{{canonical}}">
     <link rel="icon" href="{{asset_prefix}}favicon.svg" type="image/svg+xml">
     <script>{{theme_bootstrap}}</script>
-    <link rel="stylesheet" href="{{asset_prefix}}styles.css?v=14">
+    <link rel="stylesheet" href="{{asset_prefix}}styles.css?v=15">
+    <link rel="stylesheet" href="{{asset_prefix}}writing.css?v=1">
     <script src="{{asset_prefix}}theme.js?v=6" defer></script>
       <script src="{{asset_prefix}}gallery.js?v=2" defer></script>
   </head>
@@ -28,7 +29,7 @@
       <header class="site-header page-width">
         <a class="brand" href="./" aria-label="{{home_label}}"><span class="icon icon-square brand-mark" aria-hidden="true"></span>Denis Wen</a>
         <div class="header-actions">
-          <nav aria-label="{{navigation_label}}"><a href="#hiking">{{nav_hiking}}</a><a href="#interests">{{nav_interests}}</a><a href="#projects">Lester</a><a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
+          <nav aria-label="{{navigation_label}}"><a href="#hiking">{{nav_hiking}}</a><a href="#interests">{{nav_interests}}</a><a href="#writing">{{writing_nav}}</a><a href="#projects">Lester</a><a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
           <div class="header-controls">
 {{locale_menu}}
 {{theme_menu}}
@@ -57,6 +58,7 @@
           </div><p>{{games_p1}}</p><dl class="game-notes"><div><dt>{{rdr_title}}</dt><dd>{{rdr_text}}</dd></div><div><dt>{{gtav_title}}</dt><dd>{{gtav_text}}</dd></div><div><dt>{{gtavi_title}}</dt><dd>{{gtavi_text}}</dd></div><div><dt>{{tlou_title}}</dt><dd>{{tlou_text}}</dd></div></dl><p class="media-credits">{{game_credits}} <a href="{{asset_prefix}}assets/interests/SOURCES.md">{{official_link}}<span class="icon icon-arrow" aria-hidden="true"></span></a></p></section>
         </div>
       </section>
+<section class="writing-section" id="writing" aria-labelledby="writing-title"><div class="writing-section-heading"><h2 class="accent-title" id="writing-title">{{writing_title}}</h2><a class="writing-all" href="/writing/">{{writing_all}} ↗</a></div><p class="writing-section-intro">{{writing_intro}}</p>{{featured_writing}}</section>
       <div class="notes-spread">
         <section class="agent interest-story" id="agent" aria-labelledby="agent-title"><h2 class="interest-title accent-title" id="agent-title" lang="en">AI Agent</h2><p>{{agent_p1}}</p><p>{{agent_p2}}</p><p>{{agent_p3}}</p></section>
         <section class="f1 interest-story" id="f1" aria-labelledby="f1-title"><h2 class="interest-title accent-title" id="f1-title" lang="en">F1</h2><p>{{f1_summary}}</p><figure class="f1-figure"><a class="media-photo" href="{{asset_prefix}}assets/interests/red-bull-track.webp" data-caption="{{f1_photo_caption}}"><img src="{{asset_prefix}}assets/interests/red-bull-track.webp" alt="{{f1_photo_alt}}" width="935" height="623" loading="lazy" decoding="async"></a><figcaption>Max Verstappen · RB21 · Bahrain (2025) <span aria-hidden="true">/</span> <a href="https://news.verstappen.com/en/article/5714" target="_blank" rel="noopener noreferrer">{{f1_photo_source}}</a></figcaption></figure><p>{{f1_p2}}</p><p>{{f1_p3}}</p></section>
@@ -70,3 +72,4 @@
     <footer class="site-footer page-width"><a class="footer-brand" href="./">Denis Wen</a><span>© 2026 · {{footer_note}}</span><a class="footer-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub<span class="icon icon-arrow" aria-hidden="true"></span></a></footer>
   </body>
 </html>
+

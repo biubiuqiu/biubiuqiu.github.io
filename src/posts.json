@@ -1,0 +1,32 @@
+[
+  {
+    "slug": "sqoop-null-character",
+    "title": "一个不可见字符，为什么让数据同步字段错位？",
+    "original_title": "sqoop1.4.7从hive同步至mysql的特殊字符错误解决",
+    "date": "2022-02-09",
+    "original_datetime": "2022-02-09T18:21:56",
+    "category": "问题排查",
+    "excerpt": "从二分定位问题数据，到追踪解析器状态机，记录一次 NUL 字符引起的同步异常。",
+    "context": "Sqoop 1.4.7 / Hive 2.1.1 · 历史实践记录"
+  },
+  {
+    "slug": "spark-remote-service",
+    "title": "从依赖冲突到服务拆分：一次 Spark 集成实践",
+    "original_title": "spark 远程调用方案",
+    "date": "2021-10-08",
+    "original_datetime": "2021-10-08T14:04:33",
+    "category": "工程实践",
+    "excerpt": "当 Spark 与既有依赖难以共处，尝试把计算能力独立成服务，用接口明确边界。",
+    "context": "Spark SQL / Hive Metastore · 历史实践记录"
+  },
+  {
+    "slug": "linux-mining-process",
+    "title": "一次伪装成 sshd 的挖矿进程排查",
+    "original_title": "Linux挖矿病毒记录",
+    "date": "2024-05-28",
+    "original_datetime": "2024-05-28T10:19:12",
+    "category": "系统排查",
+    "excerpt": "从异常 CPU 占用出发，沿着执行文件、定时任务和配置追踪进程的来源。",
+    "context": "Linux / 进程与定时任务 · 历史排查记录"
+  }
+]

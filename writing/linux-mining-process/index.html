@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff">
+<title>一次伪装成 sshd 的挖矿进程排查 — Denis Wen</title><meta name="description" content="从异常 CPU 占用出发，沿着执行文件、定时任务和配置追踪进程的来源。"><link rel="canonical" href="https://biubiuqiu.github.io/writing/linux-mining-process/"><meta property="og:type" content="article"><meta property="og:title" content="一次伪装成 sshd 的挖矿进程排查"><meta property="og:description" content="从异常 CPU 占用出发，沿着执行文件、定时任务和配置追踪进程的来源。"><meta property="og:url" content="https://biubiuqiu.github.io/writing/linux-mining-process/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=1"><script src="/theme.js?v=6" defer></script></head>
+<body class="writing-page"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><a href="/">首页 ↗</a>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外观" hidden>
+              <summary aria-label="外观" title="外观"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外观">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>跟随系统</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>浅色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>深色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header><main class="writing-width writing-main" id="main"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a></nav><header class="article-header"><p class="writing-eyebrow">系统排查 / 旧文整理</p><h1>一次伪装成 sshd 的挖矿进程排查</h1><p class="article-date">原文发表于 <time datetime="2024-05-28T10:19:12">2024-05-28</time><span> · Denis Wen</span></p><p class="article-context">Linux / 进程与定时任务 · 历史排查记录</p></header><article class="article-body"><p class="article-lead">在 top 里看到一个名为 sshd 的进程持续占用大量 CPU。从进程实际运行的文件开始，排查到了定时任务和挖矿配置。</p>
+<h2>入口：一个名字熟悉的异常进程</h2>
+<p>最初的异常来自 CPU 占用。进程名看起来像常见的 SSH 服务，但资源使用情况引起了注意。进程显示的名字不能说明它实际执行的文件来自哪里，于是继续查看文件与进程的关系。</p>
+<pre><code># 查看该进程打开的文件
+lsof -p &lt;PID&gt;
+
+# 查看进程实际执行的文件
+ls -l /proc/&lt;PID&gt;/exe</code></pre>
+<h2>继续查：是谁在重复启动它？</h2>
+<p>随后检查相关用户的定时任务：</p>
+<pre><code>crontab -l -u &lt;用户名&gt;</code></pre>
+<p>原文记录了两类可疑任务：一类每隔六小时尝试下载程序及配置文件，另一类每分钟尝试启动这个伪装成 <code>sshd</code> 的程序。程序放在临时目录中，任务通过文件锁控制重复执行。</p>
+<p>这些任务解释了一个重要现象：即使结束当前进程，后续调度也可能再次启动它。排查需要把执行文件和启动来源联系起来。</p>
+<h2>配置文件给出的线索</h2>
+<p>原文进一步查看了配置文件，发现它包含 CPU 计算配置、RandomX 相关选项以及矿池连接信息。结合异常占用和定时任务，判断这是一个挖矿程序。</p>
+<p>这里不保留恶意下载地址、矿池地址与原始任务命令。公开版本只保留定位过程，避免把可执行的恶意下载指令混入排查示例。</p>
+<h2>原文做到了哪里</h2>
+<p>原文最后记录了清理相关用户定时任务的操作，但没有记录完整的入侵入口调查、其他持久化项检查或恢复验证。因此，这篇文章是一段异常进程排查记录，不能据此认定系统已经完成全面清理。</p>
+<p>原文使用的删除操作会移除该用户的整份 crontab。重新整理时保留这个范围说明：实际处置前应先保留证据，区分正常任务与恶意条目，避免把正常业务任务一并删掉。</p>
+<h2>留下来的排查顺序</h2>
+<ol><li>从 CPU 异常确认需要调查的进程。</li><li>核对实际执行文件，避免只凭进程名判断。</li><li>查找反复拉起进程的调度来源。</li><li>结合配置与行为判断用途，并明确处置记录的边界。</li></ol>
+<p>这次记录提醒我：一个看起来熟悉的名字，也值得沿着文件路径和启动链路再往下追一层。</p>
+</article><aside class="article-notice"><strong>关于这篇旧文</strong><p>日期沿用原博客。本文保留当时的实践过程，整理了结构并补充适用范围说明，移除了具体环境信息和外部截图。原题：Linux挖矿病毒记录。文中的示例不代表已经按当前环境重新验证。</p></aside><nav class="article-related" aria-label="更多文章"><h2>继续阅读</h2><a href="/writing/sqoop-null-character/">一个不可见字符，为什么让数据同步字段错位？ →</a><a href="/writing/spark-remote-service/">从依赖冲突到服务拆分：一次 Spark 集成实践 →</a><a href="/writing/">全部文章 →</a></nav></main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>保持好奇，持续探索。</span><a href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer></body></html>

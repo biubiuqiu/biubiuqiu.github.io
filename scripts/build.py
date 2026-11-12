@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
+from writing import featured_writing, build_writing
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "https://biubiuqiu.github.io/"
@@ -16,7 +17,7 @@ LANGUAGES = {
     "ja": {"label": "日本語", "path": "ja", "og_locale": "ja_JP"},
 }
 TOKENS = re.compile(r"\{\{([a-z_0-9]+)\}\}")
-RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery"}
+RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery", "featured_writing"}
 SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale"}
 
 
@@ -109,6 +110,7 @@ def build() -> None:
             "locale_menu": menu_for(language, copy),
             "theme_menu": theme_menu_for(copy),
             "hiking_gallery": gallery_for(language, copy),
+            "featured_writing": featured_writing(ROOT, copy),
             "theme_bootstrap": (ROOT / "src" / "theme-init.js").read_text(encoding="utf-8"),
         }
         def substitute(match: re.Match[str]) -> str:
@@ -121,16 +123,21 @@ def build() -> None:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(page, encoding="utf-8")
         print(f"Built {output.relative_to(ROOT)} ({language})")
+    writing_routes = build_writing(ROOT, BASE_URL, theme_menu_for, translations["zh-CN"])
     namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
     ET.register_namespace("", namespace)
     sitemap = ET.Element(f"{{{namespace}}}urlset")
     for language in LANGUAGES:
         item = ET.SubElement(sitemap, f"{{{namespace}}}url")
         ET.SubElement(item, f"{{{namespace}}}loc").text = url_for(language)
+    for route in writing_routes:
+        item = ET.SubElement(sitemap, f"{{{namespace}}}url")
+        ET.SubElement(item, f"{{{namespace}}}loc").text = BASE_URL + route
     ET.ElementTree(sitemap).write(ROOT / "sitemap.xml", encoding="utf-8", xml_declaration=True)
 
 
 if __name__ == "__main__":
     build()
+
 
 
