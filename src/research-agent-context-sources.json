@@ -1,0 +1,67 @@
+{
+  "checked_at": "2026-11-13",
+  "pi_commit": "2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51",
+  "opencode_commit": "33aefad13c54cd0276e46eb862f67365bce8c770",
+  "sources": [
+    {
+      "id": 1,
+      "label": "Claude Code：工作原理与上下文边界",
+      "url": "https://code.claude.com/docs/en/how-claude-code-works"
+    },
+    {
+      "id": 2,
+      "label": "Claude Code：项目指令与 Auto memory",
+      "url": "https://code.claude.com/docs/en/memory"
+    },
+    {
+      "id": 3,
+      "label": "Claude Code：Prompt caching",
+      "url": "https://code.claude.com/docs/en/prompt-caching"
+    },
+    {
+      "id": 4,
+      "label": "Claude Code：Subagents 与 fork",
+      "url": "https://code.claude.com/docs/en/sub-agents"
+    },
+    {
+      "id": 5,
+      "label": "Pi：Compaction Reference（固定提交）",
+      "url": "https://github.com/earendil-works/pi/blob/2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51/packages/coding-agent/docs/compaction.md"
+    },
+    {
+      "id": 6,
+      "label": "Pi：compaction.ts（固定提交）",
+      "url": "https://github.com/earendil-works/pi/blob/2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51/packages/coding-agent/src/core/compaction/compaction.ts"
+    },
+    {
+      "id": 7,
+      "label": "Pi：session-manager.ts（固定提交）",
+      "url": "https://github.com/earendil-works/pi/blob/2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51/packages/coding-agent/src/core/session-manager.ts"
+    },
+    {
+      "id": 8,
+      "label": "OpenCode V2：Compaction 文档（固定提交）",
+      "url": "https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/services/site/src/docs/content/compaction.mdx"
+    },
+    {
+      "id": 9,
+      "label": "OpenCode V2：compaction.ts（固定提交）",
+      "url": "https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/packages/core/src/session/compaction.ts"
+    },
+    {
+      "id": 10,
+      "label": "OpenCode V2：context.ts（固定提交）",
+      "url": "https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/packages/core/src/session/context.ts"
+    },
+    {
+      "id": 11,
+      "label": "OpenCode V2：Compaction 配置定义",
+      "url": "https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/packages/schema/src/config/compaction.ts"
+    },
+    {
+      "id": 12,
+      "label": "Anthropic：Effective context engineering for AI agents",
+      "url": "https://www.anthropic.com/research/effective-context-engineering-for-ai-agents"
+    }
+  ]
+}

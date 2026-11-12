@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff">
+<title>Agent 如何在长任务里保持清醒：Claude Code、Pi 与 OpenCode 的上下文管理研究 — Denis Wen</title><meta name="description" content="从官方文档与固定源码快照出发，区分历史、上下文和记忆，推演可回放、有预算、能验证的上下文层。"><link rel="canonical" href="https://biubiuqiu.github.io/writing/agent-context-management/"><meta property="og:type" content="article"><meta property="og:title" content="Agent 如何在长任务里保持清醒：Claude Code、Pi 与 OpenCode 的上下文管理研究"><meta property="og:description" content="从官方文档与固定源码快照出发，区分历史、上下文和记忆，推演可回放、有预算、能验证的上下文层。"><meta property="og:url" content="https://biubiuqiu.github.io/writing/agent-context-management/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=3"><script src="/theme.js?v=6" defer></script></head>
+<body class="writing-page"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><a href="/">首页 ↗</a>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外观" hidden>
+              <summary aria-label="外观" title="外观"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外观">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>跟随系统</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>浅色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>深色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header><main class="writing-width writing-main" id="main"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a></nav><header class="article-header"><p class="writing-eyebrow">Agent 研究 / 文档与源码研究</p><h1>Agent 如何在长任务里保持清醒：Claude Code、Pi 与 OpenCode 的上下文管理研究</h1><p class="article-date">发表于 <time datetime="2026-11-13">2026-11-13</time><span> · Denis Wen</span></p><p class="article-context">文档与源码研究 · 含实现推演 · 2026-11-13 核验</p></header><article class="article-body"><p class="article-lead">同一个模型，为什么换一个 Agent 产品，长任务的表现就不一样？我更关心的差异，是它每一轮究竟让模型看见什么，以及它如何保证：省掉一段历史之后，任务仍然能接得住。</p>
+<aside class="research-scope"><strong>研究范围 · 2026-11-13</strong><p>Claude Code 依据官方公开文档讨论行为，不推断其未公开实现。Pi 与 OpenCode 同时阅读了固定提交的源码；OpenCode 以 V2 为准。下文分别标注“已证实”“分析”和“实现推演”。本文没有运行三款产品的统一性能测试，预算数字与伪代码是设计示例。</p></aside>
+<nav class="article-toc" aria-label="文章目录"><strong>阅读路径</strong><a href="#context-model">先分清四种状态</a><a href="#three-products">三款产品的实现差异</a><a href="#core-insights">值得借鉴的设计判断</a><a href="#implementation">一个可以落地的上下文层</a><a href="#evaluation">如何验证它真的有效</a><a href="#sources">研究来源与源码快照</a></nav>
+<h2 id="context-model">一、先分清：历史、上下文、记忆与运行环境</h2>
+<p><strong>我的分析：</strong>“Agent 记住了什么”至少包含四个不同问题。把它们合并成一个 messages 数组，很容易在恢复、切换模型和压缩时产生混乱。</p>
+<table><thead><tr><th>层次</th><th>负责保存什么</th><th>不能据此认定什么</th></tr></thead><tbody><tr><td>会话历史</td><td>用户消息、模型响应、工具调用与结果等事件</td><td>保存过，就意味着下一轮全部发送</td></tr><tr><td>当前上下文</td><td>本次模型请求实际包含的输入</td><td>没发送，就意味着原始内容被删除</td></tr><tr><td>长期记忆</td><td>跨会话有价值的偏好、事实与定位线索</td><td>所有历史都应被提升成长期事实</td></tr><tr><td>运行环境</td><td>文件、进程、工作目录及外部副作用</td><td>恢复聊天，就等于恢复文件和进程</td></tr></tbody></table>
+<p>例如，一次测试日志可以完整保存在历史里，当前请求只带失败结论和可定位引用；“这个项目用什么命令测试”可能适合项目指令；测试时生成的文件则属于工作区。它们的保存周期与恢复方法并不相同。</p>
+<p>因此，我把本轮输入理解为一个计算结果：<code>当前输入 = 指令 + 任务状态 + 被选中的历史 + 必要证据</code>。Anthropic 对 context engineering 的描述，同样强调每一轮都要整理有限窗口中的有效信息。<a class="source-ref" href="#source-12">[12]</a></p>
+<h2 id="three-products">二、三款产品分别把复杂度放在哪里？</h2>
+<p>先给出对照。这里比较的是可核实的机制，不能据此排出整体能力高低。</p>
+<table><thead><tr><th>产品与证据范围</th><th>压缩与续接</th><th>值得注意的边界</th></tr></thead><tbody><tr><td>Claude Code · 官方文档</td><td>自动或手动 compact；项目指令、按需加载与独立子任务上下文协作</td><td>公开行为不等于完整内部算法</td></tr><tr><td>Pi · 固定源码快照</td><td>结构化摘要、保留边界、会话树和上下文投影</td><td>原始记录与模型可见消息分开处理</td></tr><tr><td>OpenCode V2 · 固定源码快照</td><td>摘要加近期内容；可选后台预计算；区分自身摘要与 provider 原生压缩</td><td>V1 的 pruning 解释不能直接套到 V2</td></tr></tbody></table>
+<h3>2.1 Claude Code：先减少进入主上下文的信息</h3>
+<p><strong>已证实：</strong>官方文档明确描述了自动压缩和带重点的 <code>/compact</code>。它也从入口控制上下文：Skills 的完整内容按需加载，MCP 工具定义可经工具搜索延迟加载；子 Agent 的工具过程留在自己的上下文中，主会话接收结果摘要。<a class="source-ref" href="#source-1">[1]</a></p>
+<p>这意味着，压缩并非唯一调节手段。对大量搜索、日志分析这样的侧任务，把过程留在独立上下文，可以减少主任务反复携带的噪声。不过，子任务仍会花费自己的 token；fork 还会继承父上下文，不能把它理解成一个零成本的空白窗口。<a class="source-ref" href="#source-4">[4]</a></p>
+<p><strong>已证实：</strong>项目指令与 Auto memory 是另一条跨会话通道。官方文档描述了简短的 <code>MEMORY.md</code> 入口和按需读取的主题文件；在研究时点，入口加载上限是前 200 行或 25KB，以先到者为准。这是索引入口的边界，不是整个记忆目录的容量。<a class="source-ref" href="#source-2">[2]</a></p>
+<p><strong>我的分析：</strong>这里最值得借鉴的是分层：常驻规则负责约束，按需知识负责补充，当前摘要负责续接。若把三者全写进一份越来越长的“永久提示词”，只是把会话膨胀转移到了启动阶段。</p>
+<p>Claude Code 的精确摘要选择算法、每项内部阈值和所有回退分支，不能仅凭这些文档还原。更不能因为 Claude API 有某种 context management 能力，就认定 Claude Code 在所有路径都使用同一种实现。</p>
+<h3>2.2 Pi：把“下一轮能看见什么”做成可重建的投影</h3>
+<p><strong>已证实：</strong>Pi 的摘要记录包含 <code>summary</code>、<code>firstKeptEntryId</code>、<code>tokensBefore</code> 等字段。在所读快照中，默认预留量是 16,384 tokens，近期保留目标是 20,000 tokens；它们分别控制触发与保留，不是同一个“摘要长度”。切分时还要考虑工具调用与结果的完整性。<a class="source-ref" href="#source-5">[5]</a></p>
+<p>比默认数字更有意思的是结构。<code>session-manager.ts</code> 用 <code>id</code> 与 <code>parentId</code> 表达会话路径，由 <code>buildContextEntries()</code> 选择当前摘要与保留区间，再由 <code>buildSessionProjection()</code> 应用上下文编辑，最后形成模型消息。上下文编辑可以改变内容或省略某条记录，而原始条目仍可存在。<a class="source-ref" href="#source-7">[7]</a></p>
+<p><strong>我的分析：</strong>这给了上层产品一个清楚的设计方向：历史是事实记录，模型输入是基于事实记录生成的视图。分支、回放、压缩就不必都通过破坏性地改写一个数组完成。但能重建“当时发过什么”，仍不代表能重现模型的随机输出或撤销已发生的工具副作用。</p>
+<p><strong>已证实：</strong>Pi 的默认摘要围绕目标、约束、进度、决策、下一步与关键上下文组织。token 估计会利用最近可用的 usage，再估算其后的新增消息。摘要生成则先把对话序列化，构造专门的摘要请求；对不完整摘要和试图调用工具的摘要响应有校验。<a class="source-ref" href="#source-6">[6]</a></p>
+<p><strong>我的分析：</strong>“下一步做什么、为什么不能做另一个选择”，往往比“刚才调用了哪些工具”更接近任务的最小续接状态。摘要应该优化接手者的决策，而非聊天记录的覆盖率。</p>
+<h3>2.3 OpenCode V2：连压缩本身也进入调度</h3>
+<p><strong>已证实：</strong>当前 V2 文档描述的是摘要与近期内容共同续接，近期保留目标默认为约 15,000 tokens；<code>buffer</code> 管理预留空间。文档明确区分 V1 的 tail-turn / pruning 行为。保留的近期内容也不是所有数据逐字不动：长工具输出会被缩短，附件数据会变为简短描述。<a class="source-ref" href="#source-8">[8]</a> 配置定义也已使用 <code>auto</code>、<code>keep.tokens</code>、<code>buffer</code> 这些字段。<a class="source-ref" href="#source-11">[11]</a></p>
+<p><strong>已证实：</strong>源码让正常摘要请求尽可能沿用现有对话前缀，再附加摘要要求，以尝试复用 provider 的 prompt cache。实验性的后台路径会提前生成并暂存摘要，到真正需要压缩时再决定是否切入；若模型、指令或历史前缀等条件不再匹配，就不能简单复用。<a class="source-ref" href="#source-9">[9]</a></p>
+<p>此外，它区分自己生成的文本摘要与 provider 原生压缩。后者可能产生不透明检查点，其可迁移性受 provider 和模型限制。不能假设“压缩后切换模型”只需换一个 model 字段。<a class="source-ref" href="#source-8">[8]</a></p>
+<p><strong>我的分析：</strong>后台摘要真正难的部分，不是多开一次 LLM 请求，而是证明它在切入时仍然对应当前会话。它更像一个有版本条件的状态更新，而不是生成完一段文字就结束。</p>
+<h2 id="core-insights">三、我认为最重要的四个判断</h2>
+<h3>3.1 压缩目标应该是“能继续做对”，不是“摘要读起来完整”</h3>
+<p>设想用户要求修改支付回调，同时明确“不要改数据库结构”。随后 Agent 连续读文件、运行测试，积累了大量日志。一份摘要即使详细描述了测试过程，只要丢掉这条限制，就可能在下一轮把任务方向带偏。</p>
+<p><strong>我的推论：</strong>摘要至少应保住目标、用户限制、已验证事实、尚未证实的假设、已完成的外部动作、当前阻塞和下一步。文件中可以重新读取的细节适合缩成引用；用户已经排除的方案则未必能靠重新读代码找回来。</p>
+<h3>3.2 能再次读取的证据，应该有稳定地址和版本</h3>
+<p>“详细日志已省略”不足以支持续接。更有用的是：哪次运行、哪个工具调用、日志哪一段、对应哪个代码版本。否则，模型想补证据时，只能再跑一遍命令，而命令可能很贵、不可重复，或者会产生新的副作用。</p>
+<p>工作区文件也会变化。一个文件路径定位的是当前内容；原始工具输出或带哈希的快照，才能定位当时观察到的内容。两者都需要，并应明确区分。</p>
+<h3>3.3 Prompt cache 是成本机制，不是语义记忆</h3>
+<p><strong>已证实：</strong>Claude Code 文档将压缩后的对话层缓存变化，与系统提示和项目上下文层分开说明。压缩会改变历史前缀，但其他稳定层仍可能复用缓存。<a class="source-ref" href="#source-3">[3]</a> OpenCode 的上下文组装代码也刻意把更共享、更稳定的指令放到前面。<a class="source-ref" href="#source-10">[10]</a></p>
+<p><strong>我的推论：</strong>每轮少发一点，并不必然更便宜。频繁改写早期内容，可能让后续大段前缀重新计算。反过来，缓存命中高也不代表模型“记住得好”：被缓存的输入照样占窗口，也可能带来无关信息。应分别看输入规模、缓存成本与任务质量。</p>
+<h3>3.4 压缩不能制造新的授权</h3>
+<p>研究日志、网页和仓库文件时，工具结果可能包含指令式文字。如果摘要把“某网页声称可以执行”改写成“用户已允许执行”，信息就跨越了信任边界。</p>
+<p><strong>我的设计判断：</strong>用户指令、工具观察、模型假设应带不同来源。授权必须由原始用户事件或产品权限状态证明，不能靠摘要中的一句话成立。把内容压短，不应把它的身份也压没。</p>
+<h2 id="implementation">四、实现推演：为自己的 Agent 做一个上下文层</h2>
+<p><strong>以下是我的方案推演，不是对三款产品内部实现的描述。</strong>我会先建立可回放的数据结构，再加摘要能力。</p>
+<h3>4.1 保留事件，单独编译本轮输入</h3>
+<p>会话事件只追加，较大的工具输出放在持久化工件里，事件保存引用。单独的上下文编译器，根据当前分支、任务状态、证据与预算生成请求。它可以省略内容，却不应偷偷销毁原始记录。</p>
+<pre><code>// 设计示例，不对应任何产品的现有接口
+SessionEvent {
+  event_id, session_id, branch_id, parent_id,
+  role, kind, content_ref, tool_call_id,
+  provenance, created_at
+}
+
+ContextCheckpoint {
+  checkpoint_id, base_event_id, source_event_ids,
+  summary_ref, retained_from_event_id,
+  model_key, instructions_hash, projection_version
+}</code></pre>
+<p>这里的 checkpoint 只描述会话上下文。文件系统检查点、进程恢复与外部 API 的执行记录需要各自的机制，不能由这张表替代。原始事件的保留也应遵守产品的数据删除和租户隔离规则，而不是无限制永久保存。</p>
+<h3>4.2 工具交换按完整单元处理</h3>
+<p>不能只按消息条数粗暴截断。一次 assistant tool call 和对应的结果需要共同参与边界判断；并行工具还可能有多个结果。若必须缩短结果，要保留工具 ID、状态、关键证据与取回方式，并让适配器保证 provider 所要求的消息结构合法。</p>
+<p>超大输出可以先持久化，再发送有范围的片段。编译器必须知道“截断了什么”；模型也应看到省略标记，而不是把不完整片段误认为全量结果。</p>
+<h3>4.3 预算由整次请求决定</h3>
+<p>我会分别计入固定指令与工具定义、任务状态、近期消息、检索证据，并为输出、工具增长和估算误差留空间。具体模型可能同时限制输入、输出和总窗口，适配层必须分别检查。</p>
+<pre><code>输入预算 = 模型可用窗口 - 本次输出预留 - 安全余量
+可裁剪历史预算 = 输入预算 - 固定指令 - 任务状态 - 近期内容 - 必要证据</code></pre>
+<p>例如在一个假设的 128k 总窗口里，先为输出与余量留 24k，输入目标不超过 104k。再给固定内容 12k、近期内容 24k、状态摘要 8k、证据 16k，剩余约 44k 才可分配给其他历史。这只是预算演示，不是推荐阈值或实测结果。</p>
+<p>若固定内容已经过大，应减少常驻工具和指令；继续摘要剩下的一小段聊天，不会解决根因。若一次工具返回就足以越界，控制点还必须前移到工具输出进入下一轮之前。</p>
+<h3>4.4 工具结果可以有三种可见状态</h3>
+<table><thead><tr><th>状态</th><th>本轮携带</th><th>适合场景</th></tr></thead><tbody><tr><td>FULL</td><td>原始或有范围的完整内容</td><td>当前正在推理、需要精确比对</td></tr><tr><td>REFERENCE</td><td>事实摘要、来源 ID、版本与取回入口</td><td>信息仍有价值，但不必常驻全文</td></tr><tr><td>OMITTED</td><td>不参与本轮输入，历史仍按保留策略存储</td><td>重复输出、已结束的探索支线</td></tr></tbody></table>
+<p>我更愿意先实现可解释的规则：保护未解决错误、最近一次验证、仍未完成的工具交换；重复的大文件读取降为引用。等有了评测数据，再考虑让模型参与决定淘汰顺序。</p>
+<p>“最近十次工具调用”可以作为保护规则之一，却不能作为全部策略。十次大日志可能仍然超窗，而更早的一条用户限制反而最重要。</p>
+<h3>4.5 后台摘要用版本校验切入</h3>
+<p>假设后台摘要只覆盖到事件 E100，它运行期间会话又产生了 E101 到 E108。正确的切入结果应保留这些新增事件；如果用户已经切换分支、修改目标或换了模型，原来的摘要还未必可以用。</p>
+<pre><code>snapshot = capture(branch, prefix_end, instructions_hash, model_key)
+candidate = summarize(snapshot.events)
+
+at_next_safe_boundary:
+  if prefix_still_matches(snapshot) and policy_still_matches(snapshot):
+    atomically_append_checkpoint(candidate, base=snapshot.prefix_end)
+    keep_all_events_after(snapshot.prefix_end)
+  else:
+    discard_or_recompute(candidate)</code></pre>
+<p>“安全边界”也要有定义：本设计会等待当前工具批次结算，并在请求编译前检查。候选摘要失败或不完整时，不覆盖旧检查点；持久化完成后再切换视图。这里需要版本号或比较并交换，而不是让两个异步任务同时改 messages。</p>
+<h3>4.6 提供有上限的失败恢复</h3>
+<p>如果压缩后下一轮仍超窗，我会先判断增长来自哪里：固定指令、单个附件，还是工具结果。恢复尝试必须有上限，并校验缩减前后的实际预算。不断“压缩—重发同一个超大输入”，只是把失败变成昂贵的循环。</p>
+<p>如果摘要不可用，但原始历史还在，可以回到上一个有效检查点，重新选择保留区间。跨模型时则重建可移植的文本投影；provider 不透明检查点不能被当作通用会话格式。</p>
+<h2 id="evaluation">五、如何验证它真的有效？</h2>
+<p><strong>以下是待执行的评测方案，本文没有宣称测出了产品排名。</strong>我会准备一组能反复回放的任务，分别比较全量历史、按预算截断、摘要加近期内容、引用化证据与状态检查点几种策略。模型、工具环境和任务输入保持一致。</p>
+<table><thead><tr><th>测试场景</th><th>重点检查</th></tr></thead><tbody><tr><td>用户中途改变要求</td><td>新约束是否覆盖旧决策，旧目标是否继续被执行</td></tr><tr><td>连续三次以上压缩</td><td>未解决问题、被排除方案、来源引用是否逐轮漂移</td></tr><tr><td>长日志与并行工具</td><td>调用结果配对、失败信息保留、超窗恢复是否有界</td></tr><tr><td>切分支、换模型、重启</td><td>会话视图、工作区状态与检查点是否明确对应</td></tr><tr><td>工具结果夹带指令</td><td>是否把外部文字升级成用户要求或授权</td></tr><tr><td>已提交或已发布的任务</td><td>是否遗忘动作状态而重复执行有副作用的操作</td></tr></tbody></table>
+<p>记录任务成功率、关键约束保留率、证据取回成功率、重复工具调用、压缩等待时长，以及整个任务的 token 与费用。缓存命中率和摘要压缩比只是辅助指标；如果压缩更狠，却让 Agent 多绕了十轮，整体收益可能为负。</p>
+<p>我还会保存“压缩前输入、摘要候选、切入后的实际请求、下一步动作”这四份产物。只有这样，才能分清一次失败究竟来自摘要遗漏、检索失败、消息结构错误，还是模型在已有证据下做错了判断。</p>
+<h2>六、最后的判断</h2>
+<p>Claude Code 让我更关注进入上下文之前的分层与隔离；Pi 让我看到会话投影如何成为独立的数据结构；OpenCode V2 则把缓存、后台预计算、provider 差异与安全切入放进同一套生命周期里。</p>
+<p>如果从零做一个 Agent，我会优先把事件记录、证据引用、任务状态和请求编译器做好，再加可验证的摘要与恢复。让系统始终能回答三个问题：<strong>这轮模型看到了什么？哪些结论来自哪里？下一步为什么还成立？</strong></p>
+<p>长上下文能延后压缩，但更可靠的长任务，需要的是在信息越来越多时，仍能保住目标、边界和证据的能力。</p>
+<section class="research-sources" id="sources"><h2>研究来源与源码快照</h2><p>检索日期：2026-11-13。官方文档可能持续更新；开源实现使用下列固定提交。未做横向性能实测，文中的实现方案与评测矩阵属于推演。</p><ol><li id="source-1"><a href="https://code.claude.com/docs/en/how-claude-code-works" target="_blank" rel="noopener noreferrer">Claude Code：工作原理与上下文边界 ↗</a></li><li id="source-2"><a href="https://code.claude.com/docs/en/memory" target="_blank" rel="noopener noreferrer">Claude Code：项目指令与 Auto memory ↗</a></li><li id="source-3"><a href="https://code.claude.com/docs/en/prompt-caching" target="_blank" rel="noopener noreferrer">Claude Code：Prompt caching ↗</a></li><li id="source-4"><a href="https://code.claude.com/docs/en/sub-agents" target="_blank" rel="noopener noreferrer">Claude Code：Subagents 与 fork ↗</a></li><li id="source-5"><a href="https://github.com/earendil-works/pi/blob/2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51/packages/coding-agent/docs/compaction.md" target="_blank" rel="noopener noreferrer">Pi：Compaction Reference（固定提交） ↗</a></li><li id="source-6"><a href="https://github.com/earendil-works/pi/blob/2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51/packages/coding-agent/src/core/compaction/compaction.ts" target="_blank" rel="noopener noreferrer">Pi：compaction.ts（固定提交） ↗</a></li><li id="source-7"><a href="https://github.com/earendil-works/pi/blob/2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51/packages/coding-agent/src/core/session-manager.ts" target="_blank" rel="noopener noreferrer">Pi：session-manager.ts（固定提交） ↗</a></li><li id="source-8"><a href="https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/services/site/src/docs/content/compaction.mdx" target="_blank" rel="noopener noreferrer">OpenCode V2：Compaction 文档（固定提交） ↗</a></li><li id="source-9"><a href="https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/packages/core/src/session/compaction.ts" target="_blank" rel="noopener noreferrer">OpenCode V2：compaction.ts（固定提交） ↗</a></li><li id="source-10"><a href="https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/packages/core/src/session/context.ts" target="_blank" rel="noopener noreferrer">OpenCode V2：context.ts（固定提交） ↗</a></li><li id="source-11"><a href="https://github.com/anomalyco/opencode/blob/33aefad13c54cd0276e46eb862f67365bce8c770/packages/schema/src/config/compaction.ts" target="_blank" rel="noopener noreferrer">OpenCode V2：Compaction 配置定义 ↗</a></li><li id="source-12"><a href="https://www.anthropic.com/research/effective-context-engineering-for-ai-agents" target="_blank" rel="noopener noreferrer">Anthropic：Effective context engineering for AI agents ↗</a></li></ol><p>Pi：<code>2443c687e3fbc53af7b3a8ab8dc21a170cdf0d51</code><br>OpenCode：<code>33aefad13c54cd0276e46eb862f67365bce8c770</code></p></section>
+</article><nav class="article-related" aria-label="更多文章"><h2>继续阅读</h2><a href="/writing/sqoop-null-character/">一个不可见字符，为什么让数据同步字段错位？ →</a><a href="/writing/spark-remote-service/">从依赖冲突到服务拆分：一次 Spark 集成实践 →</a><a href="/writing/linux-mining-process/">一次伪装成 sshd 的挖矿进程排查 →</a><a href="/writing/">全部文章 →</a></nav></main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>保持好奇，持续探索。</span><a href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer></body></html>

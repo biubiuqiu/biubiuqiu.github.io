@@ -90,7 +90,7 @@
     "writing_nav": "文章",
     "writing_title": "文章与笔记",
     "writing_all": "全部文章",
-    "writing_intro": "从旧博客整理的一些技术实践与问题排查记录，日期保留原始发表时间。"
+    "writing_intro": "记录 Agent 研究、技术实践与问题排查。旧文保留原始发表日期。"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -183,7 +183,7 @@
     "writing_nav": "Writing",
     "writing_title": "Writing & notes",
     "writing_all": "All articles",
-    "writing_intro": "Technical notes and investigations from my earlier blog, with their original publication dates. Articles are in Chinese."
+    "writing_intro": "Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates. Articles are in Chinese."
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -276,6 +276,6 @@
     "writing_nav": "記事",
     "writing_title": "記事とノート",
     "writing_all": "すべての記事",
-    "writing_intro": "以前のブログから整理した技術実践と問題調査の記録。初公開の日付を残しています。記事本文は中国語です。"
+    "writing_intro": "Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。本文は中国語です。"
   }
 }

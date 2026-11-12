@@ -1,5 +1,16 @@
 [
   {
+    "slug": "agent-context-management",
+    "title": "Agent 如何在长任务里保持清醒：Claude Code、Pi 与 OpenCode 的上下文管理研究",
+    "original_title": "Agent 如何在长任务里保持清醒：Claude Code、Pi 与 OpenCode 的上下文管理研究",
+    "date": "2026-11-13",
+    "original_datetime": "2026-11-13",
+    "kind": "research",
+    "category": "Agent 研究",
+    "excerpt": "从官方文档与固定源码快照出发，区分历史、上下文和记忆，推演可回放、有预算、能验证的上下文层。",
+    "context": "文档与源码研究 · 含实现推演 · 2026-11-13 核验"
+  },
+  {
     "slug": "sqoop-null-character",
     "title": "一个不可见字符，为什么让数据同步字段错位？",
     "original_title": "sqoop1.4.7从hive同步至mysql的特殊字符错误解决",
