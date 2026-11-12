@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark light">
-    <meta name="theme-color" content="#242326">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#ffffff">
     <title>Denis Wen — Lester、AI Agent 与山野</title>
     <meta name="description" content="Denis Wen 的个人主页：AI Agent、正在做的项目 Lester、高原徒步、电影、游戏与 F1。">
     <link rel="canonical" href="https://biubiuqiu.github.io/">
@@ -21,7 +21,7 @@
     <meta property="og:url" content="https://biubiuqiu.github.io/">
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
     <script>(function () {
-  var preference = "dark";
+  var preference = "light";
   try {
     var stored = localStorage.getItem("denis-theme");
     if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
@@ -33,26 +33,23 @@
   root.dataset.theme = theme;
   root.dataset.themePreference = preference;
   root.style.colorScheme = theme;
-  var color = theme === "dark" ? "#242326" : "#f6f3ef";
+  var color = theme === "dark" ? "#181c20" : "#ffffff";
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
 })();
 
 </script>
-    <link rel="stylesheet" href="./styles.css?v=10">
-    <script src="./theme.js?v=5" defer></script>
+    <link rel="stylesheet" href="./styles.css?v=11">
+    <script src="./theme.js?v=6" defer></script>
       <script src="./gallery.js?v=2" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到正文</a>
-    <div class="page-shell">
-      <header class="site-header">
+    <div class="cover">
+      <img class="cover-photo" src="./assets/hiking/cover.webp" alt="" width="1536" height="745" fetchpriority="high">
+      <header class="site-header page-width">
         <a class="brand" href="./" aria-label="Denis Wen 首页"><span class="icon icon-square brand-mark" aria-hidden="true"></span>Denis Wen</a>
         <div class="header-actions">
-          <nav aria-label="主导航">
-            <a href="#projects">项目</a>
-            <a href="#interests">兴趣</a>
-            <a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub<span class="icon icon-arrow" aria-hidden="true"></span></a>
-          </nav>
+          <nav aria-label="主导航"><a href="#hiking">山野</a><a href="#interests">兴趣</a><a href="#projects">Lester</a><a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
           <div class="header-controls">
           <details class="language-switcher">
             <summary aria-label="语言: 中文"><span>中文</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
@@ -73,67 +70,50 @@
           </div>
         </div>
       </header>
-      <main id="main">
-        <section class="hero" aria-labelledby="intro-title">
-          <h1 id="intro-title">保持好奇，持续探索。</h1>
-          <p class="intro">你好，我是 Denis。<br>探索 AI Agent，也把时间留给山野、电影、游戏和 F1。</p>
-          <a class="button" href="#projects">认识 Lester<span class="icon icon-arrow" aria-hidden="true"></span></a>
-        </section>
-        <section class="project" id="projects" aria-labelledby="project-title">
-          <p class="project-kicker">正在做的项目 / 01</p>
-          <div class="project-identity"><h2 id="project-title" lang="en">Lester</h2><p lang="en">OPEN SOURCE</p></div>
-          <div class="project-detail">
-            <p>Lester 是我正在做的开源 AI Agent 工作空间，可以自己部署，通过对话处理任务、文件与代码。</p><p class="project-name-story">名字来自《GTA V》里的幕后高手 Lester Crest。希望它也能冷静、机敏地理解目标、找到办法，把事情做出来。</p>
-            <div class="project-links">
-              <a class="text-link" href="https://github.com/biubiuqiu/lester-agent" target="_blank" rel="noopener noreferrer">查看源码<span class="icon icon-arrow" aria-hidden="true"></span></a>
-            </div>
-          </div>
-        </section>
-        <section class="interests" id="interests" aria-labelledby="interests-title">
-          <h2 class="sr-only" id="interests-title">让我保持好奇的事</h2>
-          <details class="interest-story" id="agent" open>
-            <summary><span class="interest-title" lang="en">AI Agent</span><span class="interest-summary">探索人与 Agent 的协作方式。</span><span class="icon icon-caret disclosure-icon" aria-hidden="true"></span></summary>
-            <div class="interest-copy"><p>我喜欢体验新的 Agent 产品，也喜欢拆开看它们如何工作。</p><p>从对话方式、工具使用，到上下文、记忆和执行环境，我关心这些设计最终会怎样影响使用体验：Agent 能理解多少背景？任务中断后能否继续？人应该在什么时候参与判断？</p><p>我会不断追问：一个新功能解决了什么问题，又让哪些原本困难的事情变得容易了？喜欢动手尝试，也喜欢在尝试中慢慢形成自己的判断。</p></div>
-          </details>
-          <details class="interest-story" id="hiking" open>
-            <summary><span class="interest-title">高原徒步</span><span class="interest-summary">从虎跳峡出发，走近山野。</span><span class="icon icon-caret disclosure-icon" aria-hidden="true"></span></summary>
-            <div class="interest-copy"><p>比起喧闹的景区，我更喜欢近距离接触山野。沿着山路走进去，看山峰、峡谷、森林和云雾，而不只是站在观景台上远远看一眼。这也是我喜欢上徒步的原因。</p><p>我的第一条徒步路线是虎跳峡。后来走过梅里北坡、阿布吉措、哈巴西坡，也走过麦理浩径。现在尤其喜欢高原徒步，想用脚步慢慢接近那些山间的风景。</p> <section class="hiking-gallery" id="hiking-photos" aria-label="沿途所见">
-<p class="gallery-heading">沿途所见</p><p class="gallery-hint">点击照片查看大图</p><div class="photo-grid">
-<a class="photo-link" href="./assets/hiking/img_2146.webp" data-caption="云间雪峰与冰川"><figure><img src="./assets/hiking/img_2146.webp" alt="云间雪峰与冰川" width="1200" height="582" loading="lazy" decoding="async"><figcaption>云间雪峰与冰川</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/img_1931.webp" data-caption="日照雪山"><figure><img src="./assets/hiking/img_1931.webp" alt="日照雪山" width="1200" height="900" loading="lazy" decoding="async"><figcaption>日照雪山</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/dsc02281.webp" data-caption="山间建筑与冰川"><figure><img src="./assets/hiking/dsc02281.webp" alt="山间建筑与冰川" width="1200" height="800" loading="lazy" decoding="async"><figcaption>山间建筑与冰川</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/dsc02288.webp" data-caption="云雾与山涧"><figure><img src="./assets/hiking/dsc02288.webp" alt="云雾与山涧" width="1200" height="800" loading="lazy" decoding="async"><figcaption>云雾与山涧</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/dsc00891.webp" data-caption="层叠的山脊"><figure><img src="./assets/hiking/dsc00891.webp" alt="层叠的山脊" width="1200" height="800" loading="lazy" decoding="async"><figcaption>层叠的山脊</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/dsc01901.webp" data-caption="林线上的山路"><figure><img src="./assets/hiking/dsc01901.webp" alt="林线上的山路" width="1200" height="800" loading="lazy" decoding="async"><figcaption>林线上的山路</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/dsc02645.webp" data-caption="山海之间"><figure><img src="./assets/hiking/dsc02645.webp" alt="山海之间" width="1200" height="800" loading="lazy" decoding="async"><figcaption>山海之间</figcaption></figure></a>
-<a class="photo-link" href="./assets/hiking/img_1209.webp" data-caption="高原山谷全景"><figure><img src="./assets/hiking/img_1209.webp" alt="高原山谷全景" width="1200" height="448" loading="lazy" decoding="async"><figcaption>高原山谷全景</figcaption></figure></a>
-</div></section><p class="route-label">走过的路线</p><ul class="route-list" aria-label="走过的路线"><li>梅里北坡</li><li>虎跳峡</li><li>阿布吉措</li><li>哈巴西坡</li><li>麦理浩径</li></ul></div>
-          </details>
-          <details class="interest-story" id="f1" open>
-            <summary><span class="interest-title" lang="en">F1</span><span class="interest-summary">关注红牛车队和 Max Verstappen。</span><span class="icon icon-caret disclosure-icon" aria-hidden="true"></span></summary>
-            <div class="interest-copy"><p>会期待 Max 的精彩表现，也喜欢琢磨比赛里的细节：赛车在不同赛道的竞争力、轮胎策略、进站时机，以及天气变化带来的机会。</p><p>从排位赛到正赛，享受速度、判断与不确定性交织的过程。</p></div>
-          </details>
-          <details class="interest-story" id="movies" open>
-            <summary><span class="interest-title">电影</span><span class="interest-summary">留一段时间，走进另一个故事。</span><span class="icon icon-caret disclosure-icon" aria-hidden="true"></span></summary>
-            <div class="interest-copy"><p>看电影也是我的日常爱好。给自己留一段完整的时间，跟着银幕里的故事走一会儿。</p><figure class="cinema-figure"><a class="media-photo" href="./assets/interests/cinema.webp" data-caption="灯光暗下，故事开始。 · AI 生成氛围图"><img src="./assets/interests/cinema.webp" alt="暖色灯光下的空影院与银幕" width="1200" height="675" loading="lazy" decoding="async"></a><figcaption>灯光暗下，故事开始。 · AI 生成氛围图</figcaption></figure></div>
-          </details>
-          <details class="interest-story" id="games" open>
-            <summary><span class="interest-title">游戏</span><span class="interest-summary">喜欢 R 星的开放世界，也喜欢《最后生还者》1 和 2。</span><span class="icon icon-caret disclosure-icon" aria-hidden="true"></span></summary>
-            <div class="interest-copy"><p>喜欢的游戏里，有 R 星的《荒野大镖客》和 GTA 系列，也有《最后生还者》1 和 2。从西部荒野到城市街头，再到末世旅途，是几种不同的世界与故事。</p><div class="game-grid">
-              <article class="game-entry"><a class="media-photo" href="./assets/interests/rdr.webp" data-caption="《荒野大镖客 2》官方游戏画面"><img src="./assets/interests/rdr.webp" alt="《荒野大镖客 2》官方游戏画面" width="960" height="540" loading="lazy" decoding="async"></a><h3>荒野大镖客</h3><p>西部、荒野与时代的变迁。骑马穿过山谷与小镇，开放世界之外，还有人与人之间的故事。</p><a class="game-source" href="https://www.playstation.com/en-us/games/red-dead-redemption-2/" target="_blank" rel="noopener noreferrer">官方介绍与图片来源<span aria-hidden="true"> ↗</span></a></article>
-              <article class="game-entry"><a class="media-photo" href="./assets/interests/gtav.webp" data-caption="GTA V 官方游戏画面"><img src="./assets/interests/gtav.webp" alt="GTA V 官方游戏画面" width="960" height="540" loading="lazy" decoding="async"></a><h3>GTA V</h3><p>洛圣都的城市街头、三位主角交织的故事，还有自由探索的开放世界。</p><a class="game-source" href="https://www.playstation.com/en-us/games/grand-theft-auto-v/" target="_blank" rel="noopener noreferrer">官方介绍与图片来源<span aria-hidden="true"> ↗</span></a></article>
-              <article class="game-entry"><a class="media-photo" href="./assets/interests/gtavi.webp" data-caption="GTA VI 官方宣传图"><img src="./assets/interests/gtavi.webp" alt="GTA VI 官方宣传图" width="960" height="540" loading="lazy" decoding="async"></a><h3>GTA VI</h3><p>持续关注的系列新作：从罪恶都市到 Leonida，看看 R 星会如何构建下一个开放世界。</p><a class="game-source" href="https://www.rockstargames.com/VI/" target="_blank" rel="noopener noreferrer">官方介绍与图片来源<span aria-hidden="true"> ↗</span></a></article>
-              <article class="game-entry"><a class="media-photo" href="./assets/interests/tlou.webp" data-caption="《最后生还者 Part I》官方游戏画面"><img src="./assets/interests/tlou.webp" alt="《最后生还者 Part I》官方游戏画面" width="960" height="540" loading="lazy" decoding="async"></a><h3>最后生还者 1 &amp; 2</h3><p>《最后生还者》1 和 2 都是我喜欢的作品。从第一部到第二部，末世中的生存、人与人之间的关系与艰难选择，始终贯穿故事。</p><a class="game-source" href="https://www.playstation.com/en-us/games/the-last-of-us-part-i/" target="_blank" rel="noopener noreferrer">官方介绍与图片来源<span aria-hidden="true"> ↗</span></a></article>
-            </div><p class="media-credits">游戏配图来自官方宣传素材；图片及相关作品版权归各自权利人所有。</p></div>
-          </details>
-        </section>
-      </main>
+      <section class="hero page-width" aria-labelledby="intro-title"><h1 id="intro-title">保持好奇，持续探索。</h1><p class="intro">你好，我是 Denis。<br>探索 AI Agent，也把时间留给山野、电影、游戏和 F1。</p></section>
+    </div>
+    <main class="page-width" id="main">
+      <div class="journal-spread">
+        <aside class="profile-column" aria-labelledby="about-title">
+          <section class="about"><h2 class="accent-title" id="about-title">关于我</h2><p>你好，我是 Denis。</p><p>喜欢探索 AI Agent 的可能性，也喜欢在山野中行走，看看更广阔的世界。</p></section>
+          <section class="project" id="projects" aria-labelledby="project-title"><h2 id="project-title" lang="en">Lester</h2><p>Lester 是我正在做的开源 AI Agent 工作空间，可以自己部署，通过对话处理任务、文件与代码。</p><p class="project-name-story">名字来自《GTA V》里的幕后高手 Lester Crest。希望它也能冷静、机敏地理解目标、找到办法，把事情做出来。</p><a class="text-link" href="https://github.com/biubiuqiu/lester-agent" target="_blank" rel="noopener noreferrer">查看源码<span class="icon icon-arrow" aria-hidden="true"></span></a></section>
+        </aside>
+        <section class="hiking-story interest-story" id="hiking" aria-labelledby="hiking-title"><h2 class="interest-title" id="hiking-title">山野之间</h2><p class="hiking-intro">我的第一条徒步路线是虎跳峡。比起喧闹的景区，我更喜欢近距离接触山野，尤其喜欢高原徒步，沿着山路走近雪山、峡谷与森林。</p><section class="hiking-gallery" id="hiking-photos" aria-label="沿途所见">
+<p class="sr-only">点击照片查看大图</p>
+<a class="photo-link featured-photo" href="./assets/hiking/img_1931.webp" data-caption="日照雪山"><figure><img src="./assets/hiking/img_1931.webp" alt="日照雪山" width="1200" height="900" loading="lazy" decoding="async"><figcaption class="sr-only">日照雪山</figcaption></figure></a>
+<div class="photo-thumbnails">
+<a class="photo-link thumbnail-photo" href="./assets/hiking/img_2146.webp" data-caption="云间雪峰与冰川"><figure><img src="./assets/hiking/img_2146.webp" alt="云间雪峰与冰川" width="1200" height="582" loading="lazy" decoding="async"><figcaption class="sr-only">云间雪峰与冰川</figcaption></figure></a>
+<a class="photo-link thumbnail-photo" href="./assets/hiking/dsc02281.webp" data-caption="山间建筑与冰川"><figure><img src="./assets/hiking/dsc02281.webp" alt="山间建筑与冰川" width="1200" height="800" loading="lazy" decoding="async"><figcaption class="sr-only">山间建筑与冰川</figcaption></figure></a>
+<a class="photo-link thumbnail-photo" href="./assets/hiking/dsc02288.webp" data-caption="云雾与山涧"><figure><img src="./assets/hiking/dsc02288.webp" alt="云雾与山涧" width="1200" height="800" loading="lazy" decoding="async"><figcaption class="sr-only">云雾与山涧</figcaption></figure></a>
+<a class="photo-link thumbnail-photo" href="./assets/hiking/dsc00891.webp" data-caption="层叠的山脊"><figure><img src="./assets/hiking/dsc00891.webp" alt="层叠的山脊" width="1200" height="800" loading="lazy" decoding="async"><figcaption class="sr-only">层叠的山脊</figcaption></figure></a>
+<a class="photo-link thumbnail-photo" href="./assets/hiking/dsc01901.webp" data-caption="林线上的山路"><figure><img src="./assets/hiking/dsc01901.webp" alt="林线上的山路" width="1200" height="800" loading="lazy" decoding="async"><figcaption class="sr-only">林线上的山路</figcaption></figure></a>
+<a class="photo-link thumbnail-photo" href="./assets/hiking/dsc02645.webp" data-caption="山海之间"><figure><img src="./assets/hiking/dsc02645.webp" alt="山海之间" width="1200" height="800" loading="lazy" decoding="async"><figcaption class="sr-only">山海之间</figcaption></figure></a>
+<a class="photo-link thumbnail-photo" href="./assets/hiking/img_1209.webp" data-caption="高原山谷全景"><figure><img src="./assets/hiking/img_1209.webp" alt="高原山谷全景" width="1200" height="448" loading="lazy" decoding="async"><figcaption class="sr-only">高原山谷全景</figcaption></figure></a>
+</div>
+</section><ul class="route-list" aria-label="走过的路线"><li>梅里北坡</li><li>虎跳峡</li><li>阿布吉措</li><li>哈巴西坡</li><li>麦理浩径</li></ul></section>
+      </div>
+      <section class="leisure" id="interests" aria-labelledby="leisure-title"><h2 class="accent-title" id="leisure-title">生活里的其他热爱</h2>
+        <div class="leisure-spread">
+          <section class="movies interest-story" id="movies" aria-labelledby="movies-title"><h3 class="interest-title" id="movies-title">电影</h3><figure class="cinema-figure"><a class="media-photo" href="./assets/interests/cinema.webp" data-caption="灯光暗下，故事开始。 · AI 生成氛围图"><img src="./assets/interests/cinema.webp" alt="暖色灯光下的空影院与银幕" width="1200" height="675" loading="lazy" decoding="async"></a><figcaption>灯光暗下，故事开始。 · AI 生成氛围图</figcaption></figure><p>看电影也是我的日常爱好。给自己留一段完整的时间，跟着银幕里的故事走一会儿。</p></section>
+          <section class="games interest-story" id="games" aria-labelledby="games-title"><h3 class="interest-title" id="games-title">游戏</h3><div class="game-posters">
+            <a class="media-photo game-poster" href="./assets/interests/rdr-cover.webp" data-caption="《荒野大镖客 2》官方封面"><img src="./assets/interests/rdr-cover.webp" alt="《荒野大镖客 2》官方封面" width="480" height="720" loading="lazy" decoding="async"><span>荒野大镖客</span></a>
+            <a class="media-photo game-poster" href="./assets/interests/gtav-cover.webp" data-caption="GTA V 官方封面"><img src="./assets/interests/gtav-cover.webp" alt="GTA V 官方封面" width="480" height="720" loading="lazy" decoding="async"><span>GTA V</span></a>
+            <a class="media-photo game-poster" href="./assets/interests/gtavi-cover.webp" data-caption="GTA VI 官方宣传海报"><img src="./assets/interests/gtavi-cover.webp" alt="GTA VI 官方宣传海报" width="480" height="720" loading="lazy" decoding="async"><span>GTA VI</span></a>
+            <a class="media-photo game-poster" href="./assets/interests/tlou-cover.webp" data-caption="《最后生还者 Part I》官方封面"><img src="./assets/interests/tlou-cover.webp" alt="《最后生还者 Part I》官方封面" width="480" height="720" loading="lazy" decoding="async"><span>最后生还者 1</span></a>
+            <a class="media-photo game-poster" href="./assets/interests/tlou2-cover.webp" data-caption="《最后生还者 Part II Remastered》官方封面"><img src="./assets/interests/tlou2-cover.webp" alt="《最后生还者 Part II Remastered》官方封面" width="480" height="720" loading="lazy" decoding="async"><span>最后生还者 2</span></a>
+          </div><p>喜欢的游戏里，有 R 星的《荒野大镖客》和 GTA 系列，也有《最后生还者》1 和 2。从西部荒野到城市街头，再到末世旅途，是几种不同的世界与故事。</p><dl class="game-notes"><div><dt>荒野大镖客</dt><dd>西部、荒野与时代的变迁。骑马穿过山谷与小镇，开放世界之外，还有人与人之间的故事。</dd></div><div><dt>GTA V</dt><dd>洛圣都的城市街头、三位主角交织的故事，还有自由探索的开放世界。</dd></div><div><dt>GTA VI</dt><dd>持续关注的系列新作：从罪恶都市到 Leonida，看看 R 星会如何构建下一个开放世界。</dd></div><div><dt>最后生还者 1 &amp; 2</dt><dd>《最后生还者》1 和 2 都是我喜欢的作品。从第一部到第二部，末世中的生存、人与人之间的关系与艰难选择，始终贯穿故事。</dd></div></dl><p class="media-credits">游戏配图来自官方宣传素材；图片及相关作品版权归各自权利人所有。 <a href="./assets/interests/SOURCES.md">官方介绍与图片来源<span class="icon icon-arrow" aria-hidden="true"></span></a></p></section>
+        </div>
+      </section>
+      <div class="notes-spread">
+        <section class="agent interest-story" id="agent" aria-labelledby="agent-title"><h2 class="interest-title accent-title" id="agent-title" lang="en">AI Agent</h2><p>我喜欢体验新的 Agent 产品，也喜欢拆开看它们如何工作。</p><p>从对话方式、工具使用，到上下文、记忆和执行环境，我关心这些设计最终会怎样影响使用体验：Agent 能理解多少背景？任务中断后能否继续？人应该在什么时候参与判断？</p><p>我会不断追问：一个新功能解决了什么问题，又让哪些原本困难的事情变得容易了？喜欢动手尝试，也喜欢在尝试中慢慢形成自己的判断。</p></section>
+        <section class="f1 interest-story" id="f1" aria-labelledby="f1-title"><h2 class="interest-title accent-title" id="f1-title" lang="en">F1</h2><p>关注红牛车队和 Max Verstappen。</p><p>会期待 Max 的精彩表现，也喜欢琢磨比赛里的细节：赛车在不同赛道的竞争力、轮胎策略、进站时机，以及天气变化带来的机会。</p><p>从排位赛到正赛，享受速度、判断与不确定性交织的过程。</p></section>
+      </div>
+    </main>
       <dialog class="photo-viewer" aria-labelledby="photo-viewer-title" data-loading="正在加载图片…" data-error="图片暂时无法加载，可以尝试单独打开。">
         <header class="photo-toolbar"><span class="photo-title" id="photo-viewer-title">沿途所见</span><div class="photo-actions"><a class="photo-separate" target="_blank" rel="noopener noreferrer">单独打开<span aria-hidden="true"> ↗</span></a><button class="photo-close photo-control" type="button" aria-label="关闭大图" autofocus><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div></header>
         <div class="photo-stage" aria-busy="false"><img class="photo-image" alt="" hidden><p class="photo-status" role="status" hidden></p></div>
         <footer class="photo-bottom"><button class="photo-prev photo-control" type="button" aria-label="上一张图片"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button><div class="photo-info" aria-live="polite" aria-atomic="true"><p class="photo-caption"></p><p class="photo-counter"></p></div><button class="photo-next photo-control" type="button" aria-label="下一张图片"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg></button><p class="photo-help"><span class="photo-keys">← → 切换图片 · Esc 关闭</span><span class="photo-touch">左右滑动切换图片</span></p></footer>
       </dialog>
-      <footer class="site-footer"><small>© 2026 Denis Wen</small><span>保持好奇，持续探索。<a class="footer-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub<span class="icon icon-arrow" aria-hidden="true"></span></a></span></footer>
-    </div>
+    <footer class="site-footer page-width"><a class="footer-brand" href="./">Denis Wen</a><span>© 2026 · 保持好奇，持续探索。</span><a class="footer-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub<span class="icon icon-arrow" aria-hidden="true"></span></a></footer>
   </body>
 </html>

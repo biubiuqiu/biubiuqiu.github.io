@@ -7,3 +7,11 @@
 - `cinema.webp`: AI-generated empty cinema atmosphere illustration; not a personal photograph.
 
 WebP derivatives resized for the personal site. Game image rights remain with the respective rights holders.
+
+## Poster art used in the Horizon Journal redesign
+
+- `rdr-cover.webp`: https://cdn.akamai.steamstatic.com/steam/apps/1174180/library_600x900_2x.jpg
+- `gtav-cover.webp`: https://cdn.akamai.steamstatic.com/steam/apps/271590/library_600x900_2x.jpg
+- `tlou-cover.webp`: https://cdn.akamai.steamstatic.com/steam/apps/1888930/library_600x900_2x.jpg
+- `tlou2-cover.webp`: https://cdn.akamai.steamstatic.com/steam/apps/2531310/library_600x900_2x.jpg
+- `gtavi-cover.webp`: https://www.rockstargames.com/VI/_next/static/media/poster_full.02ig6s_80ei58.jpg

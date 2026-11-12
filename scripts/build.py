@@ -62,12 +62,18 @@ def theme_menu_for(copy: dict[str, str]) -> str:
 def gallery_for(language, copy):
     prefix = "../" if LANGUAGES[language]["path"] else "./"
     items = json.loads((ROOT / "src" / "photos.json").read_text())
-    rows = [' <section class="hiking-gallery" id="hiking-photos" aria-label="'+html.escape(copy["gallery_title"],quote=True)+'">', '<p class="gallery-heading">'+html.escape(copy["gallery_title"])+'</p><p class="gallery-hint">'+html.escape(copy["gallery_hint"])+'</p><div class="photo-grid">']
+    items.sort(key=lambda item: item["file"] != "img_1931.webp")
+    rows = ['<section class="hiking-gallery" id="hiking-photos" aria-label="'+html.escape(copy["gallery_title"],quote=True)+'">', '<p class="sr-only">'+html.escape(copy["gallery_hint"])+'</p>']
     for i, item in enumerate(items):
-        caption=html.escape(item[language],quote=True)
-        path=prefix+"assets/hiking/"+item["file"]
-        rows.append(f'<a class="photo-link" href="{path}" data-caption="{caption}"><figure><img src="{path}" alt="{caption}" width="{item["width"]}" height="{item["height"]}" loading="lazy" decoding="async"><figcaption>{caption}</figcaption></figure></a>')
-    rows.append("</div></section>")
+        caption = html.escape(item[language], quote=True)
+        path = prefix + "assets/hiking/" + item["file"]
+        if i == 1:
+            rows.append('<div class="photo-thumbnails">')
+        kind = "featured-photo" if i == 0 else "thumbnail-photo"
+        rows.append(f'<a class="photo-link {kind}" href="{path}" data-caption="{caption}"><figure><img src="{path}" alt="{caption}" width="{item["width"]}" height="{item["height"]}" loading="lazy" decoding="async"><figcaption class="sr-only">{caption}</figcaption></figure></a>')
+    if len(items) > 1:
+        rows.append('</div>')
+    rows.append('</section>')
     return "\n".join(rows)
 
 
