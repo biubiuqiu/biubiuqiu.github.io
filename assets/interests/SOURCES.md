@@ -27,3 +27,20 @@ WebP derivatives resized for the personal site. Game image rights remain with th
 - `red-bull-track.webp`: Max Verstappen driving the RB21 at Bahrain International Circuit, filming day on 25 February 2025. Source: https://news.verstappen.com/en/article/5714
 - Original: https://news.verstappen.com/img/2025/Formule_1_Testdagen_Bahrein/MV_Bahrain_FD1-30b.jpg
 - Copyright © Verstappen.com, Red Bull Content Pool. Visible watermark and credit preserved. Converted to WebP without cropping.
+
+## Movie posters
+
+Selected classics from the IMDb Top 250 / Douban Top 250 tradition. No live ranking or rating is claimed. Posters are downloaded from TMDB and resized to WebP without cropping; film and artwork rights belong to the respective rights holders.
+
+- `movie-shawshank.webp`: https://www.themoviedb.org/movie/278-the-shawshank-redemption
+  - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg
+- `movie-interstellar.webp`: https://www.themoviedb.org/movie/157336-interstellar
+  - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg
+- `movie-inception.webp`: https://www.themoviedb.org/movie/27205-inception
+  - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg
+- `movie-truman.webp`: https://www.themoviedb.org/movie/37165-the-truman-show
+  - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/vuza0WqY239yBXOadKlGwJsZJFE.jpg
+- `movie-spirited.webp`: https://www.themoviedb.org/movie/129-spirited-away
+  - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg
+- `movie-forrest.webp`: https://www.themoviedb.org/movie/13-forrest-gump
+  - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/saHP97rTPS5eLmrLQEcANmKrsFl.jpg
