@@ -71,9 +71,9 @@
     "tlou_part1": "最后生还者 1",
     "tlou_part2": "最后生还者 2",
     "tlou2_alt": "《最后生还者 Part II Remastered》官方封面",
-    "f1_photo_alt": "暖色灯光下的红牛 RB21 赛车",
-    "f1_photo_caption": "红牛 RB21 赛车 · 2025 发布照",
-    "f1_photo_source": "图片来源：Formula 1"
+    "f1_photo_alt": "Max 驾驶红牛 RB21 行驶在巴林赛道上",
+    "f1_photo_caption": "Max Verstappen · 红牛 RB21 · 巴林赛道实拍（2025）",
+    "f1_photo_source": "图片：Verstappen.com / Red Bull Content Pool"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -147,9 +147,9 @@
     "tlou_part1": "The Last of Us I",
     "tlou_part2": "The Last of Us II",
     "tlou2_alt": "Official The Last of Us Part II Remastered cover",
-    "f1_photo_alt": "Red Bull RB21 racing car under warm studio lights",
-    "f1_photo_caption": "Red Bull RB21 · 2025 launch photograph",
-    "f1_photo_source": "Image source: Formula 1"
+    "f1_photo_alt": "Max driving the Red Bull RB21 on track in Bahrain",
+    "f1_photo_caption": "Max Verstappen · Red Bull RB21 · Bahrain on-track photograph (2025)",
+    "f1_photo_source": "Photo: Verstappen.com / Red Bull Content Pool"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -223,8 +223,8 @@
     "tlou_part1": "The Last of Us I",
     "tlou_part2": "The Last of Us II",
     "tlou2_alt": "The Last of Us Part II Remasteredの公式カバー",
-    "f1_photo_alt": "暖かな照明に照らされたレッドブル RB21",
-    "f1_photo_caption": "レッドブル RB21 · 2025年発表写真",
-    "f1_photo_source": "画像出典：Formula 1"
+    "f1_photo_alt": "バーレーンのコースを走るマックスのレッドブル RB21",
+    "f1_photo_caption": "Max Verstappen · レッドブル RB21 · バーレーン走行写真（2025）",
+    "f1_photo_source": "写真：Verstappen.com / Red Bull Content Pool"
   }
 }
