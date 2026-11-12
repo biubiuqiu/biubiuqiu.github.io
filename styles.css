@@ -27,3 +27,5 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
 @media(max-height:500px) and (orientation:landscape){.photo-toolbar{min-height:52px;padding-block:4px}.photo-bottom{padding-block:8px}.photo-help{display:none}.photo-image{max-height:calc(100dvh - 145px)}}
 /* Keep white navigation legible when the real photograph has bright clouds. */
 .cover::before{content:"";position:absolute;inset:0 0 auto;height:160px;background:linear-gradient(rgba(0,0,0,.4),transparent);z-index:-1;pointer-events:none}.intro{text-wrap:pretty}
+
+.f1-figure{margin:22px 0}.f1-figure .media-photo{display:block;overflow:hidden;background:#080b12}.f1-figure img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain}.f1-figure figcaption{margin-top:9px;color:var(--muted);font-size:10px;line-height:1.8}.f1-figure figcaption span{margin-inline:6px}.f1-figure figcaption a{text-decoration:underline;text-underline-offset:3px}

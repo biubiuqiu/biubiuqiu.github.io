@@ -70,7 +70,10 @@
     "leisure_title": "生活里的其他热爱",
     "tlou_part1": "最后生还者 1",
     "tlou_part2": "最后生还者 2",
-    "tlou2_alt": "《最后生还者 Part II Remastered》官方封面"
+    "tlou2_alt": "《最后生还者 Part II Remastered》官方封面",
+    "f1_photo_alt": "暖色灯光下的红牛 RB21 赛车",
+    "f1_photo_caption": "红牛 RB21 赛车 · 2025 发布照",
+    "f1_photo_source": "图片来源：Formula 1"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -143,7 +146,10 @@
     "leisure_title": "Other things I love",
     "tlou_part1": "The Last of Us I",
     "tlou_part2": "The Last of Us II",
-    "tlou2_alt": "Official The Last of Us Part II Remastered cover"
+    "tlou2_alt": "Official The Last of Us Part II Remastered cover",
+    "f1_photo_alt": "Red Bull RB21 racing car under warm studio lights",
+    "f1_photo_caption": "Red Bull RB21 · 2025 launch photograph",
+    "f1_photo_source": "Image source: Formula 1"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -216,6 +222,9 @@
     "leisure_title": "日々の好きなこと",
     "tlou_part1": "The Last of Us I",
     "tlou_part2": "The Last of Us II",
-    "tlou2_alt": "The Last of Us Part II Remasteredの公式カバー"
+    "tlou2_alt": "The Last of Us Part II Remasteredの公式カバー",
+    "f1_photo_alt": "暖かな照明に照らされたレッドブル RB21",
+    "f1_photo_caption": "レッドブル RB21 · 2025年発表写真",
+    "f1_photo_source": "画像出典：Formula 1"
   }
 }

@@ -15,3 +15,9 @@ WebP derivatives resized for the personal site. Game image rights remain with th
 - `tlou-cover.webp`: https://cdn.akamai.steamstatic.com/steam/apps/1888930/library_600x900_2x.jpg
 - `tlou2-cover.webp`: https://cdn.akamai.steamstatic.com/steam/apps/2531310/library_600x900_2x.jpg
 - `gtavi-cover.webp`: https://www.rockstargames.com/VI/_next/static/media/poster_full.02ig6s_80ei58.jpg
+
+## Red Bull Racing
+
+- `red-bull-racing.webp`: RB21 (2025) launch photograph, published in the official Formula 1 gallery: https://www.formula1.com/en/latest/article/gallery-check-out-all-the-angles-of-red-bulls-new-2025-spec-rb21-car.5lNblUfIS1cXeMj7nze4nL.html
+- Original asset: https://media.formula1.com/image/upload/t_16by9North/c_fit%2Cw_3200%2Ch_1800/q_auto/v1740000001/fom-website/2025/Red%20Bull/SI202502240458_hires_jpeg_24bit_rgb.webp
+- Resized WebP derivative. Image rights remain with the respective rights holders.
