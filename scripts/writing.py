@@ -27,9 +27,10 @@ def build_writing(root, base_url, theme_menu_for, copy):
     bootstrap = (root / 'src/theme-init.js').read_text()
     theme = theme_menu_for(copy)
     def shell(title, description, path, body):
+        visual_assets = '<link rel="stylesheet" href="/context-demos.css?v=1"><script src="/context-demos.js?v=1" defer></script>' if path == 'writing/agent-context-management/' else ''
         return '''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff">
-<title>''' + html.escape(title) + ''' — Denis Wen</title><meta name="description" content="''' + html.escape(description, quote=True) + '''"><link rel="canonical" href="''' + base_url + path + '''"><meta property="og:type" content="''' + ('article' if path != 'writing/' else 'website') + '''"><meta property="og:title" content="''' + html.escape(title, quote=True) + '''"><meta property="og:description" content="''' + html.escape(description, quote=True) + '''"><meta property="og:url" content="''' + base_url + path + '''"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>''' + bootstrap + '''</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=3"><script src="/theme.js?v=6" defer></script></head>
+<title>''' + html.escape(title) + ''' — Denis Wen</title><meta name="description" content="''' + html.escape(description, quote=True) + '''"><link rel="canonical" href="''' + base_url + path + '''"><meta property="og:type" content="''' + ('article' if path != 'writing/' else 'website') + '''"><meta property="og:title" content="''' + html.escape(title, quote=True) + '''"><meta property="og:description" content="''' + html.escape(description, quote=True) + '''"><meta property="og:url" content="''' + base_url + path + '''"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>''' + bootstrap + '''</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=3"><script src="/theme.js?v=6" defer></script>''' + visual_assets + '''</head>
 <body class="writing-page"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><a href="/">首页 ↗</a>''' + theme + '''</div></header><main class="writing-width writing-main" id="main">''' + body + '''</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>保持好奇，持续探索。</span><a href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer></body></html>'''
 
     rows = []
@@ -57,3 +58,4 @@ def build_writing(root, base_url, theme_menu_for, copy):
         target.write_text(shell(post['title'], post['excerpt'], path, body))
         routes.append(path)
     return routes
+
