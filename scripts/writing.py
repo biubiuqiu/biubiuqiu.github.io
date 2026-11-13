@@ -28,6 +28,8 @@ def build_writing(root, base_url, theme_menu_for, copy):
     theme = theme_menu_for(copy)
     def shell(title, description, path, body):
         visual_assets = '<link rel="stylesheet" href="/context-demos.css?v=1"><script src="/context-demos.js?v=1" defer></script>' if path == 'writing/agent-context-management/' else ''
+        if path == 'writing/agent-tool-design/':
+            visual_assets = '<link rel="stylesheet" href="/context-demos.css?v=1"><link rel="stylesheet" href="/tool-demos.css?v=1"><script src="/tool-demos.js?v=1" defer></script>'
         return '''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff">
 <title>''' + html.escape(title) + ''' — Denis Wen</title><meta name="description" content="''' + html.escape(description, quote=True) + '''"><link rel="canonical" href="''' + base_url + path + '''"><meta property="og:type" content="''' + ('article' if path != 'writing/' else 'website') + '''"><meta property="og:title" content="''' + html.escape(title, quote=True) + '''"><meta property="og:description" content="''' + html.escape(description, quote=True) + '''"><meta property="og:url" content="''' + base_url + path + '''"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>''' + bootstrap + '''</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=3"><script src="/theme.js?v=6" defer></script>''' + visual_assets + '''</head>

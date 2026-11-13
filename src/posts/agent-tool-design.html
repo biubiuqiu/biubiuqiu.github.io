@@ -1,0 +1,96 @@
+<p class="article-lead">既然 Bash 已经能读文件、写文件、跑程序，为什么 Agent 还要单独设计 Read、Edit 和 Write？最值得研究的，是这些看似重复的工具，如何减少模型需要猜测的东西。</p>
+<aside class="research-scope"><strong>研究范围 · 2026-11-13</strong><p>Claude Code 依据当前官方工具参考讨论公开行为；Pi 与 OpenCode 依据文末固定提交阅读源码。文中的“我的分析”解释设计取舍，“实现推演”是我提出的方案，不代表产品内部实现。没有运行三款产品的统一效果评测。图中的文件、日志与运行状态均为教学示例。</p></aside>
+<nav class="article-toc" aria-label="文章目录"><strong>阅读路径</strong><a href="#tools-map">先看图：四个工具分别负责什么</a><a href="#read-design">Read：把文件变成可用的观察</a><a href="#edit-design">Edit：用旧内容约束新动作</a><a href="#write-design">Write：完整内容，完整责任</a><a href="#bash-design">Bash：通用能力背后的运行时</a><a href="#cross-design">比工具名字更重要的设计</a><a href="#build-design">实现推演与验证方法</a><a href="#tool-sources">来源与源码快照</a></nav>
+<h2 id="tools-map">一、先看图：同一个任务，四种不同的契约</h2>
+<p>假设任务是“把重试次数从 3 改为 5，再验证”。Read 回答“现在是什么”，Edit 表达“只改这一处”，Write 表达“这个文件的完整内容应当是什么”，Bash 则让模型调用真实环境里的程序。它们不是必须依次执行的四个步骤，而是不同的动作边界。</p>
+<div class="tool-map" aria-label="四种工具的职责对照"><section><span>01 / 观察</span><h3>Read</h3><p>读取配置文件的相关范围。</p><code>path + offset + limit</code><small>输出是观察，不是完整世界。</small></section><section><span>02 / 局部变更</span><h3>Edit</h3><p>找到旧代码，再替换为新代码。</p><code>old text → new text</code><small>旧内容不匹配，就要重新判断。</small></section><section><span>03 / 完整内容</span><h3>Write</h3><p>创建新配置，或重写整个文件。</p><code>path + full content</code><small>没有提供的部分，不会自动保留。</small></section><section><span>04 / 执行与验证</span><h3>Bash / Shell</h3><p>运行测试、编译器与已有 CLI。</p><code>command + execution context</code><small>启动成功，不等于任务完成。</small></section></div>
+<p><strong>我的分析：</strong>专用工具的价值，是把常见操作变成容易生成、容易校验、容易解释的调用；Shell 的价值，是让模型组合已有软件，而不必为每个命令重新造一个工具。边界应由任务分布、模型能力与运行环境决定，不能只按 API 数量判断好坏。</p>
+<h2 id="read-design">二、Read：它返回的不是文件本身，而是一次观察</h2>
+<h3>2.1 行号、范围和“还有多少”，共同决定下一步</h3>
+<p><strong>已证实：</strong>Claude Code 的 Read 支持行号与范围读取，也能把图片等内容以模型可感知的形式返回。大文件处理会区分完整内容与部分视图；具体限制与模型、版本有关。<a class="source-ref" href="#ts-1">[1]</a></p>
+<p>更容易看清实现的是 Pi。其 Read 接受从 1 开始的 <code>offset</code> 和行数 <code>limit</code>；文本结果同时受到行数与字节数限制。所读快照中的默认上限为 2,000 行或 50 KiB，先达到哪个就按哪个截断；返回结果会给出继续读取的位置。<a class="source-ref" href="#ts-4">[4]</a><a class="source-ref" href="#ts-5">[5]</a></p>
+<p><strong>我的分析：</strong>“只给 2,000 行”还不够。模型需要知道这是全文、指定范围，还是被容量上限截断。否则，“当前没看到”就容易被误读成“文件里没有”。行数限制防止普通长文件占满输入，字节限制处理压缩成一行的 JSON、长字符串等情况；两者都不是精确的 token 计量。</p>
+<figure class="context-demo tool-lab" id="read-lab" data-tool-lab="read"><figcaption><span class="demo-kicker">可操作图解 / 教学示例</span><h3>图 1：你看到两行，不代表文件只有两行</h3><p>切换读取范围，观察“模型看见的内容”与下一步提示。此处用 6 行小文件模拟分页，不是产品默认限制。</p></figcaption><div class="tool-options" hidden><button data-read="first" type="button">读前两行</button><button data-read="next" type="button">继续读取</button><button data-read="target" type="button">直接读目标附近</button></div><div class="demo-dual"><section><h4>磁盘文件 · config.ts</h4><pre class="tool-code">1  export const config = {
+2    host: 'localhost',
+3    retries: 3,
+4    timeout: 1000,
+5    audit: true,
+6  };</pre></section><section><h4>本次工具结果 · 模型看到的范围</h4><pre class="tool-code tool-read-result">1  export const config = {
+2    host: 'localhost',</pre><p class="tool-read-notice">仅展示第 1–2 行，共 6 行。继续读取从第 3 行开始。</p></section></div><p class="demo-explanation" aria-live="polite">先确定范围，再判断文件。没有看到 retries，不能断言它不存在。</p></figure>
+<h3>2.2 Read 也是运行环境到模型的适配层</h3>
+<p>图片不能只回传一串二进制；目录不能冒充普通文本；查不到路径也不能只扔一个没有方向的异常。OpenCode V2 的 Read 在模型侧同时处理文件与目录，并明确提醒：显示出来的行号不是文件内容的一部分，不能复制进 Edit 参数。它还会在部分路径错误场景给出候选路径，在成功读取后发现相关的 <code>AGENTS.md</code>。<a class="source-ref" href="#ts-8">[8]</a></p>
+<p><strong>我的分析：</strong>Read 的真正产物，是“内容 + 定位信息 + 完整性说明”。如果读取还会触发项目指令发现，那么改用 Shell 读取时，运行时也必须考虑是否保持这一语义；否则同样读到一段文本，后续行为可能受不同指令影响。工具替代不能只比较 stdout 是否一样。</p>
+<h2 id="edit-design">三、Edit：把一次写入，变成带前提的变更</h2>
+<h3>3.1 为什么不直接让模型指定“改第 42 行”</h3>
+<p>行号是方便人定位的坐标，但文件前面多插入几行，坐标就变了。旧文本则同时表达了位置和前提：我想修改的，是仍然长成这个样子的那一段。相比整文件重写，模型也不必重新生成大量没有变化的代码。</p>
+<p><strong>已证实：</strong>Claude Code 的 Edit 用 <code>old_string</code> 与 <code>new_string</code> 做精确替换；多处匹配时，需要扩大上下文或明确使用 <code>replace_all</code>。当前文档中的先读后改限制存在模型和版本差异，不能写成所有模型都无例外地必须先调用 Read。<a class="source-ref" href="#ts-1">[1]</a></p>
+<figure class="context-demo tool-lab" id="edit-lab" data-tool-lab="edit"><figcaption><span class="demo-kicker">可操作图解 / 教学示例</span><h3>图 2：为什么“匹配两处”应该失败</h3><p>试一次模糊目标，再补足旧代码的上下文。还可以模拟读取之后文件被其他人改过。</p></figcaption><div class="demo-dual"><section><h4>当前磁盘内容</h4><pre class="tool-code tool-edit-file">const upload = { retries: 3 };
+const download = { retries: 3 };</pre><label class="demo-branch-toggle tool-edit-toggle" hidden><input type="checkbox">其他人已把 upload 改成 4</label></section><section><h4>模型提出的替换</h4><pre class="tool-code tool-edit-proposal">old: retries: 3
+new: retries: 5</pre><div class="tool-options" hidden><button data-edit="short" type="button">提交短片段</button><button data-edit="unique" type="button">补充上下文再提交</button></div></section></div><p class="demo-explanation" aria-live="polite">短片段匹配两处。工具应拒绝猜测，而不是随机修改第一个位置。</p><small class="tool-lab-note">本图演示严格匹配的一次替换；不会修改真实文件，也不模拟各产品的全部格式容错规则。</small></figure>
+<p><strong>我的分析：</strong>旧文本匹配有点像给局部修改加一个条件，但不是完整的版本锁。只要其他人改的是不在匹配片段里的代码，这次 Edit 仍可能成功。它能挡住一部分过期假设，不能证明整份文件的语义都没变，更不等于跨进程的 compare-and-swap。</p>
+<h3>3.2 对格式宽容，对目标歧义严格</h3>
+<p><strong>已证实：</strong>Pi 的 Edit 虽然描述为精确文本替换，辅助实现却先尝试精确匹配，再进行有限的规范化匹配，处理行尾空白、部分 Unicode 引号、空格等表示差异。当前版本支持一次对单个文件提交多个 <code>edits</code>，所有目标对同一个原始内容匹配，拒绝重叠区间。<a class="source-ref" href="#ts-6">[6]</a></p>
+<p>OpenCode V2 同样对换行、排版引号及部分空白差异做限定的回退；匹配不唯一仍然要明确处理。找不到旧内容时，还可能提示新内容已经存在，或返回附近相似行；这些包含文件内容的提示会先检查读取许可。<a class="source-ref" href="#ts-9">[9]</a></p>
+<p><strong>我的分析：</strong>这是两种错误的区别：模型丢了一个排版符号，和模型不知道要改哪一处。前者可通过可解释的规则容错，后者应该拒绝。所谓“智能编辑”，不应该是在证据不足时更积极地猜测。回退还应暴露用了什么规则，避免用户以为发生的是逐字节替换。</p>
+<h3>3.3 工具协议和展示界面，解决不同问题</h3>
+<p>让模型提交 old/new，并不妨碍运行时给人展示 diff。Anthropic 早期的工具设计文章指出，生成 unified diff 可能要求模型在写完内容前算对行数，而 JSON 还有转义开销；这些格式对普通程序等价，对模型却不一定一样容易。该文章还记录过用绝对路径降低相对目录混淆的实践。<a class="source-ref" href="#ts-3">[3]</a></p>
+<p><strong>我的分析：</strong>可以让模型用它更擅长的协议表达意图，让工具负责匹配、计算 diff，再让人看适合审阅的形式。old/new、patch 和整文件都不是通用赢家；对代码改动密度、模型训练偏好和多文件任务，应通过评测选择。工具参数是模型交互界面，不必直接照搬人类编辑器的操作方式。</p>
+<h2 id="write-design">四、Write：参数更简单，承担的内容却更多</h2>
+<p>Write 的契约通常很直接：路径加完整内容，创建或覆盖。Pi 的实现还会创建缺失的父目录；OpenCode V2 的描述明确建议局部变更使用 Edit。<a class="source-ref" href="#ts-7">[7]</a><a class="source-ref" href="#ts-10">[10]</a></p>
+<p><strong>我的分析：</strong>Write 适合新文件、短小的完整配置，或者本来就要重新生成的产物。修改大文件的一行却用 Write，意味着模型必须再次正确输出其他所有内容；“我只想改这里”不会自动成为工具约束。生成量和意外遗漏面都会扩大。</p>
+<div class="tool-table-scroll" role="region" aria-label="对照表，可横向滚动" tabindex="0"><table><thead><tr><th>需求</th><th>更自然的表达</th><th>仍要检查的事</th></tr></thead><tbody><tr><td>新建一个配置文件</td><td>Write：完整内容</td><td>目标是否已存在，是否允许覆盖</td></tr><tr><td>现有函数改几行</td><td>Edit：带上下文的局部替换</td><td>是否匹配唯一位置，是否符合最新代码</td></tr><tr><td>大量规律性变更</td><td>经过验证的脚本或专用重构工具</td><td>作用范围、预览、失败与回滚策略</td></tr><tr><td>重构跨多个文件</td><td>分组修改，加完整的验证流程</td><td>部分成功时怎么办；多文件不天然具备事务性</td></tr></tbody></table></div>
+<p>小接口并不自动意味着小风险。同样写一次文件，Write 可以替换全部字节，Edit 只授权一个局部意图；但两者背后的文件系统写入是否原子、是否持久化，是另外一层契约。</p>
+<h2 id="bash-design">五、Bash：名字像一个工具，实际接入了一整个软件生态</h2>
+<h3>5.1 为什么始终需要这条通用通道</h3>
+<p>编译、测试、包管理、Git、数据处理，都已经有成熟的命令行接口。若为每个子命令建立专用工具，工具定义会不断增长，而且参数边界容易重叠。Shell 用一套组合规则连接已有程序，是能力扩展最直接的方式之一。</p>
+<p><strong>我的分析：</strong>代价也很明确：一段命令可能包含重定向、管道、子进程与网络访问，副作用不能只从“Bash”这个名字判断。专用 Edit 的变更意图可直接呈现；同样的修改藏在脚本里，运行时需要分析和约束更多东西。工具描述负责引导，权限和隔离必须由模型之外的系统执行。<a class="source-ref" href="#ts-2">[2]</a></p>
+<h3>5.2 读文件留开头，执行日志留结尾：不是随便截一段</h3>
+<p><strong>已证实：</strong>Pi 的文本 Read 使用头部截断，而 Bash 的文本输出保留尾部；大输出会保存到临时文件，并给出可继续读取的路径。Bash 还区分非零退出、取消与超时等状态。所读源码为这些路径分别生成结果或错误。<a class="source-ref" href="#ts-4">[4]</a><a class="source-ref" href="#ts-5">[5]</a><a class="source-ref" href="#ts-11">[11]</a></p>
+<p><strong>我的分析：</strong>文件开头通常给出结构、导入与定义，日志结尾经常包含最终状态；这是有用的默认启发式，绝不是保证。错误也可能在日志中间。因此“保留尾部 + 可检索的全文”比“只保留尾部”重要：缩短观察，仍留下追溯证据的路。</p>
+<figure class="context-demo tool-lab" id="shell-lab" data-tool-lab="shell"><figcaption><span class="demo-kicker">分步动画 / 教学示例</span><h3>图 3：运行状态、输出大小和任务结果，要分开看</h3><p>播放一次测试命令的生命周期。这里统一展示设计概念，不是任一产品的真实结果格式。</p></figcaption><div class="tool-stage-row" aria-label="命令生命周期"><span>待启动</span><span>运行中</span><span>已结束</span></div><div class="demo-dual"><section><h4>运行环境</h4><div class="tool-process demo-block">尚未启动测试命令</div><div class="tool-logfile demo-artifact">日志工件：尚未生成</div></section><section><h4>模型当前收到什么</h4><pre class="tool-code tool-shell-output">等待执行。</pre></section></div><div class="demo-controls" hidden><button type="button" data-shell="prev">← 上一步</button><button type="button" class="demo-play" data-shell="play">播放动画</button><button type="button" data-shell="next">下一步 →</button><button type="button" data-shell="reset">重置</button><span class="demo-count">1 / 4</span></div><p class="demo-explanation" aria-live="polite">还没有运行，就没有测试结论。文字里说“已开始”也不等于测试通过。</p></figure>
+<h3>5.3 执行工具还需要时间、状态和身份</h3>
+<p><strong>已证实：</strong>OpenCode V2 这一快照中的通用执行工具名为 <code>shell</code>。其参数明确区分 <code>workdir</code>、超时和后台运行，结果区分 <code>running</code> 与 <code>completed</code>；后台任务带标识并在结束后通知会话。源码中的说明要求避免为等待完成而反复轮询。<a class="source-ref" href="#ts-12">[12]</a></p>
+<p><strong>我的分析：</strong>“一个 Bash 工具”不能被理解为“一个永远活着的终端”。文件、当前目录、环境变量与进程各有生命周期，产品之间也不同。没有明确约定，就不该假设上一条命令的 <code>export</code>、后台任务或目录切换能在下一次调用中沿用。</p>
+<p>更关键的是：超时不一定意味着副作用没发生，取消返回也不一定证明所有子进程已停止。可靠运行时必须说明自己知道什么。如果一次发布命令失联，盲目重试可能重复发布；恢复前应先核对外部状态，而不是只重放上一次参数。</p>
+<h2 id="cross-design">六、真正的巧思，往往藏在工具之间</h2>
+<h3>6.1 错误结果也是下一步的操作界面</h3>
+<p>“失败”几乎没有信息。“匹配了两处，请增加周围上下文”“已展示到第 120 行，请从 121 行继续”“进程仍在运行，不要重复启动”，则直接减少下一步的不确定性。错误不只是让程序抛异常，还在教模型怎样修复调用。Anthropic 的工具设计文章也强调返回有意义的信息、控制响应量，并通过实际任务评测迭代描述。<a class="source-ref" href="#ts-13">[13]</a></p>
+<p><strong>我的分析：</strong>好的错误应回答三件事：什么条件没满足、是否已产生副作用、接下来可以怎样确认。尤其对写入与执行，不能把“模型收到错误”直接等价为“世界没有改变”。</p>
+<h3>6.2 参数描述不是注释，而是模型执行前的约束说明</h3>
+<p>Pi 的参数说明强调批量 edits 都匹配原始文件；OpenCode 的 Edit 明确要求不要复制行号。它们都针对真实的误用方式，在模型生成参数之前解释正确边界。<a class="source-ref" href="#ts-6">[6]</a><a class="source-ref" href="#ts-9">[9]</a></p>
+<p><strong>我的分析：</strong>一个可用的工具应同时说明“什么时候用”和“什么时候不用”。例如 Write 必须说明覆盖，Edit 必须说明目标歧义，Read 必须说明返回范围。JSON Schema 能限制类型，却不能单独保证模型选择了正确文件、理解了覆盖语义。</p>
+<h3>6.3 工具之间要共享状态，但别夸大共享状态的保证</h3>
+<p><strong>已证实：</strong>Pi 的 Edit 与 Write 经过同一份文件变更队列，同文件串行、不同文件可并行。取消逻辑在等待文件操作结束之后检查信号，避免过早释放队列。OpenCode 的文件变更层同样明确指出：进程内的锁只约束协作调用，外部写入仍可能竞争。<a class="source-ref" href="#ts-14">[14]</a><a class="source-ref" href="#ts-15">[15]</a></p>
+<p><strong>我的分析：</strong>队列不是跨进程锁，串行不是磁盘持久化，写入一次也不是跨文件事务。共享读写状态有助于减少误用，但真正的并发控制应把 IDE、格式化器、Shell 和其他 Agent 都纳入考虑。只给专用 Edit 加锁，挡不住 Bash 里另一个脚本写同一文件。</p>
+<h3>6.4 工具集合会演进，设计原则比固定名单更耐用</h3>
+<p>当前 Claude Code 文档已按平台调整搜索工具的默认提供方式；macOS、Linux 与 WSL 的部分搜索通过 Bash 执行，特定配置下才恢复 Glob/Grep。<a class="source-ref" href="#ts-1">[1]</a> 这提醒我：不能把某个版本的工具名单当成 Agent 的本质。</p>
+<p><strong>我的分析：</strong>模型更擅长 Shell 后，部分专用工具可能收益下降；权限、观测或多模态能力仍可能要求保留独立接口。该评测的是完成质量、恢复成本和副作用可控性，而不是“越少越优雅”或“越多越专业”。</p>
+<h2 id="build-design">七、如果自己实现，我会先保证哪些契约</h2>
+<p><strong>实现推演：</strong>下面是一种面向可部署 Agent Workspace 的设计，不是上面产品源码的复刻。核心思路是把“模型意图”“运行时校验”和“实际副作用”分开记录。</p>
+<div class="tool-table-scroll" role="region" aria-label="对照表，可横向滚动" tabindex="0"><table><thead><tr><th>层次</th><th>建议记录或检查</th><th>解决的问题</th></tr></thead><tbody><tr><td>输入</td><td>工具版本、明确的工作区与路径语义、调用 ID</td><td>同样的字符串不要指向不同工作区</td></tr><tr><td>观察</td><td>读取范围、是否截断、内容版本或 hash</td><td>区分没看到、没有、已经变化</td></tr><tr><td>写入</td><td>旧内容条件、预期版本、授权范围、实际 diff</td><td>拒绝过期假设，并让修改可审阅</td></tr><tr><td>执行</td><td>任务 ID、状态、退出码、取消结果、日志引用</td><td>区分启动成功与工作完成</td></tr><tr><td>恢复</td><td>副作用是否已提交、结果是否已送达、可否安全重试</td><td>避免超时后盲目重复写入或执行</td></tr></tbody></table></div>
+<p>例如局部修改请求可以额外带上 <code>expected_version</code>，由单一写入服务校验并提交。只有版本检查和写入在同一个受约束的提交机制里，这个字段才有并发意义；“先算 hash，过一会儿再写”仍存在竞争窗口。临时文件加 rename 可帮助解决部分可见性问题，但还要分别考虑符号链接、权限、跨文件系统与崩溃持久化。</p>
+<p>返回结果也可以分两层：给模型一小段足够做决定的文本，给运行时与界面结构化字段，例如 <code>status</code>、<code>changed_paths</code>、<code>truncated</code>、<code>artifact_ref</code>。保留结构化数据不意味着把所有字段都塞进下一轮模型输入；大工件的有效期和访问权限也必须明确。</p>
+<h3>怎样证明这些巧思真的有用</h3>
+<p>我会用同一个模型、同一批任务，对照 strict Edit、限定格式容错、patch、整文件重写等协议。至少覆盖以下情形，再决定工具该不该合并：</p>
+<ul><li><strong>目标定位：</strong>重复代码、旧文本过期、文件前面插入新行，是否误改？</li><li><strong>格式与范围：</strong>CRLF、Unicode 引号、一行超大 JSON、部分读取，是否误判完整性？</li><li><strong>并发与中断：</strong>外部写入、批量编辑区间重叠、取消发生在写入中途，能否解释真实结果？</li><li><strong>执行恢复：</strong>日志超长、命令退出 1、后台任务尚未完成、工具返回前连接断开，会不会误报成功或重复执行？</li></ul>
+<p>除任务成功率，我还会看误改率、额外重试次数、传给模型的输入量、等待时间，以及失败之后能否恢复。本文没有执行这些对照实验，因此不能宣称某个协议带来具体百分比提升。</p>
+<p>我的判断是：<strong>工具是在为模型设计一个可观察、可操作、可纠错的世界。</strong>Read 把观察范围讲清楚，Edit 把修改前提写出来，Write 让完整覆盖的责任显式化，Bash 把开放能力接入有状态的执行环境。模型负责提出下一步，运行时负责兑现契约；两者配合，才可能在真实文件和进程上稳定地工作。</p>
+<h2 id="tool-sources">研究来源与源码快照</h2>
+<p>核验日期：2026-11-13。官方在线文档会变化；源码链接固定到提交。Pi：<code>d36266e06669</code>；OpenCode V2：<code>94e070db9794</code>。只对所读文件与公开说明做结论，不代表已验证完整产品的所有运行路径。</p>
+<ol class="article-sources">
+<li id="ts-1"><a href="https://code.claude.com/docs/en/tools-reference" target="_blank" rel="noopener noreferrer">Claude Code · Tools reference</a>：Read / Edit / Write / 搜索工具与版本差异。</li>
+<li id="ts-2"><a href="https://code.claude.com/docs/en/permissions" target="_blank" rel="noopener noreferrer">Claude Code · Permissions</a>：读取、修改、Shell 的权限边界。</li>
+<li id="ts-3"><a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener noreferrer">Building effective agents · Appendix 2</a>：工具格式、生成负担与绝对路径的历史实践。</li>
+<li id="ts-4"><a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/read.ts" target="_blank" rel="noopener noreferrer">Pi · read.ts</a>：范围读取、截断与继续读取提示。</li>
+<li id="ts-5"><a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/truncate.ts" target="_blank" rel="noopener noreferrer">Pi · truncate.ts</a>：行数 / 字节预算，头部与尾部策略。</li>
+<li id="ts-6"><a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/edit.ts" target="_blank" rel="noopener noreferrer">Pi · edit.ts</a> / <a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/edit-diff.ts" target="_blank" rel="noopener noreferrer">edit-diff.ts</a>：原始内容批量匹配、限定容错与重叠检查。</li>
+<li id="ts-7"><a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/write.ts" target="_blank" rel="noopener noreferrer">Pi · write.ts</a>：创建、覆盖与父目录处理。</li>
+<li id="ts-8"><a href="https://github.com/anomalyco/opencode/blob/94e070db9794829173b571161f06e61c1e892dd4/packages/core/src/tool/plugin/read.ts" target="_blank" rel="noopener noreferrer">OpenCode V2 · read.ts</a>：模型视图、路径提示与项目指令发现。</li>
+<li id="ts-9"><a href="https://github.com/anomalyco/opencode/blob/94e070db9794829173b571161f06e61c1e892dd4/packages/core/src/tool/plugin/edit.ts" target="_blank" rel="noopener noreferrer">OpenCode V2 · edit.ts</a>：匹配回退、歧义处理与失败提示。</li>
+<li id="ts-10"><a href="https://github.com/anomalyco/opencode/blob/94e070db9794829173b571161f06e61c1e892dd4/packages/core/src/tool/plugin/write.ts" target="_blank" rel="noopener noreferrer">OpenCode V2 · write.ts</a>：完整写入的模型侧契约。</li>
+<li id="ts-11"><a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/bash.ts" target="_blank" rel="noopener noreferrer">Pi · bash.ts</a>：文本输出、日志引用、取消与退出状态。</li>
+<li id="ts-12"><a href="https://github.com/anomalyco/opencode/blob/94e070db9794829173b571161f06e61c1e892dd4/packages/core/src/tool/plugin/shell.ts" target="_blank" rel="noopener noreferrer">OpenCode V2 · shell.ts</a>：工作目录、后台执行与完成通知。</li>
+<li id="ts-13"><a href="https://www.anthropic.com/research/writing-tools-for-agents" target="_blank" rel="noopener noreferrer">Writing effective tools for agents</a>：信息密度、工具说明与评测方法。</li>
+<li id="ts-14"><a href="https://github.com/earendil-works/pi/blob/d36266e06669c6991a7c9509d1da04d18d30378d/packages/coding-agent/src/core/tools/file-mutation-queue.ts" target="_blank" rel="noopener noreferrer">Pi · file-mutation-queue.ts</a>：同文件写入串行队列，结合 edit.ts / write.ts 阅读取消逻辑。</li>
+<li id="ts-15"><a href="https://github.com/anomalyco/opencode/blob/94e070db9794829173b571161f06e61c1e892dd4/packages/core/src/file-mutation.ts" target="_blank" rel="noopener noreferrer">OpenCode V2 · file-mutation.ts</a>：进程内协作锁及其限制。</li>
+</ol>
