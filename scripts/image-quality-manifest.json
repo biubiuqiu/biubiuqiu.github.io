@@ -1,0 +1,146 @@
+{
+  "date": "2026-11-15",
+  "strategy": "Source JPEG pixels preserved; metadata-only removal; listing WebP separate from full viewer assets",
+  "files": [
+    {
+      "path": "assets/hiking/full/dsc00891.jpg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 442505,
+      "sha256": "66d10503ef0572f14afddd3002f18b30e70745e247279f1cf413b7b6b5be25ac"
+    },
+    {
+      "path": "assets/hiking/full/dsc01901.jpg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 514253,
+      "sha256": "fa3cf4dd7ef665c4763d4f1f9fcb6394f6c140a8711d9cb4e060bc7b8c681582"
+    },
+    {
+      "path": "assets/hiking/full/dsc02281.jpg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 478602,
+      "sha256": "1b2084017da521d96cbc5d5cac13406302add186fbbaf4142a01ef0f433884f4"
+    },
+    {
+      "path": "assets/hiking/full/dsc02288.jpg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 696845,
+      "sha256": "3402360eba3c0779d2f1f3e4f3990228f9bc4cefd1019494844a2ad9db5d9fd4"
+    },
+    {
+      "path": "assets/hiking/full/dsc02645.jpg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 506171,
+      "sha256": "44641425ecdded07b05a1486b5c4a23c7a5e64dbbd7262a5909f2d955b15c08b"
+    },
+    {
+      "path": "assets/hiking/full/img_1209.jpg",
+      "width": 1536,
+      "height": 574,
+      "bytes": 441708,
+      "sha256": "a2df652bbd721024b93e845c4ca4093c79c8f81d19d63a68637bfa9f016e5e91"
+    },
+    {
+      "path": "assets/hiking/full/img_1931.jpg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 298889,
+      "sha256": "f3723891d0cc40931c8b8459e6e1d3e83851fe4d558004aebe2d547d8ac9f811"
+    },
+    {
+      "path": "assets/hiking/full/img_2146.jpg",
+      "width": 1536,
+      "height": 745,
+      "bytes": 622110,
+      "sha256": "82bfd8d25fcbefdeeafe18517b8df2531e0efd945da09eb88724335dc6f783d3"
+    },
+    {
+      "path": "assets/interests/full/gtav-cover.jpg",
+      "width": 600,
+      "height": 900,
+      "bytes": 242131,
+      "sha256": "bba708cf29c2a9192a9294f584475d124968c749d4724abca087582e2306cb51"
+    },
+    {
+      "path": "assets/interests/full/gtavi-cover.jpg",
+      "width": 1920,
+      "height": 2124,
+      "bytes": 902900,
+      "sha256": "5257b7786e42f36ae83bce05791d2bfe8098a53f00c75b69a81564c511b9c903"
+    },
+    {
+      "path": "assets/interests/full/movie-forrest.jpg",
+      "width": 2000,
+      "height": 3000,
+      "bytes": 551669,
+      "sha256": "c18c5201868a1e17dff0a14ea2949ca87ca1637ae91f2f6a659d36393b11e444"
+    },
+    {
+      "path": "assets/interests/full/movie-inception.jpg",
+      "width": 2000,
+      "height": 3000,
+      "bytes": 984791,
+      "sha256": "3b359958958f49d31464226e9a2a4d14cf7ff69ec70d90fbf49b2d0e06265fc2"
+    },
+    {
+      "path": "assets/interests/full/movie-interstellar.jpg",
+      "width": 2000,
+      "height": 3000,
+      "bytes": 1299370,
+      "sha256": "b52e6de92cedc818885a17626e9c3dae0112195a18050866ede3f5f5678b6989"
+    },
+    {
+      "path": "assets/interests/full/movie-shawshank.jpg",
+      "width": 2000,
+      "height": 3000,
+      "bytes": 781176,
+      "sha256": "40af99dc071fab448ada642e59cd68c357d9250f4e5af0985f5302af5b81cb15"
+    },
+    {
+      "path": "assets/interests/full/movie-spirited.jpg",
+      "width": 2000,
+      "height": 3000,
+      "bytes": 460273,
+      "sha256": "3edd10e9601200c3476fc7cfe93c83c28fe5735370d65189b83ff4512fb1f4d7"
+    },
+    {
+      "path": "assets/interests/full/movie-truman.jpg",
+      "width": 1400,
+      "height": 2100,
+      "bytes": 1096728,
+      "sha256": "131e52eb25a2f79e4a1411570a89c943f05ef7244de6a1c2ee13ffb4214a4f17"
+    },
+    {
+      "path": "assets/interests/full/rdr-cover.jpg",
+      "width": 600,
+      "height": 900,
+      "bytes": 240179,
+      "sha256": "c09c7d4e2042be7bea7f729f30653c2a923b0d985297991a4498d5ac2dc1e166"
+    },
+    {
+      "path": "assets/interests/full/red-bull-track.jpg",
+      "width": 935,
+      "height": 623,
+      "bytes": 501448,
+      "sha256": "ad2fbbd0b270389b1148b9af46cce156b0d10b0ea645581dded5bf15495e8c99"
+    },
+    {
+      "path": "assets/interests/full/tlou-cover.jpg",
+      "width": 600,
+      "height": 900,
+      "bytes": 138142,
+      "sha256": "ec9860418f98a69797feb95424954207e3865f7c7d8ead470de413648e1b086e"
+    },
+    {
+      "path": "assets/interests/full/tlou2-cover.jpg",
+      "width": 600,
+      "height": 900,
+      "bytes": 174318,
+      "sha256": "a5918f1468902fc7dc3ac4b44b50f6e07d33db2a432c4f4811fc40a505a2cf86"
+    }
+  ]
+}

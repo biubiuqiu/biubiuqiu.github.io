@@ -44,3 +44,7 @@ Selected classics from the IMDb Top 250 / Douban Top 250 tradition. No live rank
   - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/39wmItIWsg5sZMyRUHLkWBcuVCM.jpg
 - `movie-forrest.webp`: https://www.themoviedb.org/movie/13-forrest-gump
   - Image: https://media.themoviedb.org/t/p/w600_and_h900_face/saHP97rTPS5eLmrLQEcANmKrsFl.jpg
+
+## Full-resolution viewer assets (2026-11-15)
+
+The `full/` folder retains source JPEG pixels without resizing or recompression. EXIF/IPTC/comment metadata is removed without re-encoding. Movie posters use the same TMDB artwork through its `/original/` path. Game covers retain the native source dimensions (Steam: 600×900; GTA VI: 1920×2124). The on-track F1 source is natively 935×623; no artificial enlargement is used. Listing thumbnails remain WebP.

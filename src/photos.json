@@ -5,7 +5,10 @@
     "height": 582,
     "zh-CN": "云间雪峰与冰川",
     "en": "Snow peaks and glaciers",
-    "ja": "雲間の雪峰と氷河"
+    "ja": "雲間の雪峰と氷河",
+    "full": "full/img_2146.jpg",
+    "full_width": 1536,
+    "full_height": 745
   },
   {
     "file": "img_1931.webp",
@@ -13,7 +16,10 @@
     "height": 900,
     "zh-CN": "日照雪山",
     "en": "Alpenglow",
-    "ja": "朝日に染まる雪山"
+    "ja": "朝日に染まる雪山",
+    "full": "full/img_1931.jpg",
+    "full_width": 1536,
+    "full_height": 1152
   },
   {
     "file": "dsc02281.webp",
@@ -21,7 +27,10 @@
     "height": 800,
     "zh-CN": "山间建筑与冰川",
     "en": "Architecture beneath a glacier",
-    "ja": "氷河の下の建物"
+    "ja": "氷河の下の建物",
+    "full": "full/dsc02281.jpg",
+    "full_width": 1536,
+    "full_height": 1024
   },
   {
     "file": "dsc02288.webp",
@@ -29,7 +38,10 @@
     "height": 800,
     "zh-CN": "云雾与山涧",
     "en": "Clouds and mountain streams",
-    "ja": "雲と山の渓流"
+    "ja": "雲と山の渓流",
+    "full": "full/dsc02288.jpg",
+    "full_width": 1536,
+    "full_height": 1024
   },
   {
     "file": "dsc00891.webp",
@@ -37,7 +49,10 @@
     "height": 800,
     "zh-CN": "层叠的山脊",
     "en": "Layered mountain ridges",
-    "ja": "幾重にも続く稜線"
+    "ja": "幾重にも続く稜線",
+    "full": "full/dsc00891.jpg",
+    "full_width": 1536,
+    "full_height": 1024
   },
   {
     "file": "dsc01901.webp",
@@ -45,7 +60,10 @@
     "height": 800,
     "zh-CN": "林线上的山路",
     "en": "Above the tree line",
-    "ja": "森林限界の上へ"
+    "ja": "森林限界の上へ",
+    "full": "full/dsc01901.jpg",
+    "full_width": 1536,
+    "full_height": 1024
   },
   {
     "file": "dsc02645.webp",
@@ -53,7 +71,10 @@
     "height": 800,
     "zh-CN": "山海之间",
     "en": "Where mountains meet the sea",
-    "ja": "山と海の間"
+    "ja": "山と海の間",
+    "full": "full/dsc02645.jpg",
+    "full_width": 1536,
+    "full_height": 1024
   },
   {
     "file": "img_1209.webp",
@@ -61,6 +82,9 @@
     "height": 448,
     "zh-CN": "高原山谷全景",
     "en": "An alpine valley",
-    "ja": "高原の谷のパノラマ"
+    "ja": "高原の谷のパノラマ",
+    "full": "full/img_1209.jpg",
+    "full_width": 1536,
+    "full_height": 574
   }
 ]

@@ -32,11 +32,14 @@
     pending.onload = function () {
       if (request !== token || !viewer.open) return;
       image.src = pending.src;
+      // Do not enlarge the source beyond its native pixel density on Retina screens.
+      var density = Math.max(1, window.devicePixelRatio || 1);
+      image.style.maxWidth = "min(100%, " + Math.floor(pending.naturalWidth / density) + "px)";
       image.hidden = false;
+      counter.textContent = (index + 1) + " / " + group.length + " · " + pending.naturalWidth + " × " + pending.naturalHeight;
       status.hidden = true;
       stage.setAttribute('aria-busy', 'false');
-      // Warm the adjacent photo without loading the full album up front.
-      if (group.length > 1) new Image().src = group[(index + 1) % group.length].href;
+      // Full-resolution files are fetched only when the visitor opens them.
     };
     pending.onerror = function () {
       if (request !== token || !viewer.open) return;
@@ -103,6 +106,7 @@
   viewer.addEventListener('close', function () {
     ++request;
     image.removeAttribute('src');
+    image.style.removeProperty('max-width');
     image.hidden = true;
     touchStart = null;
     document.documentElement.classList.remove('viewer-open');

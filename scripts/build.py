@@ -68,10 +68,12 @@ def gallery_for(language, copy):
     for i, item in enumerate(items):
         caption = html.escape(item[language], quote=True)
         path = prefix + "assets/hiking/" + item["file"]
+        full_path = prefix + "assets/hiking/" + item.get("full", item["file"])
+        srcset = f' srcset="{path} {item["width"]}w, {full_path} {item["full_width"]}w" sizes="(max-width: 680px) 100vw, 55vw"' if i == 0 and item.get("full") else ""
         if i == 1:
             rows.append('<div class="photo-thumbnails">')
         kind = "featured-photo" if i == 0 else "thumbnail-photo"
-        rows.append(f'<a class="photo-link {kind}" href="{path}" data-caption="{caption}"><figure><img src="{path}" alt="{caption}" width="{item["width"]}" height="{item["height"]}" loading="lazy" decoding="async"><figcaption class="sr-only">{caption}</figcaption></figure></a>')
+        rows.append(f'<a class="photo-link {kind}" href="{full_path}" data-caption="{caption}"><figure><img src="{path}"{srcset} alt="{caption}" width="{item["width"]}" height="{item["height"]}" loading="lazy" decoding="async"><figcaption class="sr-only">{caption}</figcaption></figure></a>')
     if len(items) > 1:
         rows.append('</div>')
     rows.append('</section>')
