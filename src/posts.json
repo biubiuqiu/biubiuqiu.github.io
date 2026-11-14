@@ -1,5 +1,16 @@
 [
   {
+    "slug": "agent-sandbox-workspace",
+    "title": "一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果",
+    "original_title": "一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果",
+    "date": "2026-11-14",
+    "original_datetime": "2026-11-14",
+    "kind": "research",
+    "category": "Agent 研究",
+    "excerpt": "模型提出步骤，程序在哪里执行？从文件、进程、依赖与状态出发，理解沙盒如何让 Agent 真正完成更多事情。",
+    "context": "原理解析 · 分步动画与工作空间图解 · 含实现推演"
+  },
+  {
     "slug": "agent-tool-design",
     "title": "Read、Edit、Write、Bash：Agent 工具设计里的巧思",
     "original_title": "Read、Edit、Write、Bash：Agent 工具设计里的巧思",

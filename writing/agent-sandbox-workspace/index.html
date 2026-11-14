@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff">
+<title>一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果 — Denis Wen</title><meta name="description" content="模型提出步骤，程序在哪里执行？从文件、进程、依赖与状态出发，理解沙盒如何让 Agent 真正完成更多事情。"><link rel="canonical" href="https://biubiuqiu.github.io/writing/agent-sandbox-workspace/"><meta property="og:type" content="article"><meta property="og:title" content="一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果"><meta property="og:description" content="模型提出步骤，程序在哪里执行？从文件、进程、依赖与状态出发，理解沙盒如何让 Agent 真正完成更多事情。"><meta property="og:url" content="https://biubiuqiu.github.io/writing/agent-sandbox-workspace/"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=15"><link rel="stylesheet" href="/writing.css?v=3"><script src="/theme.js?v=6" defer></script><link rel="stylesheet" href="/context-demos.css?v=1"><link rel="stylesheet" href="/sandbox-demos.css?v=1"><script src="/sandbox-demos.js?v=1" defer></script></head>
+<body class="writing-page"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><a href="/">首页 ↗</a>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外观" hidden>
+              <summary aria-label="外观" title="外观"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外观">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>跟随系统</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>浅色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>深色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header><main class="writing-width writing-main" id="main"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a></nav><header class="article-header"><p class="writing-eyebrow">Agent 研究 / 文档与源码研究</p><h1>一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果</h1><p class="article-date">发表于 <time datetime="2026-11-14">2026-11-14</time><span> · Denis Wen</span></p><p class="article-context">原理解析 · 分步动画与工作空间图解 · 含实现推演</p></header><article class="article-body"><p class="article-lead">模型可以写出一段分析代码，但代码要在哪里运行？生成的文件放在哪里？下一步还能找到吗？当 Agent 从回答问题走向实际完成任务，它需要的不只是更长的上下文，还需要一个能计算、能保存结果、能验证假设的工作空间。</p>
+<aside class="research-scope"><strong>阅读范围 · 2026-11-14</strong><p>本文从任务执行出发解释沙盒原理，结合官方文档讨论操作系统机制。图解、文件名与接口均为教学示例；“实现推演”是设计建议，不是某个产品内部实现。本文没有进行不同隔离技术的性能或安全对照测试。</p></aside>
+<nav class="article-toc" aria-label="文章目录"><strong>阅读路径</strong><a href="#why-compute">为什么需要一个计算空间</a><a href="#sandbox-task">动画：任务怎样在沙盒里完成</a><a href="#workspace-parts">拆开工作空间的组成</a><a href="#isolation">隔离究竟发生在哪里</a><a href="#state-lifetime">文件还在，进程还在吗</a><a href="#allocation">按用户还是按会话分配</a><a href="#runtime-design">一个最小可用的运行时</a><a href="#sandbox-sources">研究来源</a></nav>
+<h2 id="why-compute">一、模型能提出做法，还需要一个地方把做法执行出来</h2>
+<p>先想一个普通任务：用户上传一份订单 CSV，希望统计金额、生成报表，再检查结果。模型可以理解字段、决定统计口径、写出 Python，但“生成了一段代码”和“已经用真实数据算出了结果”之间，隔着一次真正的执行。</p>
+<p>模型推理本身当然也消耗计算资源。这里说的<strong>计算空间</strong>，特指它通过工具使用的外部执行环境：CPU 运行生成的程序，内存承载处理中的数据，文件系统保存输入和产物，操作系统管理进程。模型通常通过工具请求使用它，而不是自己变成一个 Python 进程。</p>
+<p>这像把一台可操作的电脑交给 Agent。它不仅能说“可以这样处理”，还可以把脚本放进去、运行它、看到报错、修改后重跑，最后交付一个真实存在的文件。沙盒里的产物、日志和退出状态，会成为下一轮判断的证据。</p>
+<div class="sandbox-overview" aria-label="模型、运行时与工作空间的关系"><section><span>决定下一步</span><h3>模型</h3><p>理解目标、生成工具调用、解释结果。</p></section><div class="sandbox-link" aria-label="工具请求与执行结果双向传递">工具请求 ↓<br>观察结果 ↑</div><section><span>兑现调用契约</span><h3>Agent 运行时</h3><p>定位工作区、检查权限、派发执行、记录状态。</p></section><div class="sandbox-link" aria-label="运行时向工作空间派发操作">派发操作 ↓<br>结果与产物 ↑</div><section class="sandbox-overview-space"><span>真正发生计算</span><h3>受约束的工作空间</h3><p>文件 + 进程 + 依赖 + 资源 + 访问边界。</p></section></div>
+<h3>1.1 为什么不把所有数据都交给模型算</h3>
+<p>对于结构明确的遍历、排序、聚合、格式转换，让程序处理通常更合适：模型描述规则，代码逐条应用规则。没有必要为了统计一个大文件，让每一行都先穿过模型上下文。</p>
+<p>Anthropic 的代码执行文章也展示了这种做法：数据在执行环境中筛选、转换，再把必要结果返回给模型；文件可用于保存跨操作的中间状态。<a class="source-ref" href="#sb-source-1">[1]</a> 这说明<strong>上下文不是工作空间的全部</strong>。模型可以只看到汇总、样本和失败信息，完整输入与产物另有承载位置。</p>
+<p>但这不自动保证结果正确。金额按字符串拼接还是数值相加、退款是否扣除、单位是什么，仍取决于任务定义和代码。需要先明确口径，再运行、检查，不能把“程序算的”当作正确性的证明。</p>
+<h3>1.2 为什么不只提供一百个固定工具</h3>
+<p>固定工具非常适合边界清楚的业务动作，例如查询订单、创建日程。计算空间则允许 Agent 临时组合步骤：解析一种新格式、写一个过滤脚本、用现有库转换文档，再把结果交给另一个工具。它扩展的是可组合能力，不是让每一种新需求都等一个新接口。</p>
+<p><strong>并非所有 Agent 都需要独立沙盒。</strong>如果任务只是在已授权的业务 API 之间选择和编排，工具服务器可能已经承担全部执行。遇到动态代码、大文件、多步产物或持续进程时，独立工作空间的价值才明显。MCP 等协议负责工具连接与调用约定，本身并不等于一台执行机器。</p>
+<h2 id="sandbox-task">二、跟着一个任务走：从请求到可交付文件</h2>
+<figure class="context-demo sandbox-lab" id="sandbox-task-demo" data-sandbox-demo="task"><figcaption><span class="demo-kicker">分步动画 / 教学示例</span><h3>图 1：模型写计划，工作空间执行，结果再回到模型</h3><p>点击“下一步”或播放。示例 CSV 有 3 笔订单，金额为 120、80、300，总额为 500；动画展示概念，不执行真实命令。</p></figcaption><div class="sandbox-stage-list"><span>理解</span><span>准备</span><span>计算</span><span>核对</span></div><div class="sandbox-task-panels"><section><h4>模型 / 运行时</h4><div class="sandbox-thought">用户请求：统计订单金额，生成汇总文件。</div></section><section class="sandbox-workbench"><h4>工作空间 · workspace-demo</h4><div class="sandbox-file-list">输入：orders.csv</div><div class="sandbox-process">进程：尚未启动</div></section></div><div class="sandbox-observation"><strong>模型收到的观察</strong><pre>尚未执行，不能宣称已完成统计。</pre></div><div class="demo-controls" hidden><button type="button" data-sandbox-action="prev">← 上一步</button><button type="button" class="demo-play" data-sandbox-action="play">播放动画</button><button type="button" data-sandbox-action="next">下一步 →</button><button type="button" data-sandbox-action="reset">重置</button><span class="demo-count">1 / 4</span></div><p class="demo-explanation" aria-live="polite">先明确统计口径，再调用执行环境。</p></figure>
+<p>这个例子里，模型不需要亲自逐行心算，但需要理解数据、提出合适程序，并根据实际执行结果调整。代码出错时，错误信息成为新的观察；程序成功结束后，还要检查文件存在、行数符合预期、统计口径一致。</p>
+<pre><code># 假设当前目录中已有 orders.csv，金额单位为整数元
+import csv
+from pathlib import Path
+
+with open("orders.csv", newline="", encoding="utf-8") as f:
+    rows = list(csv.DictReader(f))
+
+total = sum(int(row["amount"]) for row in rows)
+Path("summary.csv").write_text(
+    f"order_count,total_amount\n{len(rows)},{total}\n",
+    encoding="utf-8",
+)
+print({"order_count": len(rows), "total_amount": total})</code></pre>
+<p>在这个玩具数据集里，结果应为 3 笔、500 元。真实任务如果有小数金额、缺失值、重复订单或币种混用，就需要改用相应的数据规则；示例不具备这些生产校验。生成文件也只是工作区内的结果，还需要通过下载或产物接口交付给用户。</p>
+<h2 id="workspace-parts">三、拆开这台“电脑”：它究竟提供了什么</h2>
+<p>工作空间不只是一个目录。目录能保存文件，却不能单独解释进程在哪里运行、依赖来自哪里、可以连接哪些网络、资源由谁限制。可以从下面五个部分理解。</p>
+<figure class="context-demo sandbox-lab" id="sandbox-parts-demo" data-sandbox-demo="parts"><figcaption><span class="demo-kicker">组成图 / 点击查看</span><h3>图 2：一个目录之外，还要有执行与管理能力</h3><p>切换卡片，看看每一部分让 Agent 多做了什么，以及它没有自动保证什么。</p></figcaption><div class="sandbox-part-tabs" hidden></div><div class="sandbox-part-card"><h4>文件系统</h4><p>输入、脚本、中间结果与产物有稳定的定位方式。</p><div class="sandbox-part-example">/workspace/orders.csv</div><small>有路径，不代表数据会永久保存。</small></div><p class="demo-explanation" aria-live="polite">工作空间是多种能力的组合，不由一个目录名决定。</p></figure>
+<h3>3.1 文件系统：把中间状态从对话里拿出来</h3>
+<p>输入 CSV、分析脚本、图表、测试日志都可以有自己的路径。下一次工具调用读取这些文件，就能继续处理，而不必把全部内容重新嵌进提示词。文件系统也使不同程序能交换数据：一个程序输出 CSV，另一个程序把它画成图。</p>
+<p>但“路径相同”不等于“内容版本相同”。会话摘要写着文件存在，文件也可能已经被清理、覆盖或移动。恢复后要检查真实状态，而不是相信聊天里上一次的描述。</p>
+<h3>3.2 进程：让动作真正发生，并有一个可追踪的身份</h3>
+<p>运行 Python、启动浏览器、执行编译、等待测试，都涉及进程。进程有 PID、退出码、标准输出、标准错误、子进程与运行时间。一个长命令可能还没结束，模型却已开始下一轮推理，所以运行时需要用任务 ID 追踪它。</p>
+<p>模型通常不需要和执行进程在同一台机器。运行时可以通过受控连接派发命令，收集输出并回传。浏览器、GPU 或大型计算也可以由单独的执行服务承担；不必把所有能力都装在一个沙盒里。</p>
+<h3>3.3 依赖与资源：让“可以运行”变成可预期</h3>
+<p>脚本需要 Python 和库，网页需要浏览器，视频需要编解码工具。基础镜像提供可复用的软件环境，项目文件和必要配置再组成具体任务的工作区。安装过程还需要考虑版本、下载来源和缓存，不能假设依赖永远能从网络装成功。</p>
+<p>CPU、内存、磁盘容量、进程数与执行时长则决定它能做多大的工作。一个无限循环不能无限占用整台宿主机；同样，一段程序能启动，不代表给定内存足够把整个数据集读进来。</p>
+<h2 id="isolation">四、为什么还需要“沙盒”这道边界</h2>
+<p>到这里，我们已经解释了<strong>工作空间为什么有用</strong>。还需要再问：动态生成的程序如果路径写错、消耗失控，或读取了不可信内容，它能够影响到哪里？</p>
+<p>“专属计算空间”和“安全隔离边界”相关，但不是同义词。一个普通目录加一个 shell 可以作为工作区，却未必具备可靠隔离。沙盒是在提供执行能力的同时，由运行时和操作系统约束可见资源、可执行操作和影响范围。</p>
+<div class="sandbox-boundary" aria-label="工作空间访问边界示意"><p class="sandbox-boundary-label">受约束的执行环境 · 概念示意</p><div class="sandbox-boundary-inside"><strong>Agent 生成的程序</strong><span>读写授权工作目录</span><span>使用受限计算资源</span><span>访问允许的外部服务</span></div><div class="sandbox-boundary-gate">操作系统 / 执行服务按策略检查边界</div><div class="sandbox-boundary-outside"><span>其他用户数据</span><span>宿主机敏感目录</span><span>未授权网络与凭证</span></div><small>这些保护需要明确配置与验证；框里画了一条线，不代表所有访问天然被阻断。</small></div>
+<h3>4.1 几种机制各自解决一个问题</h3>
+<div class="sandbox-table-scroll" role="region" aria-label="隔离机制对照，可横向滚动" tabindex="0"><table><thead><tr><th>机制</th><th>主要约束</th><th>不能据此认定</th></tr></thead><tbody><tr><td>Namespaces</td><td>进程、挂载、网络等资源的视图与命名范围</td><td>进入 namespace 就能任意安全运行所有代码</td></tr><tr><td>Cgroups</td><td>CPU、内存、进程等资源的计量与限制</td><td>限制内存就限制了文件读取和网络访问</td></tr><tr><td>Capabilities / Seccomp / LSM</td><td>缩小权限、系统调用与访问面</td><td>一个 syscall 过滤器就是完整沙盒</td></tr><tr><td>文件与网络策略</td><td>挂载范围、读写权限、外连目标与出口</td><td>文件隔离自动带来网络隔离</td></tr></tbody></table></div>
+<p>Docker 文档分别说明了 namespaces 与资源控制的角色；Linux 文档也明确提醒 seccomp 系统调用过滤本身不是完整沙盒。<a class="source-ref" href="#sb-source-2">[2]</a><a class="source-ref" href="#sb-source-3">[3]</a> 因而不能只选一个技术名词，就忽略文件挂载、权限和网络策略。</p>
+<p>提示词里写“不要访问其他目录”是行为指引；操作系统拒绝访问才是执行边界。即使模型已经批准一个动作，底层仍可以拒绝越权；反过来，沙盒允许发出请求，也不等于业务层授权它修改远程数据。</p>
+<h3>4.2 容器、gVisor、microVM：执行边界可以放在不同位置</h3>
+<p>普通 Linux 容器中的进程共享宿主机内核。gVisor 在用户态实现 Linux 风格的应用内核接口，提供 <code>runsc</code> 与容器工具集成。<a class="source-ref" href="#sb-source-4">[4]</a> Firecracker 则通过 KVM 运行 microVM，让工作负载使用客体内核。<a class="source-ref" href="#sb-source-5">[5]</a></p>
+<div class="sandbox-kernel-map" aria-label="不同执行边界的层次"><section><h4>普通容器</h4><span>任务进程</span><span>共享宿主机内核</span></section><section><h4>gVisor</h4><span>任务进程</span><span>用户态应用内核</span><span>宿主机内核</span></section><section><h4>MicroVM</h4><span>任务进程 + 客体内核</span><span>虚拟化边界 / VMM</span><span>宿主机内核 + KVM</span></section></div>
+<p>这张图只比较逻辑层次，不是完整的系统调用路径。选型还要看兼容性、工作负载、启动与维护成本，以及租户之间的信任关系。不能把它画成一个普适的性能排名，也不能假设用了 microVM 就自动有出口控制；Firecracker 文档明确把网络过滤交给宿主侧方案。<a class="source-ref" href="#sb-source-5">[5]</a></p>
+<p>还要分清两个常见场景：本地编程助手可能约束现有开发目录里的命令；云端 Agent 则可能获得一套新建的远程工作环境。Claude Code 的 sandboxed Bash 文档讨论的是文件与网络约束，不能据此推断每次调用都新建了一台虚拟机。<a class="source-ref" href="#sb-source-6">[6]</a></p>
+<h2 id="state-lifetime">五、有状态的计算空间，必须说明“什么会留下来”</h2>
+<p>对话、文件与进程是三种不同的状态。聊天历史还在，不能证明文件还在；文件还在，也不能证明正在运行的 Python 进程、内存里的变量、浏览器连接还在。</p>
+<figure class="context-demo sandbox-lab" id="sandbox-state-demo" data-sandbox-demo="state"><figcaption><span class="demo-kicker">恢复方式对照 / 教学示例</span><h3>图 3：重开环境后，文件和进程分别怎样了</h3><p>切换三种设计。这里的“回收”指终止执行实例后重新创建；不包括保留原进程的简单冻结。</p></figcaption><div class="sandbox-state-tabs" hidden></div><div class="sandbox-state-grid"><div><span>聊天记录</span><strong data-state-chat>独立保存</strong></div><div><span>工作文件</span><strong data-state-files>可能丢失</strong></div><div><span>内存与进程</span><strong data-state-process>重新启动</strong></div></div><p class="demo-explanation" aria-live="polite">临时工作目录随实例销毁，聊天历史即使存在，也不能恢复未另存的文件。</p></figure>
+<p>Kubernetes 的 volume 文档区分了跟随 Pod 生命周期的临时卷与超出单个 Pod 生命周期的持久卷。<a class="source-ref" href="#sb-source-7">[7]</a> 因此工作区回收策略必须和存储策略一起设计。</p>
+<p>一种常见做法是持久保存重要文件，空闲时释放计算资源，下次重建进程并重新挂载。另一种做法是使用支持的 checkpoint/restore 保存执行状态。gVisor 提供相关机制，但恢复还要考虑文件系统一致性、网络连接和环境兼容条件，不能理解为“在任意机器上恢复就一切不变”。<a class="source-ref" href="#sb-source-8">[8]</a></p>
+<p><strong>我的分析：</strong>暂停、进程快照、文件持久化、对象存储归档、数据备份分别处理不同问题。“退出时上传到对象存储”可以归档，却不能保护上传之前突然宕机的所有写入。需要承诺什么级别的数据不丢，就要明确写入确认、持久化路径、故障范围与恢复目标，不能只加一个退出钩子。</p>
+<h2 id="allocation">六、一个用户一个，还是一个会话一个</h2>
+<p>这是产品与资源管理上的选择，不是模型要求的固定结构。<strong>沙盒、容器、Pod 和工作目录也不天然一一对应。</strong>一个调度单元可以承载多个隔离实例；是否应该这么做，取决于隔离实现与平台设计。</p>
+<div class="sandbox-table-scroll" role="region" aria-label="工作空间分配粒度对照，可横向滚动" tabindex="0"><table><thead><tr><th>分配方式</th><th>得到什么</th><th>要处理什么</th></tr></thead><tbody><tr><td>每次调用一个临时环境</td><td>清理简单、适合独立小计算</td><td>多步状态需要显式带入带出，依赖准备可能重复</td></tr><tr><td>每个会话一个工作空间</td><td>任务状态清晰，不同会话较易分开</td><td>更多实例、依赖与文件共享方式要设计</td></tr><tr><td>每个用户一个工作空间</td><td>个人文件与依赖可复用</td><td>并发会话会竞争文件、端口、依赖版本与后台进程</td></tr></tbody></table></div>
+<p><strong>实现推演：</strong>可以把长期文件归属与短期执行实例分开：用户拥有可持续的文件空间，任务获得受约束的工作目录或独立执行实例。但“每个会话一个子目录”只解决组织问题，不自动解决跨目录访问；真正隔离仍需运行时和操作系统执行。</p>
+<h2 id="runtime-design">七、把工具调用接到这个空间，需要什么</h2>
+<p>如果自己实现，我会先让模型面对稳定的工具语义，让运行时负责定位真实机器。例如：</p>
+<pre><code>{
+  "workspace_id": "ws-demo",
+  "operation": "exec",
+  "command": ["python", "analyze.py"],
+  "cwd": "/workspace",
+  "timeout_ms": 30000,
+  "request_id": "run-demo-1"
+}</code></pre>
+<p>这是自定义接口示意，不是现有产品的调用格式。身份必须由认证上下文绑定到可访问的 workspace，不能因为客户端传了一个 ID 就信任它。<code>request_id</code> 也只是关联标识；只有服务端建立了去重与副作用记录规则，它才有幂等意义。</p>
+<p>执行服务需要回答：环境准备好了吗、命令是否仍在运行、退出码是什么、输出有没有截断、产物在哪里、取消后子进程是否清理。路由还要保证后续操作找到正确工作区；多个执行者同时接手时，需要租约或其他并发控制，避免重复执行。</p>
+<p>这也说明沙盒不等于 Agent 本身。目标理解、模型请求、上下文选择与任务编排可以在外部运行时；沙盒负责承载被派发的计算和状态。二者通过明确的接口连接，既能分别扩缩容，也更容易解释故障发生在模型、派发还是执行层。</p>
+<p><strong>我会这样检验这个设计：</strong>让一个任务完成“读输入、写脚本、运行、修错、交付”全流程；中途停止计算资源，确认承诺保留的文件仍在；模拟超长输出、内存不足、命令超时和并发写入，检查是否返回真实状态。这些验证比仅仅看到一个容器启动更接近“Agent 有了可用的工作空间”。</p>
+<p>所以，当我说 Agent 需要一个沙盒，想强调的是：<strong>它需要一个可以实际操作的环境，把提出的步骤变成计算、文件和可核验的结果，再由明确的边界约束这些操作。</strong>能计算让它做更多事，能保存状态让它把多步任务接起来，能观察结果让它纠错，隔离则让这些能力可以被有边界地交付。</p>
+<h2 id="sandbox-sources">研究来源</h2>
+<p>核验日期：2026-11-14。下面是用于解释机制的官方资料；本文的任务动画和接口设计是作者的教学与实现推演，不是运行截图或产品基准。</p>
+<ol class="article-sources">
+<li id="sb-source-1"><a href="https://www.anthropic.com/research/code-execution-with-mcp" target="_blank" rel="noopener noreferrer">Anthropic · Code execution with MCP</a>：在执行环境内筛选数据、组合程序与保存中间状态。</li>
+<li id="sb-source-2"><a href="https://docs.docker.com/engine/security/" target="_blank" rel="noopener noreferrer">Docker Engine security</a>：namespaces、cgroups 与权限机制的角色。</li>
+<li id="sb-source-3"><a href="https://docs.kernel.org/userspace-api/seccomp_filter.html" target="_blank" rel="noopener noreferrer">Linux Kernel · Seccomp BPF</a>：系统调用过滤的作用及其边界。</li>
+<li id="sb-source-4"><a href="https://gvisor.dev/docs/" target="_blank" rel="noopener noreferrer">gVisor · What is gVisor?</a>：应用内核与 runsc。</li>
+<li id="sb-source-5"><a href="https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md" target="_blank" rel="noopener noreferrer">Firecracker · Design</a>：KVM、microVM、宿主侧网络与隔离层次。</li>
+<li id="sb-source-6"><a href="https://code.claude.com/docs/en/sandboxing" target="_blank" rel="noopener noreferrer">Claude Code · Sandboxed Bash</a>：本地命令的文件系统与网络边界。</li>
+<li id="sb-source-7"><a href="https://kubernetes.io/docs/concepts/storage/volumes/" target="_blank" rel="noopener noreferrer">Kubernetes · Volumes</a>：临时存储与持久存储的生命周期。</li>
+<li id="sb-source-8"><a href="https://gvisor.dev/docs/user_guide/checkpoint_restore/" target="_blank" rel="noopener noreferrer">gVisor · Checkpoint/Restore</a>：进程状态恢复能力与环境限制。</li>
+</ol>
+</article><nav class="article-related" aria-label="更多文章"><h2>继续阅读</h2><a href="/writing/agent-tool-design/">Read、Edit、Write、Bash：Agent 工具设计里的巧思 →</a><a href="/writing/agent-context-management/">Agent 如何在长任务里保持清醒：Claude Code、Pi 与 OpenCode 的上下文管理研究 →</a><a href="/writing/sqoop-null-character/">一个不可见字符，为什么让数据同步字段错位？ →</a><a href="/writing/spark-remote-service/">从依赖冲突到服务拆分：一次 Spark 集成实践 →</a><a href="/writing/linux-mining-process/">一次伪装成 sshd 的挖矿进程排查 →</a><a href="/writing/">全部文章 →</a></nav></main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>保持好奇，持续探索。</span><a href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub ↗</a></footer></body></html>
