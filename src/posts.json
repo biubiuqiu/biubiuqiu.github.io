@@ -8,7 +8,14 @@
     "kind": "research",
     "category": "Agent 研究",
     "excerpt": "模型提出步骤，程序在哪里执行？从文件、进程、依赖与状态出发，理解沙盒如何让 Agent 真正完成更多事情。",
-    "context": "原理解析 · 分步动画与工作空间图解 · 含实现推演"
+    "context": "原理解析 · 分步动画与工作空间图解 · 含实现推演",
+    "tags": [
+      "Agent",
+      "沙盒",
+      "运行时"
+    ],
+    "cover": "/assets/writing/agent-sandbox-workspace.svg",
+    "cover_alt": "COMPUTE / WORKSPACE · A SPACE TO ACT"
   },
   {
     "slug": "agent-tool-design",
@@ -19,7 +26,14 @@
     "kind": "research",
     "category": "Agent 研究",
     "excerpt": "为什么有了 Bash，还需要 Read、Edit 和 Write？从精确匹配、分页、输出预算与执行状态，理解工具如何影响 Agent 的判断。",
-    "context": "公开文档与固定源码研究 · 含交互图解与实现推演"
+    "context": "公开文档与固定源码研究 · 含交互图解与实现推演",
+    "tags": [
+      "Agent",
+      "工具设计",
+      "Claude Code"
+    ],
+    "cover": "/assets/writing/agent-tool-design.svg",
+    "cover_alt": "TOOLS / CONTRACTS · SMALL TOOLS. CLEAR CONTRACTS."
   },
   {
     "slug": "agent-context-management",
@@ -30,7 +44,14 @@
     "kind": "research",
     "category": "Agent 研究",
     "excerpt": "从官方文档与固定源码快照出发，区分历史、上下文和记忆，推演可回放、有预算、能验证的上下文层。",
-    "context": "文档与源码研究 · 含实现推演 · 2026-11-13 核验"
+    "context": "文档与源码研究 · 含实现推演 · 2026-11-13 核验",
+    "tags": [
+      "Agent",
+      "上下文",
+      "Claude Code"
+    ],
+    "cover": "/assets/writing/agent-context-management.svg",
+    "cover_alt": "CONTEXT / MEMORY · KEEP THE SIGNAL"
   },
   {
     "slug": "sqoop-null-character",
@@ -40,7 +61,15 @@
     "original_datetime": "2022-02-09T18:21:56",
     "category": "问题排查",
     "excerpt": "从二分定位问题数据，到追踪解析器状态机，记录一次 NUL 字符引起的同步异常。",
-    "context": "Sqoop 1.4.7 / Hive 2.1.1 · 历史实践记录"
+    "context": "Sqoop 1.4.7 / Hive 2.1.1 · 历史实践记录",
+    "tags": [
+      "数据同步",
+      "Sqoop",
+      "问题排查"
+    ],
+    "cover": "/assets/writing/sqoop-null-character.svg",
+    "cover_alt": "DATA / DEBUGGING · THE INVISIBLE CHARACTER",
+    "updated": "2026-11-13"
   },
   {
     "slug": "spark-remote-service",
@@ -50,7 +79,15 @@
     "original_datetime": "2021-10-08T14:04:33",
     "category": "工程实践",
     "excerpt": "当 Spark 与既有依赖难以共处，尝试把计算能力独立成服务，用接口明确边界。",
-    "context": "Spark SQL / Hive Metastore · 历史实践记录"
+    "context": "Spark SQL / Hive Metastore · 历史实践记录",
+    "tags": [
+      "Spark",
+      "架构",
+      "工程实践"
+    ],
+    "cover": "/assets/writing/spark-remote-service.svg",
+    "cover_alt": "SYSTEM / BOUNDARIES · MAKE THE BOUNDARY EXPLICIT",
+    "updated": "2026-11-13"
   },
   {
     "slug": "linux-mining-process",
@@ -60,6 +97,14 @@
     "original_datetime": "2024-05-28T10:19:12",
     "category": "系统排查",
     "excerpt": "从异常 CPU 占用出发，沿着执行文件、定时任务和配置追踪进程的来源。",
-    "context": "Linux / 进程与定时任务 · 历史排查记录"
+    "context": "Linux / 进程与定时任务 · 历史排查记录",
+    "tags": [
+      "Linux",
+      "进程",
+      "问题排查"
+    ],
+    "cover": "/assets/writing/linux-mining-process.svg",
+    "cover_alt": "LINUX / INVESTIGATION · FOLLOW THE PROCESS",
+    "updated": "2026-11-13"
   }
 ]
