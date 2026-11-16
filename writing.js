@@ -26,12 +26,78 @@
   if(form){
     form.hidden=false;var cards=Array.from(document.querySelectorAll('.archive-card'));var result=document.querySelector('.archive-result');var empty=document.querySelector('.archive-empty');
     var params=new URLSearchParams(location.search);['q','category','tag'].forEach(function(key){if(params.has(key))form.elements[key].value=params.get(key);});
+    var dropdowns=[];
+    function customSelect(select) {
+      var field=select.parentElement;
+      var wrapper=document.createElement('div');wrapper.className='filter-select';
+      var trigger=document.createElement('button');trigger.type='button';trigger.className='filter-trigger';
+      trigger.setAttribute('role','combobox');trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+      var value=document.createElement('span');value.id=select.name+'-value';value.className='filter-value';
+      var chevron=document.createElement('span');chevron.className='filter-chevron';chevron.setAttribute('aria-hidden','true');
+      trigger.append(value,chevron);trigger.setAttribute('aria-labelledby',select.getAttribute('aria-labelledby')+' '+value.id);
+      var menu=document.createElement('div');menu.id=select.name+'-options';menu.className='filter-options';menu.hidden=true;
+      menu.setAttribute('role','listbox');menu.setAttribute('aria-labelledby',select.getAttribute('aria-labelledby'));
+      trigger.setAttribute('aria-controls',menu.id);
+      var options=Array.from(select.options);var active=0;var query='';var typedAt=0;
+      var items=options.map(function(option,index){
+        var item=document.createElement('div');item.className='filter-option';item.id=select.name+'-option-'+index;
+        item.setAttribute('role','option');item.textContent=option.textContent;
+        item.addEventListener('pointerdown',function(e){e.preventDefault();});
+        item.addEventListener('pointermove',function(){if(active!==index)highlight(index,false);});
+        item.addEventListener('click',function(){choose(index);});menu.append(item);return item;
+      });
+      function highlight(index,scroll) {
+        active=Math.max(0,Math.min(items.length-1,index));
+        items.forEach(function(item,i){item.classList.toggle('is-active',i===active);});
+        trigger.setAttribute('aria-activedescendant',items[active].id);
+        if(scroll)items[active].scrollIntoView({block:'nearest'});
+      }
+      function sync() {
+        if(select.selectedIndex<0)select.selectedIndex=0;
+        value.textContent=options[Math.max(0,select.selectedIndex)].textContent;
+        items.forEach(function(item,i){item.setAttribute('aria-selected',String(i===select.selectedIndex));});
+        trigger.classList.toggle('has-value',Boolean(select.value));
+      }
+      function close() {
+        menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.removeAttribute('aria-activedescendant');wrapper.classList.remove('is-open');query='';
+      }
+      function open() {
+        dropdowns.forEach(function(widget){widget.close();});menu.hidden=false;wrapper.classList.add('is-open');trigger.setAttribute('aria-expanded','true');
+        highlight(Math.max(0,select.selectedIndex),true);
+      }
+      function choose(index) {
+        select.selectedIndex=index;sync();close();trigger.focus({preventScroll:true});select.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      trigger.addEventListener('click',function(){if(menu.hidden)open();else close();});
+      trigger.addEventListener('keydown',function(e){
+        var key=e.key;
+        if(key==='Tab'){close();return;}
+        if(key==='Escape'){if(!menu.hidden){e.preventDefault();e.stopPropagation();close();}return;}
+        if(key==='Enter'||key===' '){e.preventDefault();if(menu.hidden)open();else choose(active);return;}
+        if(['ArrowDown','ArrowUp','Home','End'].includes(key)){
+          e.preventDefault();var wasClosed=menu.hidden;if(wasClosed)open();
+          if(key==='Home')highlight(0,true);else if(key==='End')highlight(items.length-1,true);
+          else if(!wasClosed)highlight(active+(key==='ArrowDown'?1:-1),true);return;
+        }
+        if(key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+          e.preventDefault();if(menu.hidden)open();var now=Date.now();query=(now-typedAt>700?'':query)+key.toLocaleLowerCase();typedAt=now;
+          var found=options.findIndex(function(option){return option.textContent.toLocaleLowerCase().startsWith(query);});
+          if(found>=0)highlight(found,true);
+        }
+      });
+      document.addEventListener('pointerdown',function(e){if(!wrapper.contains(e.target))close();});
+      wrapper.addEventListener('focusout',function(e){if(!wrapper.contains(e.relatedTarget))close();});
+      wrapper.append(trigger,menu);field.append(wrapper);select.hidden=true;
+      sync();return {sync:sync,close:close};
+    }
+    form.querySelectorAll('select').forEach(function(select){dropdowns.push(customSelect(select));});
     function filter(update){var q=form.elements.q.value.trim().toLocaleLowerCase();var category=form.elements.category.value;var tag=form.elements.tag.value;var total=0;
+      dropdowns.forEach(function(widget){widget.sync();});
       cards.forEach(function(card){var matches=(!q||card.dataset.search.toLocaleLowerCase().includes(q))&&(!category||card.dataset.category===category)&&(!tag||JSON.parse(card.dataset.tags).includes(tag));card.hidden=!matches;if(matches)total++;});
       result.textContent=total===cards.length?'共 '+total+' 篇文章':'找到 '+total+' / '+cards.length+' 篇文章';empty.hidden=total!==0;
       if(update){var ps=new URLSearchParams();if(q)ps.set('q',form.elements.q.value.trim());if(category)ps.set('category',category);if(tag)ps.set('tag',tag);history.replaceState(null,'',location.pathname+(ps.size?'?'+ps.toString():''));}
     }
-    form.addEventListener('submit',function(e){e.preventDefault();filter(true);});form.addEventListener('input',function(){filter(true);});form.addEventListener('change',function(){filter(true);});form.addEventListener('reset',function(){setTimeout(function(){filter(true);},0);});filter(false);
+    form.addEventListener('submit',function(e){e.preventDefault();filter(true);});form.addEventListener('input',function(){filter(true);});form.addEventListener('change',function(){filter(true);});form.addEventListener('reset',function(){dropdowns.forEach(function(widget){widget.close();});setTimeout(function(){filter(true);},0);});filter(false);
   }
   var body=document.querySelector('.article-body');if(!body)return;
   var panel=document.querySelector('.toc-panel');var media=matchMedia('(max-width:900px)');

@@ -75,3 +75,23 @@
   .post-page .article-breadcrumb{gap:7px}
   .post-page .article-intro{padding-bottom:18px;margin-bottom:22px}
 }
+
+/* Select-only comboboxes use the journal palette on every platform. */
+.filter-field{min-width:0}
+.filter-label{display:block;font-size:10px;line-height:1.8;color:var(--muted)}
+.filter-select{position:relative;margin-top:7px;min-width:0}
+.archive-filters .filter-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;height:40px;padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:12px/1.6 var(--sans);text-align:left;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.archive-filters .filter-trigger:hover{border-color:var(--muted)}
+.archive-filters .filter-trigger:focus-visible,.filter-select.is-open .filter-trigger{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}
+.filter-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filter-trigger.has-value .filter-value{color:var(--accent)}
+.filter-chevron{width:7px;height:7px;flex-shrink:0;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);color:var(--muted);transition:transform .15s}
+.is-open .filter-chevron{transform:translateY(2px) rotate(225deg);color:var(--accent)}
+.filter-options{position:absolute;top:calc(100% + 8px);left:0;right:0;z-index:50;max-height:min(296px,45dvh);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:6px;border:1px solid var(--line);border-radius:9px;background:var(--paper);box-shadow:0 8px 28px #20232614,0 2px 5px #20232608}
+.filter-option{position:relative;display:flex;align-items:center;min-height:38px;margin:2px 0;padding:9px 30px 9px 11px;border-radius:5px;color:var(--ink);font-size:12px;line-height:1.6;overflow-wrap:anywhere;cursor:pointer}
+.filter-option.is-active{background:var(--surface)}
+.filter-option[aria-selected=true]{color:var(--accent);font-weight:550;background:var(--selected)}
+.filter-option[aria-selected=true]::after{content:"";position:absolute;right:12px;width:5px;height:10px;border:solid currentColor;border-width:0 1.5px 1.5px 0;transform:translateY(-2px) rotate(45deg)}
+:root[data-theme=dark] .filter-options{box-shadow:0 12px 32px #0005}
+@media(max-width:600px){.archive-filters .filter-trigger{height:44px}.filter-option{min-height:44px}.filter-options{max-height:min(280px,42dvh)}}
+@media(prefers-reduced-motion:reduce){.filter-trigger,.filter-chevron{transition:none!important}}
