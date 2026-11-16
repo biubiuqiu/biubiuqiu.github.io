@@ -46,6 +46,7 @@
 .post-page .article-intro{padding-bottom:22px;border-bottom:1px solid var(--line);margin-bottom:26px}
 .post-page .article-context{line-height:1.9;font-size:11px}
 .post-page .article-body .article-lead{margin-top:0}
+.post-page .article-pagination a{white-space:normal;overflow-wrap:anywhere}
 .post-page .writing-footer{padding-top:28px}
 @media(max-width:1100px){
   .post-page .article-layout{grid-template-columns:200px minmax(0,1fr);gap:24px}
