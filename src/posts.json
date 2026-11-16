@@ -14,11 +14,12 @@
       "沙盒",
       "运行时"
     ],
-    "cover": "/assets/writing/agent-sandbox-workspace.svg",
-    "cover_alt": "COMPUTE / WORKSPACE · A SPACE TO ACT",
-    "banner": "/assets/hiking/full/dsc01901.jpg",
-    "banner_alt": "林线上的山路",
-    "banner_position": "center 56%"
+    "cover": "/assets/hiking/originals/IMG_2269.jpeg",
+    "cover_alt": "云雾、金色山峰与山谷营地",
+    "banner": "/assets/hiking/originals/IMG_2269.jpeg",
+    "banner_alt": "云雾、金色山峰与山谷营地",
+    "banner_position": "center 58%",
+    "cover_position": "center 58%"
   },
   {
     "slug": "agent-tool-design",
@@ -35,11 +36,12 @@
       "工具设计",
       "Claude Code"
     ],
-    "cover": "/assets/writing/agent-tool-design.svg",
-    "cover_alt": "TOOLS / CONTRACTS · SMALL TOOLS. CLEAR CONTRACTS.",
-    "banner": "/assets/hiking/full/dsc00891.jpg",
-    "banner_alt": "层叠的山脊",
-    "banner_position": "center 52%"
+    "cover": "/assets/hiking/originals/IMG_2178.jpeg",
+    "cover_alt": "垭口山脊与远处的山谷",
+    "banner": "/assets/hiking/originals/IMG_2178.jpeg",
+    "banner_alt": "垭口山脊与远处的山谷",
+    "banner_position": "center 50%",
+    "cover_position": "center 50%"
   },
   {
     "slug": "agent-context-management",
@@ -56,11 +58,12 @@
       "上下文",
       "Claude Code"
     ],
-    "cover": "/assets/writing/agent-context-management.svg",
-    "cover_alt": "CONTEXT / MEMORY · KEEP THE SIGNAL",
-    "banner": "/assets/hiking/full/img_2146.jpg",
-    "banner_alt": "云间雪峰与冰川",
-    "banner_position": "center 46%"
+    "cover": "/assets/hiking/originals/IMG_1909.jpeg",
+    "cover_alt": "粉色晨云与雪山",
+    "banner": "/assets/hiking/originals/IMG_1909.jpeg",
+    "banner_alt": "粉色晨云与雪山",
+    "banner_position": "center 72%",
+    "cover_position": "center 72%"
   },
   {
     "slug": "sqoop-null-character",
@@ -76,12 +79,13 @@
       "Sqoop",
       "问题排查"
     ],
-    "cover": "/assets/writing/sqoop-null-character.svg",
-    "cover_alt": "DATA / DEBUGGING · THE INVISIBLE CHARACTER",
+    "cover": "/assets/hiking/originals/IMG_2162.jpeg",
+    "cover_alt": "云雾中的雪山与山脊",
     "updated": "2026-11-13",
-    "banner": "/assets/hiking/full/dsc02281.jpg",
-    "banner_alt": "山间建筑与冰川",
-    "banner_position": "center 48%"
+    "banner": "/assets/hiking/originals/IMG_2162.jpeg",
+    "banner_alt": "云雾中的雪山与山脊",
+    "banner_position": "center 58%",
+    "cover_position": "center 58%"
   },
   {
     "slug": "spark-remote-service",
@@ -97,12 +101,13 @@
       "架构",
       "工程实践"
     ],
-    "cover": "/assets/writing/spark-remote-service.svg",
-    "cover_alt": "SYSTEM / BOUNDARIES · MAKE THE BOUNDARY EXPLICIT",
+    "cover": "/assets/hiking/originals/DSC02731.jpeg",
+    "cover_alt": "河谷、桥梁与山峰倒影",
     "updated": "2026-11-13",
-    "banner": "/assets/hiking/full/img_1209.jpg",
-    "banner_alt": "高原山谷全景",
-    "banner_position": "center 50%"
+    "banner": "/assets/hiking/originals/DSC02731.jpeg",
+    "banner_alt": "河谷、桥梁与山峰倒影",
+    "banner_position": "center 56%",
+    "cover_position": "center 56%"
   },
   {
     "slug": "linux-mining-process",
@@ -118,11 +123,12 @@
       "进程",
       "问题排查"
     ],
-    "cover": "/assets/writing/linux-mining-process.svg",
-    "cover_alt": "LINUX / INVESTIGATION · FOLLOW THE PROCESS",
+    "cover": "/assets/hiking/originals/IMG_1867.jpeg",
+    "cover_alt": "星空下的雪山与山谷灯火",
     "updated": "2026-11-13",
-    "banner": "/assets/hiking/full/dsc02288.jpg",
-    "banner_alt": "云雾与山涧",
-    "banner_position": "center 48%"
+    "banner": "/assets/hiking/originals/IMG_1867.jpeg",
+    "banner_alt": "星空下的雪山与山谷灯火",
+    "banner_position": "center 58%",
+    "cover_position": "center 58%"
   }
 ]

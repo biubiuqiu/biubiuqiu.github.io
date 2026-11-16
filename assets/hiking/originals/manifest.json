@@ -1,0 +1,95 @@
+{
+  "note": "用户于 2026-11-16 上传。以下文件按上传字节原样保留，未缩放、重编码或修改 EXIF；尺寸为上传文件尺寸。",
+  "images": [
+    {
+      "file": "DSC02731.jpeg",
+      "uploaded_name": "DSC02731(1).jpeg",
+      "width": 1536,
+      "height": 1024,
+      "bytes": 360151,
+      "sha256": "6df1c58e77fe013ee1da928496d8a12f6508bef0f493fda11be5726412074592",
+      "description": "河谷、桥梁与山峰倒影"
+    },
+    {
+      "file": "IMG_1867.jpeg",
+      "uploaded_name": "IMG_1867.jpeg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 361885,
+      "sha256": "cf45eac36e6a8ca105d98328b84ee505f8d60def8956f5cc41455b8fb0af8d2a",
+      "description": "星空下的雪山与山谷灯火"
+    },
+    {
+      "file": "IMG_1909.jpeg",
+      "uploaded_name": "IMG_1909(1).jpeg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 298671,
+      "sha256": "dbd327f23fb5371a49233033d76acec80c577bd1cab9881aab2fc4bc2f240944",
+      "description": "粉色晨云与雪山"
+    },
+    {
+      "file": "IMG_1912.jpeg",
+      "uploaded_name": "IMG_1912(1).jpeg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 308465,
+      "sha256": "4c43957c0afe1b46a77910792812230e364925f95a9d17f1f03b3ea67beff764",
+      "description": "云带间的日照雪峰"
+    },
+    {
+      "file": "IMG_2051.jpeg",
+      "uploaded_name": "IMG_2051(1).jpeg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 795944,
+      "sha256": "94f5d5da33eb0a80200af2cc93ea36bf758b28facd7dba9d05e9df2bbd3ca441",
+      "description": "山谷间的雪峰与冰川"
+    },
+    {
+      "file": "IMG_2086.jpeg",
+      "uploaded_name": "IMG_2086(1).jpeg",
+      "width": 1152,
+      "height": 1536,
+      "bytes": 928619,
+      "sha256": "96c132d6887624bd934b07b04e0d20bf7e3c88aefe393f945e63e4d26801f42e",
+      "description": "秋色山路与冰川"
+    },
+    {
+      "file": "IMG_2127.jpeg",
+      "uploaded_name": "IMG_2127.jpeg",
+      "width": 1152,
+      "height": 1536,
+      "bytes": 1024967,
+      "sha256": "c00591739133ec949ee4595395f485c766a90c6a3f1be129f8d9d066ae441399",
+      "description": "雪峰下的冰湖"
+    },
+    {
+      "file": "IMG_2162.jpeg",
+      "uploaded_name": "IMG_2162(1).jpeg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 384097,
+      "sha256": "2b46f45f3962e9f36e9cb5d237ce3933b6ad665ba09de84a2f7d667a56e45012",
+      "description": "云雾中的雪山与山脊"
+    },
+    {
+      "file": "IMG_2178.jpeg",
+      "uploaded_name": "IMG_2178(1).jpeg",
+      "width": 1536,
+      "height": 814,
+      "bytes": 538853,
+      "sha256": "0695a96c19564ddcb8585c8ae73ac86de8edee1011aed5f6a15457275759ecec",
+      "description": "垭口山脊与远处的山谷"
+    },
+    {
+      "file": "IMG_2269.jpeg",
+      "uploaded_name": "IMG_2269(1).jpeg",
+      "width": 1536,
+      "height": 1152,
+      "bytes": 490460,
+      "sha256": "255bcc1f293672ac257e52ecf7406dceab422eb1b084c24ced7dd2d79e21a80f",
+      "description": "云雾、金色山峰与山谷营地"
+    }
+  ]
+}
