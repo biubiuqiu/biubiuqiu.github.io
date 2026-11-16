@@ -27,6 +27,7 @@
 .post-hero .post-hero-content{width:min(980px,calc(100% - 80px));margin:0;text-align:center;padding-top:60px;text-shadow:0 2px 14px #0006}
 .post-hero .writing-eyebrow{color:#ffffffe0;letter-spacing:.16em;font-size:11px;margin-bottom:18px}
 .post-hero h1{font:600 clamp(28px,2.8vw,40px)/1.6 var(--sans);color:#fff;letter-spacing:.01em;text-wrap:balance}
+.post-hero .hero-title-part{display:block}
 .post-hero .article-meta{justify-content:center;color:#ffffffe8;font-size:12px;gap:8px 20px;margin-top:22px}
 .post-hero .author-chip{font-size:12px}
 .post-hero .author-chip>span{background:#ffffff26;color:#fff}
