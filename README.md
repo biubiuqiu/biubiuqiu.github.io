@@ -81,3 +81,11 @@ GitHub Pages 使用 **Deploy from a branch → main → /(root)**；`.nojekyll` 
 ## Horizon Journal 布局
 
 首页使用真实徒步照片全景封面。正文为简介/Lester 与徒步的双栏，接电影/游戏、AI Agent/F1 两组开放内容，手机上自然变为单栏。所有内容默认可读；八张徒步照片通过主图和七张缩略图保留。五张游戏官方封面均可放大，分别包含《最后生还者》1 和 2。现有主题选择继续保留，默认白底，支持深色与跟随系统。
+
+## 首页与文章头图
+
+首页三种语言统一使用相册中的日照金山照片 `assets/hiking/full/img_1931.jpg`，直接加载 1536px 大图，并按桌面和手机分别设置裁切位置。
+
+文章参考 Hexo Fluid / Butterfly 的头图结构：顶部通栏照片约占半屏，叠加文章标题、作者、日期、字数、阅读时长和标签；下方进入左侧固定目录与正文阅读卡片。手机目录可折叠。原有目录定位、阅读进度、继续阅读、代码复制和主题切换继续使用。
+
+`src/posts.json` 的 `cover` 用于归档及相关文章卡片；`banner`、`banner_alt` 和 `banner_position` 分别控制文章顶部照片、说明与裁切。未配置 `banner` 时回退到 `cover`。修改后运行 `python3 scripts/build.py`，一起提交源文件和生成页面。
