@@ -63,7 +63,7 @@ def theme_menu_for(copy: dict[str, str]) -> str:
 def gallery_for(language, copy):
     prefix = "../" if LANGUAGES[language]["path"] else "./"
     items = json.loads((ROOT / "src" / "photos.json").read_text())
-    items.sort(key=lambda item: item["file"] != "img_1931.webp")
+    items.sort(key=lambda item: item["file"] != "img_2146.webp")
     rows = ['<section class="hiking-gallery" id="hiking-photos" aria-label="'+html.escape(copy["gallery_title"],quote=True)+'">', '<p class="sr-only">'+html.escape(copy["gallery_hint"])+'</p>']
     for i, item in enumerate(items):
         caption = html.escape(item[language], quote=True)
