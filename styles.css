@@ -15,6 +15,44 @@ summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:n
 @media(max-width:800px){.page-width{width:calc(100% - 48px)}.cover{min-height:480px}.site-header{align-items:flex-start;padding-top:23px;gap:18px}.brand{font-size:23px}.header-actions{flex-wrap:wrap;gap:8px;justify-content:flex-end}.header-controls{border-left:0;padding-left:0;gap:10px}nav{gap:18px}nav a{font-size:13px}.language-switcher>summary{font-size:13px}.hero{bottom:36px}h1{font-size:30px}.intro{font-size:15px;max-width:38em}.journal-spread{grid-template-columns:1fr;gap:40px}.profile-column{display:grid;grid-template-columns:1fr 1fr;gap:28px;border-right:0;padding-right:0}.project{margin-top:0;padding:0 0 0 28px;border-top:0;border-left:1px solid var(--line)}.about>p:first-of-type{margin-top:20px}.project h2{font-size:32px;margin-bottom:17px}.project p{font-size:14px}.project-name-story{margin-top:12px}.text-link{margin-top:12px;font-size:14px}.hiking-story{border-top:1px solid var(--line);padding-top:36px}.photo-thumbnails{gap:7px}.leisure-spread{grid-template-columns:1fr;gap:36px}.games{padding:32px 0 0;border-left:0;border-top:1px solid var(--line)}.game-posters{gap:12px}.game-poster span{font-size:11px}.game-notes{grid-template-columns:1fr 1fr}.leisure h3{font-size:22px}.notes-spread{gap:26px}.notes-spread>section+section{padding-left:26px}.notes-spread p{font-size:14px}.notes-spread h2{font-size:27px}.site-footer{font-size:11px;gap:14px}}
 @media(max-width:520px){.page-width{width:calc(100% - 40px)}.cover{height:540px;min-height:0}.cover-photo{object-position:50% 62%}.site-header{display:block;padding-top:20px}.brand{font-size:23px;gap:10px}.brand-mark{width:14px;height:14px}.header-actions{display:flex;flex-wrap:nowrap;justify-content:space-between;margin-top:14px;gap:12px}nav{gap:17px}nav a{font-size:13px;min-height:40px}.nav-github{display:none}.header-controls{gap:8px}.language-switcher>summary{font-size:13px;gap:4px}.theme-switcher>summary{width:34px;height:40px}.icon-appearance{width:24px;height:24px}.hero{bottom:32px}h1{font-size:26px;line-height:1.55}.intro{font-size:14px;line-height:1.95;margin-top:9px;max-width:26em}main{padding-top:38px}.journal-spread{gap:32px}.profile-column{display:block}.about>p:first-of-type{margin-top:18px}.about p,.hiking-intro{font-size:15px}.project{margin-top:30px;padding:28px 0 0;border-left:0;border-top:1px solid var(--line)}.project h2{font-size:32px}.project p{font-size:15px}.project-name-story{font-size:14px!important}.text-link{font-size:15px}.accent-title{padding-left:20px}.accent-title::before{width:4px}h2{font-size:27px}.hiking-story{padding-top:30px}.hiking-intro{margin-top:15px}.hiking-gallery{margin-top:22px}.featured-photo img{aspect-ratio:4/3}.photo-thumbnails{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}.route-list{font-size:12px;gap:4px 0;margin-top:15px}.route-list li+li::before{padding:0 7px}.leisure{margin-top:36px;padding-top:32px}.leisure>h2{margin-bottom:26px}.leisure h3{font-size:22px;margin-bottom:18px}.leisure-spread{gap:28px}.game-posters{gap:7px}.game-poster span{font-size:9px;line-height:1.6}.game-notes{grid-template-columns:1fr;gap:17px;margin-top:22px}.game-notes dt{font-size:13px}.game-notes dd{font-size:13px}.movies>p,.games>p:not(.media-credits){font-size:14px}.cinema-figure figcaption{font-size:10px}.notes-spread{display:block;margin-top:32px;padding-block:32px}.notes-spread>section+section{border-left:0;border-top:1px solid var(--line);padding:30px 0 0;margin-top:30px}.notes-spread h2{font-size:27px;margin-bottom:20px}.site-footer{flex-wrap:wrap;padding-block:20px;gap:8px 16px}.site-footer>span{order:3;flex-basis:100%;font-size:10px}.footer-brand{font-size:19px}.footer-github{font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+
+.latest-writing {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 10px 0 6px;
+  width: fit-content;
+  max-width: 100%;
+}
+.latest-label { color: var(--accent); font-size: 12px; letter-spacing: .05em; }
+.latest-title {
+  font-size: 16px;
+  font-weight: 550;
+  line-height: 1.65;
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: .24em;
+  overflow-wrap: anywhere;
+}
+.latest-writing:hover .latest-title,
+.latest-writing:focus-visible .latest-title { color: var(--accent); text-decoration-color: currentColor; }
+
+@media (max-width: 520px) {
+  .site-header {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "brand controls" "navigation navigation";
+    align-items: center; gap: 3px 10px; padding-top: 12px;
+  }
+  .site-header .brand { grid-area: brand; width: fit-content; min-height: 44px; }
+  .site-header .header-actions { display: contents; }
+  .site-header .header-controls { grid-area: controls; justify-content: flex-end; }
+  .site-header nav {
+    grid-area: navigation; justify-content: flex-start; flex-wrap: wrap;
+    gap: 0 clamp(14px, 5vw, 22px);
+  }
+  .site-header nav a, .site-header .header-controls summary { min-height: 44px; }
+  .site-header .theme-switcher > summary { width: 44px; }
+}
 /* A quiet, full-viewport lightbox; controls stay clear of the photograph. */
 .photo-link,.media-photo{cursor:zoom-in}.media-photo{display:block}.media-photo img{display:block;width:100%;height:auto}
 html.viewer-open{overflow:hidden;scrollbar-gutter:stable}

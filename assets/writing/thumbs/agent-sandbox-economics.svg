@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" fill="none">
+  <title>十分钟内的执行席位，错峰每分钟 30 席，集中到达首分钟 300 席</title>
+  <rect width="240" height="180" fill="#f5e8d7"/>
+  <g stroke="#c9bbaa" stroke-width="1.5">
+    <path d="M17 64h206m-206 93h206"/>
+    <path d="M18 20h205m-205 30h205m-205 44h205m-205 31h205" stroke-dasharray="2 6"/>
+  </g>
+  <g fill="#43716a">
+    <path d="M20 58h14v6H20zm21 0h14v6H41zm21 0h14v6H62zm21 0h14v6H83zm21 0h14v6h-14zm21 0h14v6h-14zm21 0h14v6h-14zm21 0h14v6h-14zm21 0h14v6h-14zm21 0h14v6h-14z"/>
+  </g>
+  <path d="M20 97h14v60H20z" fill="#aa5138"/>
+  <g fill="#8c7766" font-family="system-ui,sans-serif" font-size="18" font-weight="600">
+    <text x="221" y="41" text-anchor="end">30</text>
+    <text x="221" y="113" text-anchor="end">300</text>
+  </g>
+</svg>

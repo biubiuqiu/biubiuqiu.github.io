@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" fill="none">
+  <title>读取、编辑、写入文件和运行命令四种工具</title>
+  <rect width="240" height="180" fill="#ece5f0"/>
+  <g fill="#faf6fa" stroke="#b1a1b9" stroke-width="2">
+    <rect x="34" y="24" width="80" height="58" rx="6"/><rect x="126" y="24" width="80" height="58" rx="6"/>
+    <rect x="34" y="96" width="80" height="58" rx="6"/><rect x="126" y="96" width="80" height="58" rx="6" fill="#655374" stroke="#655374"/>
+  </g>
+  <g stroke="#705c7c" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M58 42h30m-30 10h23m-23 10h29"/>
+    <path d="m151 60 3-10 17-17 7 7-17 17-10 3zm16-23 7 7m-7 19h14"/>
+    <path d="M59 112h20l9 9v17H59zm19 0v10h9m-22 5h12m-12 6h9"/>
+  </g>
+  <path d="m147 116 10 8-10 9m17 0h16" stroke="#f6f0e9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

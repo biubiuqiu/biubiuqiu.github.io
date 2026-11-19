@@ -20,7 +20,9 @@
     "banner": "/assets/hiking/originals/IMG_2051.jpeg",
     "banner_alt": "山谷间的雪峰与冰川",
     "banner_position": "center 52%",
-    "cover_position": "center 52%"
+    "cover_position": "center 52%",
+    "thumbnail": "/assets/writing/thumbs/agent-sandbox-economics.svg",
+    "mobile_banner": "/assets/hiking/reading/IMG_2051.webp"
   },
   {
     "slug": "agent-sandbox-workspace",
@@ -42,7 +44,9 @@
     "banner": "/assets/hiking/originals/IMG_2269.jpeg",
     "banner_alt": "云雾、金色山峰与山谷营地",
     "banner_position": "center 58%",
-    "cover_position": "center 58%"
+    "cover_position": "center 58%",
+    "thumbnail": "/assets/writing/thumbs/agent-sandbox-workspace.svg",
+    "mobile_banner": "/assets/hiking/reading/IMG_2269.webp"
   },
   {
     "slug": "agent-tool-design",
@@ -64,7 +68,9 @@
     "banner": "/assets/hiking/originals/IMG_2178.jpeg",
     "banner_alt": "垭口山脊与远处的山谷",
     "banner_position": "center 50%",
-    "cover_position": "center 50%"
+    "cover_position": "center 50%",
+    "thumbnail": "/assets/writing/thumbs/agent-tool-design.svg",
+    "mobile_banner": "/assets/hiking/reading/IMG_2178.webp"
   },
   {
     "slug": "agent-context-management",
@@ -86,7 +92,9 @@
     "banner": "/assets/hiking/originals/IMG_1909.jpeg",
     "banner_alt": "粉色晨云与雪山",
     "banner_position": "center 72%",
-    "cover_position": "center 72%"
+    "cover_position": "center 72%",
+    "thumbnail": "/assets/writing/thumbs/agent-context-management.svg",
+    "mobile_banner": "/assets/hiking/reading/IMG_1909.webp"
   },
   {
     "slug": "sqoop-null-character",
@@ -108,7 +116,9 @@
     "banner": "/assets/hiking/originals/IMG_2162.jpeg",
     "banner_alt": "云雾中的雪山与山脊",
     "banner_position": "center 58%",
-    "cover_position": "center 58%"
+    "cover_position": "center 58%",
+    "thumbnail": "/assets/writing/thumbs/sqoop-null-character.webp",
+    "mobile_banner": "/assets/hiking/reading/IMG_2162.webp"
   },
   {
     "slug": "spark-remote-service",
@@ -130,7 +140,9 @@
     "banner": "/assets/hiking/originals/DSC02731.jpeg",
     "banner_alt": "河谷、桥梁与山峰倒影",
     "banner_position": "center 56%",
-    "cover_position": "center 56%"
+    "cover_position": "center 56%",
+    "thumbnail": "/assets/writing/thumbs/spark-remote-service.webp",
+    "mobile_banner": "/assets/hiking/reading/DSC02731.webp"
   },
   {
     "slug": "linux-mining-process",
@@ -152,6 +164,8 @@
     "banner": "/assets/hiking/originals/IMG_1867.jpeg",
     "banner_alt": "星空下的雪山与山谷灯火",
     "banner_position": "center 58%",
-    "cover_position": "center 58%"
+    "cover_position": "center 58%",
+    "thumbnail": "/assets/writing/thumbs/linux-mining-process.webp",
+    "mobile_banner": "/assets/hiking/reading/IMG_1867.webp"
   }
 ]

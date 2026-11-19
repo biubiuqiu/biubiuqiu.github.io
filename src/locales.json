@@ -88,6 +88,7 @@
     "douban_list_label": "豆瓣 Top 250",
     "film_credits": "经典片单选摘。海报来源：TMDB；电影及海报版权归各自权利人所有。",
     "writing_nav": "文章",
+    "latest_label": "最近在写",
     "writing_title": "文章与笔记",
     "writing_all": "全部文章",
     "writing_intro": "记录 Agent 研究、技术实践与问题排查。旧文保留原始发表日期。"
@@ -181,6 +182,7 @@
     "douban_list_label": "Douban Top 250",
     "film_credits": "A selection of classics. Posters via TMDB; film and poster rights belong to their respective owners.",
     "writing_nav": "Writing",
+    "latest_label": "Latest article · in Chinese",
     "writing_title": "Writing & notes",
     "writing_all": "All articles",
     "writing_intro": "Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates. Articles are in Chinese."
@@ -274,6 +276,7 @@
     "douban_list_label": "豆瓣 Top 250",
     "film_credits": "名作リストからのセレクション。ポスター出典：TMDB。作品・画像の権利は各権利者に帰属します。",
     "writing_nav": "記事",
+    "latest_label": "最近の記事 · 中国語",
     "writing_title": "記事とノート",
     "writing_all": "すべての記事",
     "writing_intro": "Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。本文は中国語です。"

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" fill="none">
+  <title>工作区里执行命令，文件保存到挂载卷</title>
+  <rect width="240" height="180" fill="#dceae2"/>
+  <rect x="24" y="28" width="192" height="125" rx="10" stroke="#587d72" stroke-width="2" stroke-dasharray="5 5"/>
+  <rect x="43" y="48" width="93" height="64" rx="5" fill="#26584f"/>
+  <path d="M44 64h91" stroke="#83a498" stroke-width="2"/>
+  <g fill="#b9d0bd"><circle cx="52" cy="56" r="2"/><circle cx="60" cy="56" r="2"/></g>
+  <path d="m58 77 9 8-9 8m17 0h15" stroke="#e8f0dd" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M103 113v17h45" stroke="#4f7d6f" stroke-width="3" stroke-linecap="round"/>
+  <path d="M141 86v43c0 8 47 8 47 0V86" fill="#9ebcab" stroke="#426d60" stroke-width="2.5"/>
+  <ellipse cx="164.5" cy="86" rx="23.5" ry="7" fill="#e2eddd" stroke="#426d60" stroke-width="2.5"/>
+  <path d="M142 106c5 7 38 7 45 0" stroke="#668c77" stroke-width="2"/>
+</svg>

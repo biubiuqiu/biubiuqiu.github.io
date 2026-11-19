@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
-from writing import featured_writing, build_writing
+from writing import featured_writing, build_writing, load_posts
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "https://biubiuqiu.github.io/"
@@ -19,7 +19,7 @@ LANGUAGES = {
 }
 TOKENS = re.compile(r"\{\{([a-z_0-9]+)\}\}")
 RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery", "featured_writing"}
-SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale"}
+SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale", "latest_slug", "latest_title"}
 
 
 def url_for(language: str) -> str:
@@ -90,6 +90,7 @@ def build() -> None:
 
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
+    posts = load_posts(ROOT)
     required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark"}
     if set(translations) != set(LANGUAGES):
         raise ValueError("Translations and configured language routes must match")
@@ -119,7 +120,9 @@ def build() -> None:
             "locale_menu": menu_for(language, copy),
             "theme_menu": theme_menu_for(copy),
             "hiking_gallery": gallery_for(language, copy),
-            "featured_writing": featured_writing(ROOT, copy),
+            "featured_writing": featured_writing(posts),
+            "latest_slug": posts[0]["slug"],
+            "latest_title": posts[0]["title"],
             "theme_bootstrap": (ROOT / "src" / "theme-init.js").read_text(encoding="utf-8"),
         }
         def substitute(match: re.Match[str]) -> str:
@@ -132,7 +135,7 @@ def build() -> None:
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(page, encoding="utf-8")
         print(f"Built {output.relative_to(ROOT)} ({language})")
-    writing_routes = build_writing(ROOT, BASE_URL, theme_menu_for, translations["zh-CN"])
+    writing_routes = build_writing(ROOT, BASE_URL, theme_menu_for, translations["zh-CN"], posts)
     namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
     ET.register_namespace("", namespace)
     sitemap = ET.Element(f"{{{namespace}}}urlset")
