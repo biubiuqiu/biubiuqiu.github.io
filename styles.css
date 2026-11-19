@@ -71,3 +71,59 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
 
 .movies>.movies-intro{margin:0 0 24px;font-size:14px;line-height:1.9}.film-posters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 16px}.film-card{min-width:0}.film-poster{display:block;background:var(--line)}.film-poster img{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:contain}.film-card h4{margin:10px 0 2px;font-size:13px;font-weight:600;line-height:1.6}.film-year{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}.film-card p{margin-top:7px;font-size:12px;line-height:1.8;color:var(--muted)}.movies>.film-list-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:25px;font-size:12px;line-height:1.8}.film-list-links a,.film-credits a{text-decoration:underline;text-underline-offset:3px}.movies>.film-credits{margin-top:15px;font-size:10px;line-height:1.9;color:var(--muted)}@media(max-width:520px){.film-posters{gap:22px 12px}.film-card h4{font-size:12px}.film-card p{font-size:11px}.movies>.movies-intro{font-size:14px}}
 
+
+/* Translucent surfaces are limited to controls that float over content. */
+:root {
+  --glass-tint: rgba(252, 250, 248, .83);
+  --glass-edge: rgba(74, 57, 50, .23);
+  --glass-rim: rgba(255, 255, 255, .85);
+  --glass-glint: rgba(255, 255, 255, .43);
+  --glass-shadow: 0 7px 24px rgba(32, 24, 21, .13);
+}
+:root[data-theme="dark"] {
+  --glass-tint: rgba(27, 31, 36, .84);
+  --glass-edge: rgba(235, 222, 212, .24);
+  --glass-rim: rgba(255, 255, 255, .15);
+  --glass-glint: rgba(229, 236, 242, .08);
+  --glass-shadow: 0 8px 26px rgba(0, 0, 0, .28);
+}
+.language-menu, .theme-menu { border-radius: 14px; text-shadow: none; }
+.language-menu a, .theme-menu button { border-radius: 8px; }
+.language-menu a:focus-visible, .theme-menu button:focus-visible { outline-offset: -3px; }
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @media not (prefers-reduced-transparency: reduce) {
+    .language-menu, .theme-menu {
+      background: linear-gradient(145deg, var(--glass-glint), transparent 46%), var(--glass-tint);
+      border-color: var(--glass-edge);
+      box-shadow: inset 0 1px 0 var(--glass-rim), var(--glass-shadow);
+      -webkit-backdrop-filter: blur(16px) saturate(135%);
+      backdrop-filter: blur(16px) saturate(135%);
+    }
+    @media (max-width: 900px) {
+      .post-page .article-layout .reading-sidebar { top: 6px; background: transparent; }
+      .post-page .reading-sidebar .toc-panel {
+        border: 1px solid var(--glass-edge);
+        border-radius: 13px;
+        background: linear-gradient(145deg, var(--glass-glint), transparent 46%), var(--glass-tint);
+        box-shadow: inset 0 1px 0 var(--glass-rim), var(--glass-shadow);
+        -webkit-backdrop-filter: blur(16px) saturate(135%);
+        backdrop-filter: blur(16px) saturate(135%);
+      }
+      .post-page .reading-sidebar .toc-content { box-shadow: none; }
+    }
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .language-switcher[open] > .language-menu, .theme-switcher[open] > .theme-menu {
+    transform-origin: top right;
+    animation: menu-arrive 150ms ease-out;
+  }
+  @keyframes menu-arrive { from { transform: translateY(-3px) scale(.985); } to { transform: none; } }
+}
+@media (forced-colors: active), (prefers-contrast: more) {
+  .language-menu, .theme-menu, .post-page .reading-sidebar .toc-panel {
+    background: var(--paper); border: 1px solid currentColor; box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
