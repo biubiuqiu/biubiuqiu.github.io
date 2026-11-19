@@ -1,0 +1,132 @@
+.pool-lab {
+  --pool-run: var(--accent);
+  --pool-warm: #658a96;
+  margin: 1.75rem 0;
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+:root[data-theme="dark"] .pool-lab { --pool-warm: #8cbac7; }
+.pool-lab figcaption strong,
+.pool-lab figcaption span { display: block; }
+.pool-lab figcaption strong { font-size: 17px; }
+.pool-lab figcaption span,
+.pool-fallback { color: var(--muted); font-size: 13px; }
+.pool-controls {
+  margin-top: 19px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px 24px;
+}
+.pool-controls fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.pool-controls legend,
+.pool-keep label { padding: 0; color: var(--muted); font-size: 12px; }
+.pool-options {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.pool-options label { position: relative; display: inline-flex; cursor: pointer; }
+.pool-options input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+.pool-options span {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 12px;
+}
+.pool-options input:checked + span {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--selected);
+  font-weight: 600;
+}
+.pool-options input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pool-keep { display: grid; flex: 1 1 125px; max-width: 190px; }
+.pool-keep label { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.pool-keep output { color: var(--ink); font-variant-numeric: tabular-nums; }
+.pool-keep input { width: 100%; height: 34px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.pool-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 22px 0 18px;
+  padding: 14px 0;
+  border-block: 1px solid var(--line);
+}
+.pool-totals dt, .pool-totals dd, .pool-key, .pool-axis, .pool-x-label,
+.pool-series .pool-minute { color: var(--muted); font-size: 12px; }
+.pool-totals dd { margin: 3px 0 0; line-height: 1.3; }
+.pool-totals dd strong { color: var(--ink); font-size: clamp(20px, 3vw, 28px); font-variant-numeric: tabular-nums; }
+.pool-key { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.pool-key span { display: inline-flex; align-items: center; gap: 6px; }
+.pool-key i { width: 10px; height: 10px; border-radius: 2px; }
+.pool-key .pool-active-key, .pool-run { background: var(--pool-run); }
+.pool-key .pool-warm-key, .pool-warm { background: var(--pool-warm); }
+.pool-plot {
+  --plot-height: 128px;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 6px;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+}
+.pool-axis {
+  display: flex;
+  height: var(--plot-height);
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-between;
+  font-size: 10px;
+  line-height: 1;
+}
+.pool-lab .pool-series {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: clamp(2px, 1vw, 10px);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pool-series::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 0 auto;
+  box-sizing: border-box;
+  height: var(--plot-height);
+  border-block: 1px solid var(--line);
+  background: linear-gradient(to bottom, transparent calc(50% - .5px), var(--line) 50%, transparent calc(50% + .5px));
+}
+.pool-lab .pool-series li { min-width: 0; margin: 0; text-align: center; }
+.pool-stack {
+  display: flex;
+  flex-direction: column-reverse;
+  height: var(--plot-height);
+  width: min(65%, 32px);
+  margin: auto;
+}
+.pool-series .pool-minute { display: block; padding-top: 4px; font-size: 10px; }
+.pool-x-label { display: block; margin-left: 32px; text-align: center; font-size: 11px; }
+.pool-table { max-width: 100%; overflow-x: auto; margin-block: 23px; }
+.article-body .pool-table table { display: table; width: 100%; margin: 0; }
+.article-body .pool-table th[scope="row"] { font-weight: 550; }
+@media (max-width: 600px) {
+  .pool-keep { flex-basis: 100%; max-width: none; }
+  .pool-plot { --plot-height: 104px; }
+  .pool-totals dt { font-size: 11px; }
+  .article-body .pool-table th, .article-body .pool-table td { min-width: 8em; padding: 8px; }
+}

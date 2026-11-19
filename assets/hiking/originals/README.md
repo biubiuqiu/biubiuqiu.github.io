@@ -6,6 +6,7 @@
 
 | 文章 | 原图 | 画面 |
 | --- | --- | --- |
+| 每人一个 Agent 沙盒，要常开多少台机器？ | IMG_2051.jpeg | 山谷间的雪峰与冰川 |
 | 一个 Agent，为什么需要一个沙盒？ | IMG_2269.jpeg | 云雾、金色山峰与山谷营地 |
 | Read、Edit、Write、Bash：Agent 工具设计里的巧思 | IMG_2178.jpeg | 垭口山脊与山谷 |
 | Agent 如何在长任务里保持清醒 | IMG_1909.jpeg | 粉色晨云与雪山 |
@@ -15,4 +16,4 @@
 
 文章头图、归档卡片、相关文章和分享元数据统一引用所选照片。裁切仅由网页 CSS 的 `object-fit` / `object-position` 控制，不改写原图；`src/posts.json` 的 `cover_position` 和 `banner_position` 分别控制卡片和头图的取景。
 
-IMG_1912.jpeg、IMG_2051.jpeg、IMG_2086.jpeg、IMG_2127.jpeg 作为后续文章素材保留。两张竖构图优先留给正文插图，避免横幅裁切掉冰湖或山路主体。
+IMG_1912.jpeg、IMG_2086.jpeg、IMG_2127.jpeg 作为后续文章素材保留。两张竖构图优先留给正文插图，避免横幅裁切掉冰湖或山路主体。

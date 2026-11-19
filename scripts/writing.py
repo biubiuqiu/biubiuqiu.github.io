@@ -93,7 +93,7 @@ def build_writing(root,base_url,theme_menu_for,copy):
         extras=''
         if post:
             slug=post['slug']
-            assets={'agent-context-management':(['context-demos'],['context-demos']), 'agent-tool-design':(['context-demos','tool-demos','parameter-demos'],['tool-demos','parameter-demos']), 'agent-sandbox-workspace':(['context-demos','sandbox-demos'],['sandbox-demos'])}
+            assets={'agent-context-management':(['context-demos'],['context-demos']), 'agent-tool-design':(['context-demos','tool-demos','parameter-demos'],['tool-demos','parameter-demos']), 'agent-sandbox-workspace':(['context-demos','sandbox-demos'],['sandbox-demos']), 'agent-sandbox-economics':(['sandbox-capacity'],['sandbox-capacity'])}
             css,js=assets.get(slug,([],[]))
             extras=''.join('<link rel="stylesheet" href="/'+x+'.css?v=1">' for x in css)+''.join('<script src="/'+x+'.js?v=1" defer></script>' for x in js)
             schema={'@context':'https://schema.org','@type':'BlogPosting','headline':post['title'],'description':description,'datePublished':post['date'],'author':{'@type':'Person','name':'Denis Wen','url':base_url},'mainEntityOfPage':base_url+path,'image':base_url.rstrip('/')+post['cover'],'wordCount':post['words'],'timeRequired':'PT'+str(post['minutes'])+'M','inLanguage':'zh-CN','keywords':post['tags']}

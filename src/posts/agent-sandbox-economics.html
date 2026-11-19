@@ -1,0 +1,93 @@
+<p class="article-lead">假设 300 个人都给 Agent 配了一台“个人电脑”。上午，它用 Python 把订单算成了一份报表。用户花了十分钟核对数字，回来只说了一句“按地区再画一张图”。这十分钟里，报表得留着，Python 解释器值得留着吗？如果 300 个人在同一分钟回来，又该准备多少台机器？</p>
+
+<p>留住一份文件、留住一个进程、留住一整台机器，给用户的体验有时很相似，平台付的钱却相差很远。先从一个已经能跑 Bash、写代码、交付文件的工作区谈起。<a href="/writing/agent-sandbox-workspace/">上一篇《一个 Agent，为什么需要一个沙盒？》</a></p>
+
+<h2 id="personal-computer">Lester 的一台个人电脑，跨过了多少次对话</h2>
+<p>在 Lester 里，同一个用户开三个对话，只拥有一台逻辑上的 Computer。数据库给沙盒表的 <code>user_id</code> 加了唯一约束，三个会话的命令分别从 <code>/workspace/conversations/&lt;id&gt;</code> 启动。文件工具按会话目录检查路径，终端、Python、Git 和预装的浏览器则可以复用同一套环境。新对话用得上已经准备好的工具，上一个任务的报告也有自己的位置。<a class="source-ref" href="#ref-lester">[1]</a></p>
+<p>我喜欢这里一个具体的取舍。Docker 后端把命名卷挂到 <code>/workspace</code>，空闲回收时调用 <code>docker stop</code>，唤醒时再 <code>start</code>。所以用户回来的那一刻，盘上的 <code>orders.csv</code> 还能打开，原来 Python 进程里的 <code>df</code> 已经消失。重新执行分析脚本就能继续画图。这几步足以让文件跨过容器启停。默认的本地卷仍在原宿主机上，想让另一台机器接手，还要给它一条取回文件的路径。<a class="source-ref" href="#ref-lester">[1]</a></p>
+<p>这让我把“一人一个”拆成三个决定。<strong>文件归谁</strong>，决定谁能回到这个工作区。<strong>哪些任务可以一起跑</strong>，决定两个会话能否同时改同一份文件、占同一个端口。<strong>计算放在哪里</strong>，决定谁为两次任务之间的空档付钱。目录能整理文件，共享的进程环境仍会发生端口冲突。可以让可信的个人任务共享工具链，给需要独立权限或互相冲突的任务单独分配执行环境。三件事可以分别演进。</p>
+
+<h2 id="time-between-turns">先找到可以归还机器的那段等待</h2>
+<p>一份 GitHub Copilot 生产轨迹研究给出了量级。研究者分析了 2026 年 6 月抽样的约 1,300 万个会话。在多轮会话里，等待用户占总时长的比例中位数为 80.1%。这个数字描述两轮交互之间的时间。要把它换算成可释放的沙盒分钟，还得知道这段时间里是否有后台任务。<a class="source-ref" href="#ref-traces">[2]</a></p>
+<p>回到报表。等人确认口径时，脚本已经退出，结果已经写盘，这段时间容易回收。等模型写下一条命令时，如果模型调用和工具编排在沙盒外，计算也可能提前释放。反过来，用户正在看报表，沙盒里的浏览器也许还在后台导出 PDF。此时 CPU 即使连续几秒接近零，停机也会打断导出。</p>
+<p>我会让执行服务记录前台命令、后台作业和仍需服务的预览，再由编排层标记“等待人工确认”这类已知停顿。短命令之间留一个热窗口，明确的长等待可以提前回收。Lester 文档给出的默认空闲阈值是 30 分钟。Google 的 Agent Substrate 则把何时调用挂起 API 交给应用。对自己的平台，值得先画出工具调用间隔的分布，再决定让一次短暂停顿付出多少恢复延迟。<a class="source-ref" href="#ref-lester">[1]</a> <a class="source-ref" href="#ref-google-cost">[3]</a></p>
+
+<h2 id="worker-pool">Google 怎样让一个 Pod 接住多个沙盒</h2>
+<p>Google 有两套名字相近的设计。Agent Sandbox on GKE 给一个 Sandbox 配一个专属 Pod。这里讨论的 <strong>Agent Substrate</strong> 多拆了一层。Kubernetes 部署一组 Worker Pod，每个 Worker 可以同时承载多个 Actor。Actor 是有稳定身份的执行实例，各自通过 gVisor 或 microVM 隔离。在 gVisor 路径上，Worker 调用 <code>runsc</code> 管理沙盒。Kubernetes 调度 Worker Pod，Substrate 根据沙盒规格和剩余容量把 Actor 放进去。<a class="source-ref" href="#ref-architecture">[4]</a> <a class="source-ref" href="#ref-sizing">[5]</a> <a class="source-ref" href="#ref-gke">[6]</a></p>
+<p>把两种设计叠起来看就清楚了。可以给报表用户一个长期有效的工作区 ID，执行时映射到一个 Actor。第一次画图落在 Worker A，后续命令按 Actor ID 路由回 A。挂起后，A 腾出的容量可接别人的任务。用户再次请求画图，调度器可以选一个兼容且有余量的 Worker B。客户端始终只保存工作区 ID。Substrate 的控制平面用 PostgreSQL 记录 Actor 与 Worker 的映射。把 Lester 的个人工作区接到这样的池子，是本文的设计推演。<a class="source-ref" href="#ref-architecture">[4]</a></p>
+<p>池化同时改变了故障和权限的单位。一个 Worker 上放 20 个活跃 Actor，这个 Worker 消失就会同时产生最多 20 个恢复请求。团队定的单机密度，还决定一次故障要预留多大的恢复余量。网络身份也要跟着 Actor 走。Google 为 Actor 分配独立身份，并可由出口网关按身份注入凭证。同一 Pod 上的两个用户，就可以用各自的权限访问外部服务。<a class="source-ref" href="#ref-gke">[6]</a></p>
+
+<h2 id="capacity">300 个工作区需要几台机器</h2>
+<p>假设每人每 10 分钟恰好运行 1 分钟工具，结束后再保留 1 分钟。把能同时给一个沙盒提供承诺资源的容量称为一个“席位”。每轮共占用 <strong>300 × 2 = 600 席位·分钟</strong>，平均占着 60 个席位。把这 60 当作机器采购依据，会漏掉任务是几点开始的。</p>
+
+<figure class="pool-lab" id="pool-lab">
+  <figcaption><strong>同样的工作量，两种到达方式</strong><span>300 个用户，10 分钟一轮。每个任务执行 1 分钟，每台工作节点可用 12 个席位。</span></figcaption>
+  <p class="pool-fallback" data-pool-fallback>执行后保留 1 分钟，每分钟均匀开始 30 人，峰值是 60 个席位，需要 5 台工作节点。如果所有人都在第 1 分钟开始，峰值达到 300，需要 25 台。两种情形平均都占 60 个席位。</p>
+  <div data-pool-interactive hidden>
+    <div class="pool-controls">
+      <fieldset><legend>任务何时开始</legend><div class="pool-options">
+        <label><input type="radio" name="pool-arrivals" value="spread" checked><span>每分钟 30 人</span></label>
+        <label><input type="radio" name="pool-arrivals" value="burst"><span>300 人同时开始</span></label>
+      </div></fieldset>
+      <div class="pool-keep"><label for="pool-grace">执行后保留 <output for="pool-grace" id="pool-grace-value">1 分钟</output></label><input type="range" id="pool-grace" min="0" max="4" value="1" step="1"></div>
+    </div>
+    <dl class="pool-totals" aria-live="polite" aria-atomic="true">
+      <div><dt>平均占用</dt><dd><strong data-pool-mean>60</strong> 席</dd></div>
+      <div><dt>峰值占用</dt><dd><strong data-pool-peak>60</strong> 席</dd></div>
+      <div><dt>峰值工作节点</dt><dd><strong data-pool-nodes>5</strong> 台</dd></div>
+    </dl>
+    <div class="pool-key"><span><i class="pool-active-key"></i>工具执行中</span><span><i class="pool-warm-key"></i>执行后保留</span></div>
+    <div class="pool-plot">
+      <div class="pool-axis" aria-hidden="true"><span>300</span><span>150</span><span>0</span></div>
+      <ol class="pool-series" role="list" data-pool-series aria-label="第 1 到 10 分钟的席位占用"></ol>
+    </div>
+    <span class="pool-x-label">每轮的第几分钟</span>
+  </div>
+</figure>
+
+<p>这里把一天中的连续任务简化为重复的十分钟周期，上一轮还在保温的任务会跨入下一轮。假设每个沙盒独享 1 vCPU、2 GiB，每台节点扣掉系统和运行时开销后还剩 12 vCPU、24 GiB，一个 Worker 恰好装 12 个。错峰与同时开始的峰值分别是 5 台和 25 台。图里按无需排队计算，未计控制面、故障备用和节点拉起时间。这是容量推演，单价和真实机器性能需要另测。</p>
+<p>Google 在 11 月 16 日发布的模型也算出了省钱失效的条件。它以 <code>us-central1</code> 的按需价比较 100 个编码 Agent，基线是每个会话常驻一个 Pod。按相同的 CPU 保证和工作时段，每人每小时发 2 次提示，挂起可省接近 40% 的节点费用。频率升到每小时 4 次，节省收窄到约 4%。模型还假设下班后工作池缩到零。比较自己的集群时，记得对齐 CPU 保证，否则很容易把超卖换来的收益也记到休眠头上。<a class="source-ref" href="#ref-google-cost">[3]</a></p>
+<p>因此我会单独记两笔账。第一笔是<strong>腾出了多少席位·分钟</strong>，有其他任务接手，它就有价值。第二笔是<strong>少付了多少节点·小时</strong>，整台节点能退出计费才会体现在这张账单上。若每台机器上都散落一个长跑任务，两个数字会差得很远。让新任务优先填已有空间，把准备缩掉的 Worker 标为排空，才能把零散的空闲拼成一台能下线的机器。对单次空档，我会比较这段容量的可回收价值与快照写入、存放、读回的增量成本。即便前者更高，恢复耗时也得落在用户愿意等的范围内。</p>
+
+<h2 id="portable-state">换一台 Worker，报表任务该带走什么</h2>
+<p>我对执行层“无状态”的判断是做一次换机实验。让 Worker A 消失，把同一用户送到 B，逐项检查他能找回什么。正在运行的沙盒有内存和进程，平台能做到的是把唯一一份重要状态从 Worker 上移走，让宿主可替换。</p>
+<div class="pool-table" role="region" aria-label="换机后各类状态的恢复方式" tabindex="0">
+<table><thead><tr><th scope="col">用户要接着做什么</th><th scope="col">持久保存什么</th><th scope="col">在 B 上如何继续</th></tr></thead><tbody>
+<tr><th scope="row">修改已保存的报表</th><td>工作区文件、已提交的产物版本</td><td>挂回用户的持久卷，或打开已提交的版本</td></tr>
+<tr><th scope="row">用原来的库再画图</th><td>基础镜像版本、项目依赖锁文件、私有修改</td><td>复用只读层，按锁文件补齐依赖，缓存可重建</td></tr>
+<tr><th scope="row">继续操作内存里的 df</th><td>兼容的进程与内存快照，以及匹配的文件版本</td><td>条件满足时恢复解释器，否则重启并从数据文件重算</td></tr>
+<tr><th scope="row">确认报表是否已经发布</th><td>任务记录、操作 ID、外部服务回执</td><td>向外部服务核对结果，并把产物关联回原来的对话</td></tr>
+</tbody></table></div>
+<p><strong>文件的可靠性取决于什么时候告诉用户“已保存”。</strong>如果唯一副本在节点本地，等退出时再上传到 S3，刚收到保存提示就遇到节点故障，那次写入可能永远进不了快照。若承诺已确认的文件能承受一次节点丢失，就要把持久提交放在成功回执之前。比如 EFS Regional 文档明确列出了同步写入或关闭文件后跨可用区持久化的语义。文件工具可以在满足所选存储的提交条件后回执。任意 Bash 程序留在用户态缓冲区里的字节，要等程序实际刷出。<a class="source-ref" href="#ref-efs">[7]</a></p>
+<p>如果大多数任务只改几个脚本、发布少量成品，更轻的路径是把成品按版本写到对象存储，上传成功后再提交指向该版本的清单。用户若需要随时打开终端、重命名文件、边运行边编辑，持久文件系统更贴近这种操作习惯。两者可以并用。把正在编辑的内容留在外接工作卷，对象存储保存发布版本和备份，几百 MiB 的参考数据就不必跟着每次进程挂起反复搬运。</p>
+<p><strong>进程连续性值得单独标价。</strong>Agent Substrate 可按条件恢复内存、根文件系统修改和持久目录。硬件或运行时不兼容时可以保留文件并重启进程，更新模板镜像时则可能只恢复持久目录。外接 CSI 卷由原存储重新挂载。同步挂起会等远端副本上传完成，异步模式允许远端副本暂处于 <code>PENDING</code>。决定何时可以拆掉一台机器，必须看最近可跨机恢复的版本。<a class="source-ref" href="#ref-gke">[6]</a> <a class="source-ref" href="#ref-sizing">[5]</a> <a class="source-ref" href="#ref-snapshots">[8]</a></p>
+<p>反过来还有个容易忽略的问题。若解释器快照里的 <code>df</code> 来自周一，挂回的工作区已被另一个任务改成周二的数据，成功唤醒也会算错。我会在快照清单中记录输入文件或工作区的提交版本。版本不匹配时，重开解释器，把重算的原因显示给用户。文件可靠与进程可恢复是两个契约，把它们接起来还需要一个一致的时间点。</p>
+
+<h2 id="handoff">老 Worker 迟到了一次写入</h2>
+<p>设 A 正在写报表，网络一断，控制面收不到心跳，于是把同一个工作区交给 B。十秒后 A 恢复连接，还握着旧的文件句柄。两台机器都能写的时候，新路由已经生效，也阻止不了 A 覆盖 B 刚改好的结果。</p>
+<p>Lester 已经用 PostgreSQL 的按用户事务锁来防止两个 API 副本同时创建 Computer。换机时还要处理活着的旧持有者。我会给每次接管分配一个递增的版本号，例如 A 拿到 41，B 接手时升到 42。发布结果的服务在提交时核对当前版本，拒绝 A 迟到的 41。这就是 fencing token。直接挂载可写 NFS 的 Bash 不会经过这个服务，这条路必须先确认旧节点的写权限已被隔离，或让两代写入不同副本、在发布入口校验版本号。单独更新数据库的一行租约管不到已经打开的文件句柄。<a class="source-ref" href="#ref-lester">[1]</a> <a class="source-ref" href="#ref-fencing">[9]</a></p>
+<p>还有一种迟到的是外部回执。发布接口已收到报告，A 却在收到响应前断线。如果 B 从快照重放“发布”这一步，读者可能收到两份。可以让同一次发布在持久任务记录里获得稳定的操作 ID，外部接口支持时复用它去重，收到结果再记录回执。没有幂等或查询能力的外部操作，应保留“结果待核对”状态。Lester 在 GitHub 发布路径上已经持久记录回执，对结果未知的写入先做核对。这个细节比保住终端进程更影响用户敢不敢点“继续”。<a class="source-ref" href="#ref-lester">[1]</a> <a class="source-ref" href="#ref-retries">[10]</a></p>
+
+<h2 id="first-result">扩容时，第一条有用的命令多久才完成</h2>
+<p>早上九点，100 个工作区同时醒来。假设每个都要从远端读回 128 MiB 压缩快照，想在 10 秒内全部读完，仅网络就需要 <strong>1.25 GiB/s</strong> 的有效吞吐，还没计算解压和随机读。继续加 CPU 空闲的 Worker，这段共享带宽依然会限制恢复速度。反过来，集中缩容也会制造同时写快照的洪峰。Google 的容量指南分别估算快照带宽、节点磁盘和上传并发。<a class="source-ref" href="#ref-sizing">[5]</a></p>
+<p>E2B 的开源运行时提供了另一种取舍。模板是预启动的 Firecracker microVM 快照，内存页在首次访问时按需读取，根文件系统在只读镜像上写时复制。于是一个只跑 <code>ls</code> 的任务可以很快开始，而第一次导入一组大库、真正绘制报表时，才可能碰到更多缺页和远端读取。平台应该同时记录“恢复请求到就绪”和“恢复请求到首条有用命令完成”的 P95，并用冷节点上的真实报表脚本来测。<a class="source-ref" href="#ref-e2b">[11]</a></p>
+<p>这些观测会导向不同的扩容动作。空闲席位耗尽且新任务排队，先增加 Worker，节点放不下新的 Worker Pod，再扩节点池。席位充足却卡在拉快照，先查远端带宽和节点缓存命中率。缩容时先停止向目标 Worker 分配新任务，让在途作业完成，或等需要的快照在远端可恢复后再撤走节点。</p>
+<p>如果我来做 Lester 的下一版，我会先保留每用户一个工作区，把已确认的文件和发布回执做成换机后能验证的东西。再采一周的工具启停、后台作业和恢复耗时，用最忙的几分钟定容量，用整周的节点小时算费用。能用文件重算的报表走便宜的进程重启，需要留住内存的 Notebook 单独走快照。等回收这些空档的收益足以抵消维护第二层调度器的成本，再引入多沙盒 Worker。</p>
+<p>最后我会用开头的报表验收。让用户看完数据再回来，指定同一份输入，换一台工作节点，画出正确的图，并且只发布一次。若还能从账单上找到这十分钟让出去的容量，就有理由把这套做法扩大到更多用户。</p>
+
+<section class="research-sources">
+<h2 id="sources">资料与源码</h2>
+<p>资料核对至 2026 年 11 月 19 日。容量图使用文中的假设，Google 的节点成本数字来自其公开模型。</p>
+<ol>
+<li id="ref-lester">Lester 的用户级 Computer、会话目录和 Docker 生命周期。<a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/docs/architecture.md#computers-and-sandboxes">架构说明</a> · <a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/backend/migrations/000002_user_sandboxes.up.sql">用户唯一约束</a> · <a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/backend/internal/sandbox/docker.go#L68-L169">Docker 后端源码</a></li>
+<li id="ref-traces">Banruo Liu 等基于 Copilot 生产轨迹的测量，见图 12。<a href="https://arxiv.org/html/2608.00101v1">Agentic Coding in the Wild</a></li>
+<li id="ref-google-cost">Google 关于下班后缩容、CPU 保证和提示频率的成本模型。<a href="https://developers.googleblog.com/en/agents-are-sessions-not-requests-size-gke-node-pools-for-ai-agent-sessions/">GKE 编码 Agent 节点成本推演</a></li>
+<li id="ref-architecture">Agent Substrate 的 Actor 分配、控制面和节点组件。<a href="https://ate.dev/docs/concepts/architecture/">Agent Substrate 架构</a></li>
+<li id="ref-sizing">Google 对单个 Worker 密度、快照带宽和节点排空的计算方法。<a href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/design-substrate-infrastructure">GKE 基础设施容量指南</a></li>
+<li id="ref-gke">Google 对两种沙盒架构、Actor 身份与分层恢复的说明。<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/machine-learning/agent-workloads">GKE Agent 工作负载架构</a></li>
+<li id="ref-efs">AWS 对 Regional 文件系统同步写入、关闭与持久化的说明。<a href="https://docs.aws.amazon.com/efs/latest/ug/features.html">Amazon EFS 数据一致性</a></li>
+<li id="ref-snapshots">Agent Substrate 的远端快照状态与兼容条件。<a href="https://ate.dev/docs/reference/api-guide/">Agent Substrate API 指南</a></li>
+<li id="ref-fencing">Martin Kleppmann 对过期租约和存储端校验版本号的推导。<a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">How to do distributed locking</a></li>
+<li id="ref-retries">操作 ID、外部副作用与结果核对。<a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">AWS 的幂等 API 实践</a> · <a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/docs/github-code-tasks.md">Lester 的 GitHub 发布回执</a></li>
+<li id="ref-e2b">E2B 关于模板快照、按需分页与写时复制根文件系统的实现说明。<a href="https://github.com/e2b-dev/runtime#why-its-fast">E2B Runtime</a></li>
+</ol></section>

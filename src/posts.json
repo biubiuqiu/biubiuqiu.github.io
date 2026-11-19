@@ -1,5 +1,28 @@
 [
   {
+    "slug": "agent-sandbox-economics",
+    "title": "每人一个 Agent 沙盒，要常开多少台机器？",
+    "original_title": "每人一个 Agent 沙盒，要常开多少台机器？",
+    "date": "2026-11-19",
+    "original_datetime": "2026-11-19",
+    "kind": "research",
+    "category": "Agent 研究",
+    "excerpt": "从 Lester 的个人工作区到 Google Agent Substrate 的多沙盒 Pod，算算 300 人错峰和同时开工各需多少机器，再追踪一次换机后，文件、进程和发布回执怎样接得上。",
+    "context": "Lester 源码与生产轨迹研究 · 交互容量推演",
+    "tags": [
+      "Agent",
+      "沙盒",
+      "运行时",
+      "Kubernetes"
+    ],
+    "cover": "/assets/hiking/originals/IMG_2051.jpeg",
+    "cover_alt": "山谷间的雪峰与冰川",
+    "banner": "/assets/hiking/originals/IMG_2051.jpeg",
+    "banner_alt": "山谷间的雪峰与冰川",
+    "banner_position": "center 52%",
+    "cover_position": "center 52%"
+  },
+  {
     "slug": "agent-sandbox-workspace",
     "title": "一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果",
     "original_title": "一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果",
