@@ -17,7 +17,7 @@
 <p>把两种设计叠起来看就清楚了。可以给报表用户一个长期有效的工作区 ID，执行时映射到一个 Actor。第一次画图落在 Worker A，后续命令按 Actor ID 路由回 A。挂起后，A 腾出的容量可接别人的任务。用户再次请求画图，调度器可以选一个兼容且有余量的 Worker B。客户端始终只保存工作区 ID。Substrate 的控制平面用 PostgreSQL 记录 Actor 与 Worker 的映射。把 Lester 的个人工作区接到这样的池子，是本文的设计推演。<a class="source-ref" href="#ref-architecture">[4]</a></p>
 <p>池化同时改变了故障和权限的单位。一个 Worker 上放 20 个活跃 Actor，这个 Worker 消失就会同时产生最多 20 个恢复请求。团队定的单机密度，还决定一次故障要预留多大的恢复余量。网络身份也要跟着 Actor 走。Google 为 Actor 分配独立身份，并可由出口网关按身份注入凭证。同一 Pod 上的两个用户，就可以用各自的权限访问外部服务。<a class="source-ref" href="#ref-gke">[6]</a></p>
 
-<h2 id="capacity">300 个工作区需要几台机器</h2>
+<h2 id="capacity">给 300 个工作区配几台机器</h2>
 <p>假设每人每 10 分钟恰好运行 1 分钟工具，结束后再保留 1 分钟。把能同时给一个沙盒提供承诺资源的容量称为一个“席位”。每轮共占用 <strong>300 × 2 = 600 席位·分钟</strong>，平均占着 60 个席位。把这 60 当作机器采购依据，会漏掉任务是几点开始的。</p>
 
 <figure class="pool-lab" id="pool-lab">
