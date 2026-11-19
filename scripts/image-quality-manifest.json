@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-15",
+  "date": "2026-11-19",
   "strategy": "Source JPEG pixels preserved; metadata-only removal; listing WebP separate from full viewer assets",
   "files": [
     {
@@ -111,8 +111,8 @@
       "path": "assets/interests/full/movie-truman.jpg",
       "width": 1400,
       "height": 2100,
-      "bytes": 1096728,
-      "sha256": "131e52eb25a2f79e4a1411570a89c943f05ef7244de6a1c2ee13ffb4214a4f17"
+      "bytes": 931635,
+      "sha256": "27430cbc7119d23d5f1b5a0d1dca1d90d171e9a03413b556cc95adfe439b3f56"
     },
     {
       "path": "assets/interests/full/rdr-cover.jpg",

@@ -2,6 +2,7 @@
 """Render all locale pages with Python's standard library."""
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 from pathlib import Path
@@ -81,6 +82,12 @@ def gallery_for(language, copy):
 
 
 def build() -> None:
+    image_manifest = json.loads((ROOT / "scripts/image-quality-manifest.json").read_text(encoding="utf-8"))
+    for image in image_manifest["files"]:
+        path = ROOT / image["path"]
+        if hashlib.sha256(path.read_bytes()).hexdigest() != image["sha256"]:
+            raise ValueError(f"Full-resolution image checksum mismatch: {image['path']}")
+
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
     required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark"}
