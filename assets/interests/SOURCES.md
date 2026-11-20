@@ -55,5 +55,6 @@ The `full/` folder retains source JPEG pixels without resizing or recompression.
 - `verstappen-vegas-2023` — Max Verstappen, 2023. © Verstappen.com, Peter van Egmond. [Event gallery](https://news.verstappen.com/en/gallerydetail/559/) · [Source photograph](https://news.verstappen.com/img/2023/Formule_1_GP_Las_Vegas_-_Nevada/171123-LVG-2155-ANT-4b.jpg).
 - `verstappen-spielberg-2025` — Max Verstappen. © Verstappen.com, Red Bull Content Pool. [Event gallery](https://news.verstappen.com/en/gallerydetail/644/) · [Source photograph](https://news.verstappen.com/img/2025/Formule_1_GP_Oostenrijk_-_Red_Bull_Ring/SI202506280179-15b.jpg).
 - `verstappen-vegas-sphere-2023` — Max Verstappen. © Verstappen.com, Red Bull Content Pool. [Event gallery](https://news.verstappen.com/en/gallerydetail/559/) · [Source photograph](https://news.verstappen.com/img/2023/Formule_1_GP_Las_Vegas_-_Nevada/SI202311171201_hires_jpeg_24bit_rgb-29b.jpg).
+- `verstappen-marina-bay-2025` — Max Verstappen. © Verstappen.com, Activepictures.cz. [Event gallery](https://news.verstappen.com/en/gallerydetail/658/) · [Source photograph](https://news.verstappen.com/img/2025/Formule_1_GP_Singapore_-_Marina_Bay/251003_R18_SINGAPORE_DP_XB5_8684-6b.jpg).
 
 The 935 × 623 listing images and full-size viewer retain the complete composition and photographer’s watermark.
