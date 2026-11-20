@@ -80,7 +80,7 @@ def load_posts(root):
 
 
 def tags_for(p):
-    return '<div class="post-tags">'+''.join('<a href="/writing/?tag='+E(t,quote=True)+'"># '+E(t)+'</a>' for t in p['tags'])+'</div>'
+    return '<div class="post-tags">'+''.join('<a class="glass-control" href="/writing/?tag='+E(t,quote=True)+'"># '+E(t)+'</a>' for t in p['tags'])+'</div>'
 
 
 def title_phrases(title, class_name):
@@ -107,7 +107,12 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
             schema={'@context':'https://schema.org','@type':'BlogPosting','headline':post['title'],'description':description,'datePublished':post['date'],'author':{'@type':'Person','name':'Denis Wen','url':base_url},'mainEntityOfPage':base_url+path,'image':base_url.rstrip('/')+post['cover'],'wordCount':post['words'],'timeRequired':'PT'+str(post['minutes'])+'M','inLanguage':'zh-CN','keywords':post['tags']}
             if post.get('updated'): schema['dateModified']=post['updated']
             extras+='<meta property="article:published_time" content="'+post['date']+'"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="'+base_url.rstrip('/')+post['cover']+'"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">'+json.dumps(schema,ensure_ascii=False).replace('<','\\u003c')+'</script>'
-        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=18"><link rel="stylesheet" href="/writing.css?v=9"><script src="/theme.js?v=6" defer></script><script src="/writing.js?v=3" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><a class="writing-index-link" href="/writing/"'+('' if post else ' aria-current="page"')+'>文章</a><a href="/atom.xml" aria-label="订阅 Atom RSS">RSS</a>'+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
+        nav = ('<nav class="liquid-nav writing-nav" aria-label="文章导航">'
+               '<canvas class="liquid-optics" aria-hidden="true"></canvas>'
+               '<span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>'
+               '<a class="writing-index-link" href="/writing/"'+('' if post else ' aria-current="page"')+'>文章</a>'
+               '<a href="/atom.xml" aria-label="订阅 Atom RSS">RSS</a></nav>')
+        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=18"><link rel="stylesheet" href="/writing.css?v=9"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=6" defer></script><script src="/writing.js?v=3" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls">'+nav+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
     def card(p):
         image = E(p.get('thumbnail', p['cover']), quote=True)
         return (f'<a class="related-card" href="/writing/{p["slug"]}/">'
@@ -123,7 +128,7 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
         <label class="archive-search"><span class="sr-only">搜索文章</span>
           <input type="search" name="q" placeholder="搜索标题、摘要或标签" enterkeyhint="search" autocomplete="off">
         </label>
-        <button type="button" class="filter-toggle" aria-expanded="false" aria-controls="archive-options">
+        <button type="button" class="filter-toggle glass-control" aria-expanded="false" aria-controls="archive-options">
           <span class="filter-adjust" aria-hidden="true"></span>筛选<span class="filter-count" hidden></span>
         </button>
       </div>
@@ -168,8 +173,8 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
             if h['tag']=='h2':section+=1;sub=0;num=str(section).zfill(2)
             else:sub+=1;num=str(section)+'.'+str(sub)
             label=re.sub(r'^(?:[一二三四五六七八九十]+、|\d+(?:\.\d+)*[.、]?\s+)\s*','',h['label'])
-            toc.append('<li class="toc-'+h['tag']+'"><a href="#'+E(h['id'],quote=True)+'"><span class="toc-number">'+num+'</span><span>'+E(label)+'</span></a></li>')
-        sidebar='<aside class="reading-sidebar"><details class="toc-panel" open><summary><span>文章目录</span><span class="toc-mobile-progress">0%</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary><div class="toc-content"><p class="toc-current">从第一节开始阅读</p><nav aria-label="文章目录"><ol>'+''.join(toc)+'</ol></nav><div class="reading-status"><div><span>阅读进度</span><strong data-progress-text>0%</strong></div><progress max="100" value="0" aria-label="文章阅读进度"></progress><span data-remaining>预计 '+str(p['minutes'])+' 分钟</span></div><div class="toc-actions"><a href="/writing/">← 全部文章</a><a href="#article-top">↑ 回到顶部</a></div></div></details></aside>'
+            toc.append('<li class="toc-'+h['tag']+'"><a class="glass-row" href="#'+E(h['id'],quote=True)+'"><span class="toc-number">'+num+'</span><span>'+E(label)+'</span></a></li>')
+        sidebar='<aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>文章目录</span><span class="toc-mobile-progress">0%</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary><div class="toc-content"><p class="toc-current">从第一节开始阅读</p><nav aria-label="文章目录"><ol>'+''.join(toc)+'</ol></nav><div class="reading-status"><div><span>阅读进度</span><strong data-progress-text>0%</strong></div><progress max="100" value="0" aria-label="文章阅读进度"></progress><span data-remaining>预计 '+str(p['minutes'])+' 分钟</span></div><div class="toc-actions"><a href="/writing/">← 全部文章</a><a href="#article-top">↑ 回到顶部</a></div></div></details></aside>'
         updated='<span>更新 <time datetime="'+p['updated']+'">'+p['updated']+'</time></span>' if p.get('updated') else ''
         hero_title = title_phrases(p['title'], 'hero-title-part')
         banner=p.get('banner',p['cover'])

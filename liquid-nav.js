@@ -1,7 +1,7 @@
 (() => {
   const nav = document.querySelector(".liquid-nav");
   if (!nav) return;
-  const photo = nav.closest(".cover").querySelector(".cover-photo");
+  const photo = document.querySelector(".cover-photo, .post-hero-photo");
   const rim = nav.querySelector(".liquid-optics");
   const lens = nav.querySelector(".liquid-lens canvas");
   const solid = matchMedia("(prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active)");
@@ -86,7 +86,7 @@
         scheduleLight();
       }
     }
-    if (solid.matches || !photo.complete || !photo.naturalWidth) {
+    if (solid.matches || !photo?.complete || !photo.naturalWidth) {
       delete nav.dataset.refracting;
       layoutKey = "";
       return;
@@ -134,7 +134,7 @@
       x = (active.offsetLeft + active.offsetWidth / 2) * 100 / bounds.width;
       y = 8;
     } else {
-      const cover = photo.getBoundingClientRect();
+      const cover = (photo || nav).getBoundingClientRect();
       x = 20 + 76 * Math.min(1, Math.max(0, -cover.top / cover.height));
       y = 4;
     }
@@ -204,7 +204,7 @@
   }
   if ("ResizeObserver" in window) {
     const observer = new ResizeObserver(scheduleLayout);
-    [nav, photo, nav.parentElement, nav.closest(".cover").querySelector(".hero")].forEach(el => observer.observe(el));
+    [nav, photo, nav.parentElement].filter(Boolean).forEach(el => observer.observe(el));
   }
   solid.addEventListener("change", scheduleLayout);
   still.addEventListener("change", () => {
@@ -213,7 +213,50 @@
     scheduleLight();
   });
   window.addEventListener("resize", scheduleLayout);
-  photo.addEventListener("load", scheduleLayout);
+  photo?.addEventListener("load", scheduleLayout);
   document.fonts?.ready.then(scheduleLayout);
   scheduleLayout();
+})();
+
+// A single moving reflection serves the smaller controls, including ones inside the photo dialog.
+(() => {
+  const selector = ".glass-control, .glass-row, .glass-panel > summary, .theme-menu button, .language-menu a";
+  const quiet = matchMedia("(prefers-reduced-motion: reduce), (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active)");
+  let surface = null;
+  let frame = 0;
+  let x = 0;
+  let y = 0;
+  function clear() {
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+    if (!surface) return;
+    surface.style.removeProperty("--shine-x");
+    surface.style.removeProperty("--shine-y");
+    surface = null;
+  }
+  function paint() {
+    frame = 0;
+    if (!surface) return;
+    const bounds = surface.getBoundingClientRect();
+    surface.style.setProperty("--shine-x", (x - bounds.left) + "px");
+    surface.style.setProperty("--shine-y", (y - bounds.top) + "px");
+  }
+  function track(event) {
+    if (quiet.matches) return;
+    const target = event.target.closest?.(selector);
+    const next = target?.matches(".glass-panel > summary") ? target.parentElement : target;
+    if (surface !== next) clear();
+    if (!next) return;
+    surface = next;
+    x = event.clientX;
+    y = event.clientY;
+    if (!frame) frame = requestAnimationFrame(paint);
+  }
+  document.addEventListener("pointermove", track, { passive: true });
+  document.addEventListener("pointerdown", track, { passive: true });
+  document.addEventListener("pointerup", event => { if (event.pointerType !== "mouse") clear(); });
+  document.addEventListener("pointerout", event => { if (!surface?.contains(event.relatedTarget)) clear(); });
+  document.addEventListener("pointercancel", clear);
+  window.addEventListener("blur", clear);
+  quiet.addEventListener("change", clear);
 })();
