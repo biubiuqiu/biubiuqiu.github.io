@@ -20,6 +20,8 @@
   position: relative;
   isolation: isolate;
   display: inline-flex;
+  overflow: hidden;
+  overflow: clip;
   gap: 0;
   flex-wrap: nowrap;
   align-items: stretch;

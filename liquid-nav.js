@@ -78,7 +78,14 @@
 
   function prepare() {
     layoutFrame = 0;
-    if (active) positionLens(active);
+    if (active) {
+      if (active.offsetWidth) positionLens(active);
+      else {
+        pointer = null;
+        select(null);
+        scheduleLight();
+      }
+    }
     if (solid.matches || !photo.complete || !photo.naturalWidth) {
       delete nav.dataset.refracting;
       layoutKey = "";
@@ -148,7 +155,11 @@
   }
   function track(event) {
     pointer = { x: event.clientX, y: event.clientY };
-    select(event.target.closest("a"));
+    // Touch retains the original target while the finger moves across the glass.
+    const target = event.pointerType === "touch" && event.type === "pointermove"
+      ? document.elementFromPoint(event.clientX, event.clientY) : event.target;
+    const link = target?.closest("a");
+    select(link && nav.contains(link) ? link : null);
     scheduleLight();
   }
   function release() {
