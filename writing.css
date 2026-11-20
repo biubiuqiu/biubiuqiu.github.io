@@ -225,3 +225,15 @@
   .archive-card .post-tags a { min-height: 38px; }
   .related-card img { height: auto; }
 }
+
+.post-hero .article-meta { gap: .7em; }
+.post-byline { display: flex; flex-wrap: wrap; gap: .4em 1.15em; margin-top: .8em; color: var(--muted); font-size: 12px; }
+.post-byline a:hover { text-decoration: underline; }
+.post-hero .post-tags a.glass-control:not(:hover):not(:focus-visible):not(:active) {
+  background: rgb(13 24 35 / .34); border-color: rgb(255 255 255 / .22); box-shadow: none;
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .post-hero .post-tags a.glass-control:not(:hover):not(:focus-visible):not(:active) {
+    color: var(--ink); background: var(--paper); border-color: currentColor;
+  }
+}

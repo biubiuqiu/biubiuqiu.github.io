@@ -22,6 +22,23 @@
     button.addEventListener('click',async function(){if(await copy(code.textContent)){button.textContent='已复制 ✓';toast('代码已复制');setTimeout(function(){button.textContent='复制代码';},1800);}});
     bar.append(label,button);pre.before(bar);
   });
+  // A handoff is scoped to one tab and consumed by the intended destination.
+  const handoffKey = 'writing.archiveNavigation';
+  function handoff(value) {
+    try { sessionStorage.setItem(handoffKey, JSON.stringify(value)); } catch {}
+  }
+  function arriving() {
+    try {
+      const value = JSON.parse(sessionStorage.getItem(handoffKey));
+      sessionStorage.removeItem(handoffKey);
+      if (value?.to === location.href && value.from === document.referrer) return value;
+    } catch {}
+    return null;
+  }
+  const arrival = arriving();
+  function ordinaryClick(e) {
+    return !e.defaultPrevented && e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey;
+  }
   var form=document.querySelector('.archive-filters');
   if(form){
     const cards = Array.from(document.querySelectorAll('.archive-card'));
@@ -176,10 +193,41 @@
     });
     readLocation();
     form.hidden = false;
-    window.addEventListener('pageshow', readLocation);
+    const grid = document.querySelector('.archive-grid');
+    grid.addEventListener('click', event => {
+      const link = event.target.closest('.archive-entry h2 a');
+      if (!link || !ordinaryClick(event)) return;
+      const bookmark = { url: location.href, article: link.href,
+        offset: link.getBoundingClientRect().top, expanded: !optionPanel.hidden };
+      history.replaceState({ ...history.state, archiveBookmark: bookmark }, '');
+      handoff({ from: location.href, to: link.href, bookmark });
+    });
+    if (arrival?.bookmark) history.replaceState({ ...history.state, archiveBookmark: arrival.bookmark }, '');
+    window.addEventListener('pageshow', () => {
+      readLocation();
+      const bookmark = history.state?.archiveBookmark;
+      if (!bookmark || bookmark.url !== location.href) return;
+      const link = [...grid.querySelectorAll('h2 a')].find(a => a.href === bookmark.article);
+      if (!link || link.closest('.archive-card').hidden) return;
+      showOptions(bookmark.expanded);
+      requestAnimationFrame(() => {
+        window.scrollBy({ top: link.getBoundingClientRect().top - bookmark.offset, behavior: 'instant' });
+        link.focus({ preventScroll: true });
+      });
+    });
     window.addEventListener('popstate', readLocation);
   }
   var body=document.querySelector('.article-body');if(!body)return;
+  const bookmark = arrival?.bookmark || history.state?.archiveOrigin;
+  if (bookmark?.article === location.href.split('#')[0] && new URL(bookmark.url).origin === location.origin) {
+    history.replaceState({ ...history.state, archiveOrigin: bookmark }, '');
+    document.querySelectorAll('a[href="/writing/"]').forEach(link => {
+      link.href = bookmark.url;
+      link.addEventListener('click', event => {
+        if (ordinaryClick(event)) handoff({ from: location.href.split('#')[0], to: link.href, bookmark });
+      });
+    });
+  }
   var panel=document.querySelector('.toc-panel');var media=matchMedia('(max-width:900px)');
   function layout(){panel.open=!media.matches;panel.querySelector('summary').tabIndex=media.matches?0:-1;}layout();media.addEventListener('change',layout);
   var links=Array.from(document.querySelectorAll('.toc-content nav a'));var headings=links.map(function(a){return document.getElementById(decodeURIComponent(a.hash.slice(1)));});
