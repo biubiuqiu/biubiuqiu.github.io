@@ -67,15 +67,23 @@
         var item=document.createElement('div');item.className='filter-option';item.id=select.name+'-option-'+index;
         item.setAttribute('role','option');item.textContent=option.textContent;
         item.addEventListener('pointerdown',function(e){e.preventDefault();});
-        item.addEventListener('pointermove',function(){if(active!==index)highlight(index,false);});
+        item.addEventListener('pointermove', function(event) {
+          if (event.pointerType === 'touch') return;
+          menu.style.setProperty('--reflection-x', event.offsetX + 'px');
+          if (active !== index) highlight(index, false);
+        });
         item.addEventListener('click',function(){choose(index);});menu.append(item);return item;
       });
       function highlight(index,scroll) {
+        menu.toggleAttribute('data-gliding', trigger.hasAttribute('aria-activedescendant') && active !== index);
         active=Math.max(0,Math.min(items.length-1,index));
+        const row = items[active];
+        menu.style.setProperty('--row-y', row.offsetTop + 'px');
+        menu.style.setProperty('--row-height', row.offsetHeight + 'px');
+        if (scroll) menu.style.removeProperty('--reflection-x');
         items.forEach(function(item,i){item.classList.toggle('is-active',i===active);});
         trigger.setAttribute('aria-activedescendant',items[active].id);
         if (scroll) {
-          const row = items[active];
           if (row.offsetTop < menu.scrollTop) menu.scrollTop = row.offsetTop;
           else if (row.offsetTop + row.offsetHeight > menu.scrollTop + menu.clientHeight) {
             menu.scrollTop = row.offsetTop + row.offsetHeight - menu.clientHeight;
@@ -89,7 +97,7 @@
         trigger.classList.toggle('has-value',Boolean(select.value));
       }
       function close() {
-        menu.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.removeAttribute('aria-activedescendant');wrapper.classList.remove('is-open');query='';
+        menu.hidden=true;menu.removeAttribute('data-gliding');trigger.setAttribute('aria-expanded','false');trigger.removeAttribute('aria-activedescendant');wrapper.classList.remove('is-open');query='';
       }
       function open() {
         dropdowns.forEach(function(widget){widget.close();});menu.hidden=false;wrapper.classList.add('is-open');trigger.setAttribute('aria-expanded','true');
@@ -104,7 +112,9 @@
         menu.classList.toggle('opens-above', above);
         menu.style.maxHeight = Math.max(44, Math.min(296, (above ? bounds.top : below) - 14)) + 'px';
       }
-      window.addEventListener('resize', fitMenu);
+      window.addEventListener('resize', () => {
+        if (!menu.hidden) { fitMenu(); highlight(active, true); }
+      });
       function choose(index) {
         select.selectedIndex=index;sync();close();trigger.focus({preventScroll:true});select.dispatchEvent(new Event('change',{bubbles:true}));
       }
