@@ -150,11 +150,25 @@
       "sha256": "e2e254c5213de091d7130b0e1cebd67a12efe0a1f30f5ff8a3e7427fd2d1d848"
     },
     {
+      "path": "assets/interests/full/verstappen-spielberg-2025.jpg",
+      "width": 935,
+      "height": 623,
+      "bytes": 565123,
+      "sha256": "96e4a70b8f9cccf6a371e14c293a6211154e392dd93c54d0522514c09c82ad2d"
+    },
+    {
       "path": "assets/interests/full/verstappen-vegas-2023.jpg",
       "width": 935,
       "height": 623,
       "bytes": 713324,
       "sha256": "17c2e559a13464db756e3a993ab487a997d44334f8595792955c81621981f0bc"
+    },
+    {
+      "path": "assets/interests/full/verstappen-vegas-sphere-2023.jpg",
+      "width": 935,
+      "height": 623,
+      "bytes": 752659,
+      "sha256": "24e329a6e6d84679d700f5619abd883b9761e1c237b2f49115626c54f7a586a7"
     }
   ]
 }

@@ -89,10 +89,10 @@
     "writing_title": "文章与笔记",
     "writing_all": "全部文章",
     "writing_intro": "记录 Agent 研究、技术实践与问题排查。旧文保留原始发表日期。",
-    "f1_monaco_caption": "摩纳哥 · 蒙特卡洛，2023",
-    "f1_monaco_alt": "维斯塔潘驾驶红牛 RB19 驶过港边，游艇与山坡上的楼宇叠在车身后方。",
-    "f1_vegas_caption": "拉斯维加斯 · 长街夜赛，2023",
-    "f1_vegas_alt": "维斯塔潘驾驶红牛 RB19 驶过拉斯维加斯大道，霓虹招牌点亮护栏后的街景。"
+    "f1_vegas_caption": "拉斯维加斯 · Sphere 球馆，2023",
+    "f1_vegas_alt": "维斯塔潘驾驶红牛 RB19 驶入夜色中的弯道，蓝色的 Sphere 球幕在车身后方亮起。",
+    "f1_austria_caption": "奥地利 · 施皮尔贝格红牛环，2025",
+    "f1_austria_alt": "维斯塔潘的红牛 RB21 掠过山谷中的赛道，背后是橙色看台和层叠的远山。"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -184,10 +184,10 @@
     "writing_title": "Writing & notes",
     "writing_all": "All articles",
     "writing_intro": "Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates. Articles are in Chinese.",
-    "f1_monaco_caption": "Monaco · Monte Carlo, 2023",
-    "f1_monaco_alt": "Max Verstappen drives his Red Bull RB19 past the harbour, with yachts and hillside apartments beyond the track.",
-    "f1_vegas_caption": "Las Vegas · The Strip, 2023",
-    "f1_vegas_alt": "Max Verstappen passes the neon signs on the Las Vegas Strip in his Red Bull RB19."
+    "f1_vegas_caption": "Las Vegas · Sphere, 2023",
+    "f1_vegas_alt": "Max Verstappen turns his Red Bull RB19 into the corner beneath the blue glow of the Sphere.",
+    "f1_austria_caption": "Austria · Red Bull Ring, Spielberg, 2025",
+    "f1_austria_alt": "Max Verstappen races his Red Bull RB21 past the orange grandstand with layers of mountains across the valley."
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -279,9 +279,9 @@
     "writing_title": "記事とノート",
     "writing_all": "すべての記事",
     "writing_intro": "Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。本文は中国語です。",
-    "f1_monaco_caption": "モナコ · モンテカルロ、2023年",
-    "f1_monaco_alt": "港沿いを走るフェルスタッペンのレッドブルRB19。背後にはヨットと斜面に並ぶ街並みが見える。",
-    "f1_vegas_caption": "ラスベガス · ストリップ、2023年",
-    "f1_vegas_alt": "フェルスタッペンのレッドブルRB19が、ネオン看板の輝く夜のストリップを駆け抜ける。"
+    "f1_vegas_caption": "ラスベガス · スフィア、2023年",
+    "f1_vegas_alt": "青く光る巨大なスフィアを背に、フェルスタッペンのレッドブルRB19が夜のコーナーへ入っていく。",
+    "f1_austria_caption": "オーストリア · シュピールベルク、レッドブルリンク、2025年",
+    "f1_austria_alt": "オレンジ色の観客席と幾重にも連なる山を背に、フェルスタッペンのレッドブルRB21が駆け抜ける。"
   }
 }

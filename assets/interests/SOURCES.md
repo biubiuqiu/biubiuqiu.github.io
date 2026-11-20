@@ -49,9 +49,11 @@ Selected classics from the IMDb Top 250 / Douban Top 250 tradition. No live rank
 
 The `full/` folder retains source JPEG pixels without resizing or recompression. EXIF/IPTC/comment metadata is removed without re-encoding. Movie posters use the same TMDB artwork through its `/original/` path. Game covers retain the native source dimensions (Steam: 600×900; GTA VI: 1920×2124). The on-track F1 source is natively 935×623; no artificial enlargement is used. Listing thumbnails remain WebP.
 
-## F1 street circuits
+## F1 race photographs
 
 - `verstappen-monaco-2023` — Max Verstappen, 2023. © Verstappen.com, Peter van Egmond. [Event gallery](https://news.verstappen.com/en/gallerydetail/540/) · [Source photograph](https://news.verstappen.com/img/2023/Formule_1_GP_Monaco_-_Monte-Carlo/20230526_G0OD1570-36b.jpg).
 - `verstappen-vegas-2023` — Max Verstappen, 2023. © Verstappen.com, Peter van Egmond. [Event gallery](https://news.verstappen.com/en/gallerydetail/559/) · [Source photograph](https://news.verstappen.com/img/2023/Formule_1_GP_Las_Vegas_-_Nevada/171123-LVG-2155-ANT-4b.jpg).
+- `verstappen-spielberg-2025` — Max Verstappen. © Verstappen.com, Red Bull Content Pool. [Event gallery](https://news.verstappen.com/en/gallerydetail/644/) · [Source photograph](https://news.verstappen.com/img/2025/Formule_1_GP_Oostenrijk_-_Red_Bull_Ring/SI202506280179-15b.jpg).
+- `verstappen-vegas-sphere-2023` — Max Verstappen. © Verstappen.com, Red Bull Content Pool. [Event gallery](https://news.verstappen.com/en/gallerydetail/559/) · [Source photograph](https://news.verstappen.com/img/2023/Formule_1_GP_Las_Vegas_-_Nevada/SI202311171201_hires_jpeg_24bit_rgb-29b.jpg).
 
 The 935 × 623 listing images and full-size viewer retain the complete composition and photographer’s watermark.
