@@ -69,9 +69,6 @@
     "tlou_part1": "最后生还者 1",
     "tlou_part2": "最后生还者 2",
     "tlou2_alt": "《最后生还者 Part II Remastered》官方封面",
-    "f1_photo_alt": "Max 驾驶红牛 RB21 行驶在巴林赛道上",
-    "f1_photo_caption": "Max Verstappen · 红牛 RB21 · 巴林赛道实拍（2025）",
-    "f1_photo_source": "图片：Verstappen.com / Red Bull Content Pool",
     "film_shawshank_title": "肖申克的救赎",
     "film_shawshank_text": "漫长岁月里，对自由与希望的坚持。",
     "film_interstellar_title": "星际穿越",
@@ -91,7 +88,11 @@
     "latest_label": "最近在写",
     "writing_title": "文章与笔记",
     "writing_all": "全部文章",
-    "writing_intro": "记录 Agent 研究、技术实践与问题排查。旧文保留原始发表日期。"
+    "writing_intro": "记录 Agent 研究、技术实践与问题排查。旧文保留原始发表日期。",
+    "f1_monaco_caption": "摩纳哥 · 蒙特卡洛，2023",
+    "f1_monaco_alt": "维斯塔潘驾驶红牛 RB19 驶过港边，游艇与山坡上的楼宇叠在车身后方。",
+    "f1_vegas_caption": "拉斯维加斯 · 长街夜赛，2023",
+    "f1_vegas_alt": "维斯塔潘驾驶红牛 RB19 驶过拉斯维加斯大道，霓虹招牌点亮护栏后的街景。"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -163,9 +164,6 @@
     "tlou_part1": "The Last of Us I",
     "tlou_part2": "The Last of Us II",
     "tlou2_alt": "Official The Last of Us Part II Remastered cover",
-    "f1_photo_alt": "Max driving the Red Bull RB21 on track in Bahrain",
-    "f1_photo_caption": "Max Verstappen · Red Bull RB21 · Bahrain on-track photograph (2025)",
-    "f1_photo_source": "Photo: Verstappen.com / Red Bull Content Pool",
     "film_shawshank_title": "The Shawshank Redemption",
     "film_shawshank_text": "Hope and freedom across years of confinement.",
     "film_interstellar_title": "Interstellar",
@@ -185,7 +183,11 @@
     "latest_label": "Latest article · in Chinese",
     "writing_title": "Writing & notes",
     "writing_all": "All articles",
-    "writing_intro": "Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates. Articles are in Chinese."
+    "writing_intro": "Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates. Articles are in Chinese.",
+    "f1_monaco_caption": "Monaco · Monte Carlo, 2023",
+    "f1_monaco_alt": "Max Verstappen drives his Red Bull RB19 past the harbour, with yachts and hillside apartments beyond the track.",
+    "f1_vegas_caption": "Las Vegas · The Strip, 2023",
+    "f1_vegas_alt": "Max Verstappen passes the neon signs on the Las Vegas Strip in his Red Bull RB19."
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -257,9 +259,6 @@
     "tlou_part1": "The Last of Us I",
     "tlou_part2": "The Last of Us II",
     "tlou2_alt": "The Last of Us Part II Remasteredの公式カバー",
-    "f1_photo_alt": "バーレーンのコースを走るマックスのレッドブル RB21",
-    "f1_photo_caption": "Max Verstappen · レッドブル RB21 · バーレーン走行写真（2025）",
-    "f1_photo_source": "写真：Verstappen.com / Red Bull Content Pool",
     "film_shawshank_title": "ショーシャンクの空に",
     "film_shawshank_text": "長い歳月の中でも失わない、自由への希望。",
     "film_interstellar_title": "インターステラー",
@@ -279,6 +278,10 @@
     "latest_label": "最近の記事 · 中国語",
     "writing_title": "記事とノート",
     "writing_all": "すべての記事",
-    "writing_intro": "Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。本文は中国語です。"
+    "writing_intro": "Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。本文は中国語です。",
+    "f1_monaco_caption": "モナコ · モンテカルロ、2023年",
+    "f1_monaco_alt": "港沿いを走るフェルスタッペンのレッドブルRB19。背後にはヨットと斜面に並ぶ街並みが見える。",
+    "f1_vegas_caption": "ラスベガス · ストリップ、2023年",
+    "f1_vegas_alt": "フェルスタッペンのレッドブルRB19が、ネオン看板の輝く夜のストリップを駆け抜ける。"
   }
 }
