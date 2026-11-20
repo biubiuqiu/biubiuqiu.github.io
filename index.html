@@ -40,8 +40,10 @@
 </script>
     <link rel="stylesheet" href="./styles.css?v=18">
     <link rel="stylesheet" href="./writing.css?v=9">
+    <link rel="stylesheet" href="./liquid-nav.css?v=1">
     <script src="./theme.js?v=6" defer></script>
-      <script src="./gallery.js?v=3" defer></script>
+    <script src="./liquid-nav.js?v=1" defer></script>
+    <script src="./gallery.js?v=3" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到正文</a>
@@ -49,9 +51,7 @@
       <img class="cover-photo" src="./assets/hiking/full/img_1931.jpg" alt="" width="1536" height="1152" fetchpriority="high">
       <header class="site-header page-width">
         <a class="brand" href="./" aria-label="Denis Wen 首页"><span class="icon icon-square brand-mark" aria-hidden="true"></span>Denis Wen</a>
-        <div class="header-actions">
-          <nav aria-label="主导航"><a href="/writing/" hreflang="zh-CN">文章</a><a href="#hiking">山野</a><a href="#interests">兴趣</a><a href="#projects">Lester</a><a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
-          <div class="header-controls">
+        <div class="header-controls">
           <details class="language-switcher">
             <summary aria-label="语言: 中文"><span>中文</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
             <div class="language-menu">
@@ -68,9 +68,19 @@
                 <button type="button" data-theme-choice="dark" aria-pressed="false"><span>深色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
               </div>
             </details>
-          </div>
         </div>
       </header>
+      <div class="cover-navigation page-width">
+        <nav class="liquid-nav" aria-label="主导航">
+          <canvas class="liquid-optics" aria-hidden="true"></canvas>
+          <span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>
+          <a href="/writing/" hreflang="zh-CN">文章</a>
+          <a href="#hiking">山野</a>
+          <a href="#interests">兴趣</a>
+          <a href="#projects">Lester</a>
+          <a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+      </div>
       <section class="hero page-width" aria-labelledby="intro-title"><h1 id="intro-title">保持好奇，持续探索。</h1><p class="intro">你好，我是 Denis。<br>探索 AI Agent，也把时间留给山野、电影、游戏和 F1。</p></section>
     </div>
     <main class="page-width" id="main">

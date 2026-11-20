@@ -1,0 +1,147 @@
+/* Keep the navigation over the ridgeline, clear of the introduction at any text size. */
+.cover {
+  display: grid;
+  grid-template-rows: auto minmax(min-content, 1fr) auto;
+}
+.cover .site-header { position: relative; z-index: 2; }
+.cover .site-header .header-controls { border: 0; padding: 0; }
+.cover .hero { position: static; padding-bottom: clamp(32px, 4vw, 50px); }
+.cover-navigation {
+  align-self: end;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.liquid-nav {
+  --light-x: 24%;
+  --light-y: 8%;
+  --rim-light: .53;
+  --travel: 320ms cubic-bezier(.22, .92, .28, 1.09);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  gap: 0;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  max-width: 100%;
+  padding: 6px;
+  border-radius: 100vmax;
+  color: white;
+  background: rgb(25 36 48 / .46);
+  box-shadow: 0 5px 14px -4px rgb(4 13 24 / .42), 0 1px 2px rgb(7 16 26 / .27);
+  -webkit-backdrop-filter: saturate(125%) blur(3px);
+  backdrop-filter: saturate(125%) blur(3px);
+}
+.liquid-nav > a {
+  z-index: 1;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding-inline: clamp(10px, 1.35vw, 23px);
+  border-radius: inherit;
+  color: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-shadow: 0 1px 3px rgb(7 12 20 / .85);
+}
+.liquid-nav > a:hover { opacity: 1; }
+.liquid-nav > a:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
+.liquid-nav > a:is(:hover, :focus-visible, :active) { background: rgb(255 255 255 / .12); }
+.liquid-nav[data-enhanced] > a:is(:hover, :focus-visible, :active) { background: transparent; }
+
+.liquid-optics, .liquid-nav::before, .liquid-nav::after, .liquid-lens, .liquid-lens canvas {
+  position: absolute;
+  pointer-events: none;
+}
+.liquid-optics, .liquid-nav::before, .liquid-nav::after {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+.liquid-optics, .liquid-lens canvas { visibility: hidden; }
+.liquid-optics { z-index: -2; }
+.liquid-nav[data-refracting] { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.liquid-nav[data-refracting] canvas { visibility: visible; }
+
+/* The center is smoked for type contrast; the two clear lips carry the scenery. */
+.liquid-nav::before {
+  content: "";
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 85px 30px at var(--light-x) var(--light-y),
+                    rgb(255 255 255 / .19), transparent),
+    linear-gradient(175deg, rgb(16 28 41 / .25), rgb(10 22 35 / .45) 35%,
+                    rgb(10 22 35 / .47) 73%, rgb(25 40 55 / .25));
+  box-shadow: inset 0 1px 2px rgb(255 255 255 / .45), inset 0 -2px 3px rgb(215 235 255 / .34);
+}
+.liquid-nav::after {
+  content: "";
+  z-index: 2;
+  padding: 1.5px;
+  background:
+    radial-gradient(ellipse 92px 50px at var(--light-x) var(--light-y),
+                    rgb(255 255 255 / var(--rim-light)) 0%, transparent 100%),
+    linear-gradient(151deg, #ffffffe8, #fff4 22%, #fff1 42%, #f5fcffbd 62%, #fff2 80%, #ffffffe0);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+.liquid-nav[data-active] { --rim-light: 1; }
+.liquid-lens {
+  inset: 6px auto 6px 0;
+  width: var(--lens-w, 44px);
+  translate: var(--lens-x, 6px) 0;
+  overflow: hidden;
+  border-radius: inherit;
+  background: rgb(245 251 255 / .16);
+  opacity: 0;
+  transition: opacity 130ms ease-out, transform 220ms cubic-bezier(.2, 1.35, .4, 1);
+}
+.liquid-lens canvas { top: 0; left: 0; transform: translate(var(--sample-x, 0px), var(--sample-y, 0px)); }
+.liquid-lens::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(ellipse 46px 27px at var(--lens-light-x, 30%) 0%, rgb(255 255 255 / .40), transparent),
+    linear-gradient(rgb(23 38 54 / .25), rgb(12 26 42 / .44) 60%, rgb(36 56 75 / .18));
+  box-shadow: inset 0 1px 1px #ffffffe0, inset 0 -1px 2px #e0f1ffc4, inset 1px 0 2px #fff5;
+}
+.liquid-nav[data-active] .liquid-lens {
+  opacity: 1;
+}
+.liquid-nav[data-travel] .liquid-lens {
+  transition: translate var(--travel), width var(--travel), opacity 110ms ease-out,
+              transform 220ms cubic-bezier(.2, 1.35, .4, 1);
+}
+.liquid-nav[data-travel] .liquid-lens canvas { transition: transform var(--travel); }
+.liquid-nav[data-pressed] .liquid-lens { transform: scale(1.035, .88); opacity: 1; transition-duration: 75ms; }
+.liquid-nav[data-pressed] .liquid-lens::after {
+  background: linear-gradient(rgb(255 255 255 / .16), rgb(12 26 42 / .52) 75%, rgb(230 247 255 / .22));
+  box-shadow: inset 0 2px 5px rgb(1 8 18 / .55), inset 0 -2px 2px #fff;
+}
+
+@media (max-width: 800px) {
+  .cover-navigation { justify-content: flex-start; padding-bottom: clamp(16px, 2.5vw, 24px); }
+}
+@media (max-width: 520px) {
+  .cover .site-header { grid-template-areas: "brand controls"; }
+  .liquid-nav { padding: 5px; }
+  .liquid-lens { top: 5px; bottom: 5px; }
+  .liquid-nav > a { padding-inline: clamp(8px, 8vw - 17.6px, 15px); font-size: clamp(13px, 3.55vw, 14px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .liquid-nav[data-travel] .liquid-lens, .liquid-nav .liquid-lens,
+  .liquid-nav[data-travel] .liquid-lens canvas { transition: none; }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+  .liquid-nav { color: #fff; background: #24303c; border: 1px solid currentColor; box-shadow: none;
+    -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .liquid-nav canvas, .liquid-nav .liquid-lens, .liquid-nav::before, .liquid-nav::after { display: none; }
+  .liquid-nav > a { text-shadow: none; }
+  .liquid-nav > a:is(:hover, :focus-visible, :active) { text-decoration: underline; text-underline-offset: .2em; }
+}

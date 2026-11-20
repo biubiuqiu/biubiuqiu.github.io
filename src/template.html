@@ -19,8 +19,10 @@
     <script>{{theme_bootstrap}}</script>
     <link rel="stylesheet" href="{{asset_prefix}}styles.css?v=18">
     <link rel="stylesheet" href="{{asset_prefix}}writing.css?v=9">
+    <link rel="stylesheet" href="{{asset_prefix}}liquid-nav.css?v=1">
     <script src="{{asset_prefix}}theme.js?v=6" defer></script>
-      <script src="{{asset_prefix}}gallery.js?v=3" defer></script>
+    <script src="{{asset_prefix}}liquid-nav.js?v=1" defer></script>
+    <script src="{{asset_prefix}}gallery.js?v=3" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">{{skip_link}}</a>
@@ -28,14 +30,22 @@
       <img class="cover-photo" src="{{asset_prefix}}assets/hiking/full/img_1931.jpg" alt="" width="1536" height="1152" fetchpriority="high">
       <header class="site-header page-width">
         <a class="brand" href="./" aria-label="{{home_label}}"><span class="icon icon-square brand-mark" aria-hidden="true"></span>Denis Wen</a>
-        <div class="header-actions">
-          <nav aria-label="{{navigation_label}}"><a href="/writing/" hreflang="zh-CN">{{writing_nav}}</a><a href="#hiking">{{nav_hiking}}</a><a href="#interests">{{nav_interests}}</a><a href="#projects">Lester</a><a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a></nav>
-          <div class="header-controls">
+        <div class="header-controls">
 {{locale_menu}}
 {{theme_menu}}
-          </div>
         </div>
       </header>
+      <div class="cover-navigation page-width">
+        <nav class="liquid-nav" aria-label="{{navigation_label}}">
+          <canvas class="liquid-optics" aria-hidden="true"></canvas>
+          <span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>
+          <a href="/writing/" hreflang="zh-CN">{{writing_nav}}</a>
+          <a href="#hiking">{{nav_hiking}}</a>
+          <a href="#interests">{{nav_interests}}</a>
+          <a href="#projects">Lester</a>
+          <a class="nav-github" href="https://github.com/biubiuqiu" target="_blank" rel="noopener noreferrer">GitHub</a>
+        </nav>
+      </div>
       <section class="hero page-width" aria-labelledby="intro-title"><h1 id="intro-title">{{hero_title}}</h1><p class="intro">{{intro_line_1}}<br>{{intro_line_2}}</p></section>
     </div>
     <main class="page-width" id="main">
