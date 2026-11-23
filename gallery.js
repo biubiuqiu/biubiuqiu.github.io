@@ -1,44 +1,5 @@
 (function () {
   'use strict';
-  var gallery = document.querySelector('.f1-gallery');
-  var racePhotos = gallery ? Array.from(gallery.querySelectorAll('.f1-figure')) : [];
-  var raceButtons = [];
-
-  function selectRace(photo) {
-    racePhotos.forEach(function (item, i) {
-      item.hidden = item !== photo;
-      raceButtons[i].setAttribute('aria-pressed', String(item === photo));
-    });
-  }
-
-  if (racePhotos.length) {
-    var strip = document.createElement('div');
-    strip.className = 'f1-strip';
-    racePhotos.forEach(function (photo) {
-      var button = document.createElement('button');
-      button.type = 'button';
-      var thumb = photo.querySelector('img').cloneNode();
-      thumb.alt = '';
-      button.setAttribute('aria-controls', photo.id);
-      button.append(thumb, photo.dataset.station);
-      button.addEventListener('click', function () {
-        selectRace(photo);
-        history.replaceState(history.state, '', '#' + photo.id);
-      });
-      strip.append(button);
-      raceButtons.push(button);
-    });
-    gallery.append(strip);
-    function selectLinkedRace() {
-      var linked = racePhotos.find(function (photo) { return '#' + photo.id === location.hash; });
-      if (linked || location.hash === '#f1') selectRace(linked || racePhotos[0]);
-      if (linked) linked.scrollIntoView({block: 'start', behavior: 'instant'});
-    }
-    selectRace(racePhotos[0]);
-    selectLinkedRace();
-    window.addEventListener('hashchange', selectLinkedRace);
-  }
-
   var viewer = document.querySelector('.photo-viewer');
   if (!viewer || typeof viewer.showModal !== 'function') return;
 
@@ -143,12 +104,6 @@
     }
   }, {passive:true});
   viewer.addEventListener('close', function () {
-    var lastRace = group[index] && group[index].closest('.f1-figure');
-    if (racePhotos.includes(lastRace)) {
-      selectRace(lastRace);
-      trigger = group[index];
-      if (location.hash.startsWith('#f1-')) history.replaceState(history.state, '', '#' + lastRace.id);
-    }
     ++request;
     image.removeAttribute('src');
     image.style.removeProperty('max-width');
