@@ -94,7 +94,10 @@
     "f1_austria_caption": "奥地利 · 施皮尔贝格红牛环，2025",
     "f1_austria_alt": "维斯塔潘的红牛 RB21 掠过山谷中的赛道，背后是橙色看台和层叠的远山。",
     "f1_singapore_caption": "新加坡 · 滨海湾，2025",
-    "f1_singapore_alt": "白色钢拱和一排吊灯沿街道向远处延伸，维斯塔潘驾驶红牛 RB21 从桥下迎面驶来。"
+    "f1_singapore_alt": "白色钢拱和一排吊灯沿街道向远处延伸，维斯塔潘驾驶红牛 RB21 从桥下迎面驶来。",
+    "f1_austria_name": "奥地利",
+    "f1_singapore_name": "新加坡",
+    "f1_vegas_name": "拉斯维加斯"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -191,7 +194,10 @@
     "f1_austria_caption": "Austria · Red Bull Ring, Spielberg, 2025",
     "f1_austria_alt": "Max Verstappen races his Red Bull RB21 past the orange grandstand with layers of mountains across the valley.",
     "f1_singapore_caption": "Singapore · Marina Bay, 2025",
-    "f1_singapore_alt": "Max Verstappen approaches in his Red Bull RB21 under white steel arches and a row of hanging lamps."
+    "f1_singapore_alt": "Max Verstappen approaches in his Red Bull RB21 under white steel arches and a row of hanging lamps.",
+    "f1_austria_name": "Austria",
+    "f1_singapore_name": "Singapore",
+    "f1_vegas_name": "Las Vegas"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -288,6 +294,9 @@
     "f1_austria_caption": "オーストリア · シュピールベルク、レッドブルリンク、2025年",
     "f1_austria_alt": "オレンジ色の観客席と幾重にも連なる山を背に、フェルスタッペンのレッドブルRB21が駆け抜ける。",
     "f1_singapore_caption": "シンガポール · マリーナベイ、2025年",
-    "f1_singapore_alt": "白い鋼のアーチと街灯が連なる橋の下から、フェルスタッペンのレッドブルRB21がこちらへ迫る。"
+    "f1_singapore_alt": "白い鋼のアーチと街灯が連なる橋の下から、フェルスタッペンのレッドブルRB21がこちらへ迫る。",
+    "f1_austria_name": "オーストリア",
+    "f1_singapore_name": "シンガポール",
+    "f1_vegas_name": "ラスベガス"
   }
 }

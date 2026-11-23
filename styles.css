@@ -127,3 +127,21 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
     -webkit-backdrop-filter: none; backdrop-filter: none;
   }
 }
+
+/* Keep the full race photograph above a compact filmstrip. */
+.f1-gallery { margin-block: 22px; }
+.f1-gallery .f1-figure { scroll-margin-top: 5rem; }
+.f1-gallery .media-photo { border-radius: 12px; }
+.f1-gallery .f1-figure figcaption { font-size: .75rem; }
+.f1-gallery .f1-figure { margin: 0 0 16px; }
+.f1-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.f1-strip button {
+  display: grid; gap: 4px; padding: 4px; min-width: 0; min-height: 44px;
+  background: var(--surface); border: 1px solid transparent; border-radius: 10px;
+  color: var(--muted); font: 500 .8125rem/1.5 var(--sans); cursor: pointer;
+}
+.f1-strip img { display: block; width: 100%; height: clamp(38px, 6vw, 60px); object-fit: cover; border-radius: 6px; }
+.f1-strip button[aria-pressed="true"] { border-color: var(--accent); background: var(--selected); color: var(--ink); }
+.f1-strip button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+@media (hover: hover) { .f1-strip button:hover { border-color: var(--accent); } }
+.f1-strip img { object-position: center 72%; }
