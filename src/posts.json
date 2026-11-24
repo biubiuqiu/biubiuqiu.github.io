@@ -1,5 +1,26 @@
 [
   {
+    "slug": "agent-transcript-storage",
+    "title": "Agent 的会话记录怎么存？从一次工具调用到跨机恢复",
+    "original_title": "Agent 的会话记录怎么存？从一次工具调用到跨机恢复",
+    "date": "2026-11-24",
+    "original_datetime": "2026-11-24",
+    "kind": "research",
+    "category": "Agent 研究",
+    "excerpt": "一份 2 MB 的订单明细，该进数据库、对象存储，还是下一轮提示词？沿着一次建单，对照 Claude Agent SDK、LangChain / LangGraph 与 OpenAI Agents SDK 的实际读写边界。",
+    "context": "官方 SDK 接口对照 · 企业运行时设计与容量算例",
+    "tags": [
+      "Agent",
+      "上下文管理",
+      "运行时",
+      "PostgreSQL"
+    ],
+    "cover": "/assets/hiking/dsc02281.webp",
+    "cover_alt": "山间建筑与冰川",
+    "banner": "/assets/hiking/full/dsc02281.jpg",
+    "mobile_banner": "/assets/hiking/dsc02281.webp"
+  },
+  {
     "slug": "agent-sandbox-economics",
     "title": "每人一个 Agent 沙盒，要常开多少台机器？",
     "original_title": "每人一个 Agent 沙盒，要常开多少台机器？",

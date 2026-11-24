@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff"><title>Agent 的会话记录怎么存？从一次工具调用到跨机恢复 — Denis Wen</title><meta name="description" content="一份 2 MB 的订单明细，该进数据库、对象存储，还是下一轮提示词？沿着一次建单，对照 Claude Agent SDK、LangChain / LangGraph 与 OpenAI Agents SDK 的实际读写边界。"><link rel="canonical" href="https://biubiuqiu.github.io/writing/agent-transcript-storage/"><meta property="og:type" content="article"><meta property="og:title" content="Agent 的会话记录怎么存？从一次工具调用到跨机恢复"><meta property="og:description" content="一份 2 MB 的订单明细，该进数据库、对象存储，还是下一轮提示词？沿着一次建单，对照 Claude Agent SDK、LangChain / LangGraph 与 OpenAI Agents SDK 的实际读写边界。"><meta property="og:url" content="https://biubiuqiu.github.io/writing/agent-transcript-storage/"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=18"><link rel="stylesheet" href="/writing.css?v=10"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=6" defer></script><script src="/writing.js?v=4" defer></script><meta property="article:published_time" content="2026-11-24"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="https://biubiuqiu.github.io/assets/hiking/dsc02281.webp"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Agent 的会话记录怎么存？从一次工具调用到跨机恢复", "description": "一份 2 MB 的订单明细，该进数据库、对象存储，还是下一轮提示词？沿着一次建单，对照 Claude Agent SDK、LangChain / LangGraph 与 OpenAI Agents SDK 的实际读写边界。", "datePublished": "2026-11-24", "author": {"@type": "Person", "name": "Denis Wen", "url": "https://biubiuqiu.github.io/"}, "mainEntityOfPage": "https://biubiuqiu.github.io/writing/agent-transcript-storage/", "image": "https://biubiuqiu.github.io/assets/hiking/dsc02281.webp", "wordCount": 3121, "timeRequired": "PT11M", "inLanguage": "zh-CN", "keywords": ["Agent", "上下文管理", "运行时", "PostgreSQL"]}</script></head><body class="writing-page post-page"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="文章导航"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="/writing/">文章</a><a href="/atom.xml" aria-label="订阅 Atom RSS">RSS</a></nav>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外观" hidden>
+              <summary aria-label="外观" title="外观"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外观">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>跟随系统</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>浅色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>深色</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header><header class="post-hero" id="article-top"><picture class="post-hero-media"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/hiking/dsc02281.webp"><img class="post-hero-photo" src="/assets/hiking/full/dsc02281.jpg" alt="山间建筑与冰川" style="object-position:center" width="1536" height="1024" fetchpriority="high"></picture><div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">Agent 研究 / 文档与源码研究</p><h1><span class="hero-title-part">Agent 的会话记录怎么存？</span><wbr><span class="hero-title-part">从一次工具调用到跨机恢复</span></h1><div class="article-meta"><span>发表于 <time datetime="2026-11-24">2026-11-24</time></span><span aria-hidden="true">·</span><span title="按每分钟约 300 字估算；动画和代码实践时间另计">约 11 分钟阅读</span></div><div class="post-tags"><a class="glass-control" href="/writing/?tag=Agent"># Agent</a><a class="glass-control" href="/writing/?tag=上下文管理"># 上下文管理</a><a class="glass-control" href="/writing/?tag=运行时"># 运行时</a><a class="glass-control" href="/writing/?tag=PostgreSQL"># PostgreSQL</a></div></div></header><main class="writing-width writing-main" id="main"><div class="reading-progress-track" aria-hidden="true"><span></span></div><div class="article-layout"><aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>文章目录</span><span class="toc-mobile-progress">0%</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary><div class="toc-content"><p class="toc-current">从第一节开始阅读</p><nav aria-label="文章目录"><ol><li class="toc-h2"><a class="glass-row" href="#unit"><span class="toc-number">01</span><span>一行该放什么？先看一次工具调用</span></a></li><li class="toc-h2"><a class="glass-row" href="#sdks"><span class="toc-number">02</span><span>同一句“继续”，三个 SDK 分别从哪里读</span></a></li><li class="toc-h3"><a class="glass-row" href="#claude"><span class="toc-number">2.1</span><span>Claude Agent SDK：把原生会话交还给运行时</span></a></li><li class="toc-h3"><a class="glass-row" href="#langchain"><span class="toc-number">2.2</span><span>LangChain / LangGraph：恢复“接下来轮到谁”</span></a></li><li class="toc-h3"><a class="glass-row" href="#openai"><span class="toc-number">2.3</span><span>OpenAI Agents SDK：留下历史，还能改变模型读到的内容</span></a></li><li class="toc-h2"><a class="glass-row" href="#layout"><span class="toc-number">03</span><span>在 PostgreSQL 和对象存储之间划线</span></a></li><li class="toc-h2"><a class="glass-row" href="#cost"><span class="toc-number">04</span><span>算一笔账：数据库变小了，哪些字节还在？</span></a></li><li class="toc-h2"><a class="glass-row" href="#read"><span class="toc-number">05</span><span>用户问“第二批呢”，实际读哪几条</span></a></li><li class="toc-h2"><a class="glass-row" href="#crash"><span class="toc-number">06</span><span>最值得做的验收：在第 44 条之后拔掉电源</span></a></li></ol></nav><div class="reading-status"><div><span>阅读进度</span><strong data-progress-text>0%</strong></div><progress max="100" value="0" aria-label="文章阅读进度"></progress><span data-remaining>预计 11 分钟</span></div><div class="toc-actions"><a href="/writing/">← 全部文章</a><a href="#article-top">↑ 回到顶部</a></div></div></details></aside><div class="article-column" data-reading-minutes="11"><div class="article-intro"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a><span aria-hidden="true">/</span><a href="/writing/?category=Agent 研究">Agent 研究</a></nav><p class="article-context">官方 SDK 接口对照 · 企业运行时设计与容量算例</p><div class="post-byline"><a href="/">Denis Wen</a><span>3,121 字</span></div><div class="reading-resume" hidden><span>上次读到 <strong></strong></span><button type="button" data-resume>继续阅读 →</button><button type="button" data-dismiss-resume aria-label="忽略上次阅读位置">×</button></div></div><article class="article-body" aria-label="文章正文"><p class="article-lead">用户让 Agent 查一下昨晚失败的订单。工具返回 2 MB 明细，Agent 找出三个异常批次，替用户建了一张工单。十分钟后，用户问：“第二批和第一批是同一个原因吗？”如果把整份明细再发给模型，每次追问都要付一次阅读费。如果只留下“三个批次异常”，这次追问又答不出来。更麻烦的是，假如进程恰好死在工单创建成功之后，下一台机器怎么知道该继续分析，还是再建一次工单？</p>
+<p>这三个问题决定了我会怎么存 transcript，也就是 Agent 与用户、模型、工具之间已经发生的交互。对于多人共用、需要跨机器恢复的服务，我会从<strong>按逻辑条目追加、小内容内联、大结果留可回读的引用</strong>开始。模型下一轮读哪些条目，单独做决定。下面用这张工单走一遍。</p>
+
+<h2 id="unit">一行该放什么？先看一次工具调用<a class="heading-anchor" href="#unit" aria-label="链接到：一行该放什么？先看一次工具调用">#</a></h2>
+<p>假设这次查询的调用编号是 <code>q7</code>，建单是 <code>t8</code>。平台可以把一次运行记成下面六条。序号属于会话，调用编号属于一次工具交互，两者各有用途。</p>
+<pre><code>序号   类型                写入的内容
+41     user.message        查昨晚失败的订单，异常批次建一张工单
+42     tool.call     q7    query_orders，时间范围与查询条件
+43     tool.result   q7    3 个异常批次，明细对象 A，版本与校验值
+44     tool.call     t8    create_ticket，依据 #43，稳定幂等键 K
+45     tool.result   t8    成功，外部工单号 O-318
+46     assistant.message   三个批次已汇总到工单 O-318</code></pre>
+<p>如果从数据库里只取 44 到 46，就能给用户展示“建了哪张工单”。如果两次查询并行，即使结果按相反的顺序回来，也能用调用编号配对。流式输出的半个词、半截 JSON 参数可以发到前端；通常等一条消息或一次调用完整后，再提交一条历史。真要断线续播，可以给增量片段配短期缓冲和游标。它的保留周期可以比会话短得多。</p>
+<p>整段会话放一个 JSON 字段，在单写者、长度有上限、总是整段读取的原型里很省事。代价取决于具体写法。假设客户端每加一条都重新上传整个数组，100 条等长消息累计要传 5,050 条消息的等价字节；分条追加只传 100 条。这是客户端传输量的算例，数据库的实际磁盘写入还取决于实现。另一种很实用的起点是本地 JSONL：同样使用 JSON 编码，每次只往末尾加记录。<strong>编码格式和更新粒度，是两项可以分别选择的设计。</strong></p>
+
+<h2 id="sdks">同一句“继续”，三个 SDK 分别从哪里读<a class="heading-anchor" href="#sdks" aria-label="链接到：同一句“继续”，三个 SDK 分别从哪里读">#</a></h2>
+<h3 id="claude">Claude Agent SDK：把原生会话交还给运行时<a class="heading-anchor" href="#claude" aria-label="链接到：Claude Agent SDK：把原生会话交还给运行时">#</a></h3>
+<p>用 TypeScript 调用 <code>query()</code> 时，可以记下返回的 <code>session_id</code>，下次通过 <code>options.resume</code> 继续。默认 transcript 保存在本机 <code>~/.claude/projects/</code> 下的 JSONL 文件中。把后续请求打到另一台机器时，光传一个 ID 还缺少它指向的数据。</p>
+<p>官方提供的 <code>SessionStore</code> 适配器支持 <code>append(key, entries)</code> 和 <code>load(key)</code>。它对后端提出了很具体的要求：读回来的条目要与写入值深度相等，顺序一致。换一种 JSON 序列化可以，擅自把工具结果换成一句摘要会破坏这项约定。键里还有项目标识和可选的子路径，后者可能对应子 Agent 的记录。我的做法是把原生条目按批持久化，给界面另建轻量索引。若在底层拆走 2 MB 明细，就在 <code>load</code> 时无损拼回；若只希望模型收到摘要，应在工具最初返回结果时就明确设计这个接口。<a href="https://code.claude.com/docs/en/agent-sdk/sessions">会话恢复</a> · <a href="https://code.claude.com/docs/en/agent-sdk/session-storage">外部存储契约与示例</a></p>
+<h3 id="langchain">LangChain / LangGraph：恢复“接下来轮到谁”<a class="heading-anchor" href="#langchain" aria-label="链接到：LangChain / LangGraph：恢复“接下来轮到谁”">#</a></h3>
+<p>LangChain 的 <code>create_agent(..., checkpointer=saver)</code> 可以接入 LangGraph 的持久化。同一个 <code>thread_id</code> 找回这条线程的图状态；<code>messages</code> 是其中一个字段，业务也能扩展自己的状态。开发时可以用 <code>InMemorySaver</code>，官方给出的数据库示例使用 <code>PostgresSaver</code>。跨线程的用户偏好则有单独的 Store。<a href="https://docs.langchain.com/oss/python/langchain/short-term-memory">LangChain 短期记忆</a> · <a href="https://docs.langchain.com/oss/python/langgraph/persistence">LangGraph 持久化</a></p>
+<p>拿工单举例，可以让检查点带上查询产物 A 的引用、待审批的建单请求和当前图状态。审批人隔天回来，运行时要知道从哪个步骤继续。只恢复聊天窗口里的六行文字，很难可靠地推断这件事。反过来，若把原始明细也塞进经常保存的状态，检查点的读取和序列化就要处理一个大字段。我的选择是让状态只带该节点下一步要用的数据，再单独测量实际 saver 的增量写入量。</p>
+<h3 id="openai">OpenAI Agents SDK：留下历史，还能改变模型读到的内容<a class="heading-anchor" href="#openai" aria-label="链接到：OpenAI Agents SDK：留下历史，还能改变模型读到的内容">#</a></h3>
+<p>Python SDK 的 <code>SQLiteSession("orders-17", "sessions.db")</code> 就能给同一会话的多次 <code>Runner.run</code> 保存历史。显式指定文件路径很重要，默认的内存库随进程结束而消失。Session 有 <code>get_items</code>、<code>add_items</code> 等接口。<code>RunConfig.session_input_callback</code> 则允许在调用模型前组合已取回的历史与本轮输入；筛掉某些旧项，并不会把其余旧项当作新增历史再写一遍。<a href="https://openai.github.io/openai-agents-python/sessions/">Session 与输入合并</a> · <a href="https://openai.github.io/openai-agents-python/ref/memory/sqlite_session/">SQLiteSession 的持久化参数</a></p>
+<p>例如，下面两次调用可以放在两个进程里执行。示例假设应用已配置同一个 <code>agent</code>，并且两个进程能访问同一份数据库文件；第二次调用用相同的会话 ID 找回历史。</p>
+<pre><code>from agents import Runner, SQLiteSession
+
+# 第一轮，agent 的查询工具返回摘要、批次号和明细引用
+session = SQLiteSession("orders-17", "orders.db")
+await Runner.run(agent, "查昨晚失败的订单", session=session)
+
+# 下一轮，重新打开会话，不需要客户端重传整段聊天
+resumed = SQLiteSession("orders-17", "orders.db")
+answer = await Runner.run(agent, "第二批和第一批原因相同吗？", session=resumed)</code></pre>
+<p>这里有两处成本。回调里只留下十条，可以减少送给模型的 token；如果此前已经取回了一万条，数据库读取量还是一万条。<code>SessionSettings(limit=N)</code> 能进一步限定取回数量，但 N 按条目计数，截断点可能刚好落在工具调用与结果之间。平台需要能回补缺失的配对，或者把整组已结束的交互移出输入。</p>
+
+<h2 id="layout">在 PostgreSQL 和对象存储之间划线<a class="heading-anchor" href="#layout" aria-label="链接到：在 PostgreSQL 和对象存储之间划线">#</a></h2>
+<p>回到企业平台。下面是我会先实现的一张逻辑表。平台生成稳定的事件 ID，同一次写入的重试沿用它。工具调用 ID 可以在一次 run 内解释，审计与排障还需要知道事件属于哪个租户、会话和 run。</p>
+<pre><code>transcript_item
+  tenant_id, session_id, seq         会话内的已提交顺序
+  event_id, run_id, kind, call_id    去重、归属与工具配对
+  payload_jsonb                     消息内容，或小预览与产物描述
+  artifact_key, digest, byte_size   大结果的不可变版本、校验值和大小
+  schema_version, created_at        解码与保留策略
+
+  PRIMARY KEY (tenant_id, session_id, seq)
+  UNIQUE      (tenant_id, session_id, event_id)</code></pre>
+<p>一次追加事务里，先锁定这条会话的头记录，检查事件是否已写入，给这一批分配连续序号，再插入条目、更新头序号并提交。这样前端拿 <code>seq &gt; cursor</code> 翻页，不会因一个较早分配的序号后来才提交而漏掉记录。不同会话可以各写各的。大型并行任务若卡在同一把锁上，先观察单会话等待时间，再决定要不要让子任务分流；全平台的并发用户数推不出这把锁有多热。</p>
+<p>明细 A 先写入当前租户名下的不可变对象并确认成功，再在数据库事务里提交第 43 条及其引用。上传成功、事务失败会留下孤儿对象，可以在宽限期后扫描回收。倒过来做则可能让用户看到一条“成功”的记录，点进去却没有明细。访问产物时按当前用户重新验权，事件里存稳定的对象标识；临时下载地址在读取时生成。</p>
+
+<h2 id="cost">算一笔账：数据库变小了，哪些字节还在？<a class="heading-anchor" href="#cost" aria-label="链接到：算一笔账：数据库变小了，哪些字节还在？">#</a></h2>
+<p>假设每天 10,000 次运行，每次 20 条记录，每条平均 1 KB，另有一次 2 MB 的工具返回。按十进制单位，每月按 30 天计。下面只算未压缩的逻辑内容；索引、WAL、副本、备份、对象请求费与网络费都需另测。</p>
+<pre><code>小记录     10,000 × 20 × 1 KB × 30  =   6 GB/月
+大结果     10,000 ×  1 × 2 MB × 30  = 600 GB/月
+条目数     10,000 × 20 × 30         = 600 万条/月</code></pre>
+<p>大结果内联，数据库承接约 606 GB/月；写到对象存储，数据库承接约 6 GB/月加引用，对象侧接住约 600 GB/月。总字节大致还在。收益是一次“打开最近会话”可以只查轻量索引和当前页，备份热库也不用反复携带大结果。如果产品承诺永久保留明细，还得单独给那 600 GB 的逐月累积付钱。</p>
+<p>这里有两次独立决策。<strong>大结果外置</strong>发生在活跃会话里，依据单条内容大小和读取方式。<strong>整段历史归档</strong>发生在会话变冷以后，依据回访频率、保留期限和可接受的恢复等待。可以把已封存的序号区间压成 JSONL 分段，在数据库登记起止序号、对象版本和校验值。先校验归档并切换读取目录，再回收热副本。此时用户突然追问，新的记录继续追加到末尾；翻旧页才取对应的归档分段。</p>
+<p>外置阈值值得用实际流量挑。拿一周样本，按工具统计结果大小的 P50、P95、P99，以及七天内有多少结果被完整重读。分别模拟 32 KB、128 KB、512 KB 的切点，看热库少写多少、每天多多少次对象 GET、恢复首条响应的 P95 慢多少。10 MB 的偶发报表和每轮必读的 40 KB 配置，很可能应该采用不同策略。删除一个租户的数据时，归档、摘要、缓存和仍在保留期内的备份也要有各自的到期路径。</p>
+
+<h2 id="read">用户问“第二批呢”，实际读哪几条<a class="heading-anchor" href="#read" aria-label="链接到：用户问“第二批呢”，实际读哪几条">#</a></h2>
+<p><strong>打开聊天页</strong>，按游标读最近一页，显示建单回执和查询摘要。只有用户展开明细时才取 A。<strong>继续问原因</strong>，先取带覆盖序号的摘要、其后的完整交互和本轮问题。摘要至少保留三个批次的标识、原查询时间范围与产物引用。如果第一批和第二批的差异藏在错误码里，就到 A 中提取这两个批次的相关行，再把它们放进预算内。不能访问或已过期时，明确告诉用户依据缺失；重新查到的是新数据，要标上新的查询时间。</p>
+<p><strong>排查当时为什么建单</strong>，沿第 44 条回看第 43 条的原始证据和当时使用的工具版本。若产品还要回答“模型当时具体看到了什么”，应记录该次模型调用使用的条目区间、摘要版本、系统提示版本、工具定义版本和最终请求摘要值。仅有哈希可以校验，无法还原内容；需要逐字核对的场景，应在授权和保留策略允许下保存实际请求，或保存足以重建请求的不可变输入。即使输入相同，重新请求模型也不能保证得到同一答案。</p>
+<p>我会让摘要带上 <code>through_seq</code> 和策略版本。线上试一种更短的摘要时，可以回到授权范围内的历史重建，再拿“第一批和第二批有何不同”这样的追问对照答案。这样压缩可以做实验；一旦用新摘要覆盖了唯一原文，就失去了验证它漏掉什么的机会。关于消息如何进入有限的模型窗口，可以接着读<a href="/writing/agent-context-management/">《Agent 的上下文管理》</a>。</p>
+
+<h2 id="crash">最值得做的验收：在第 44 条之后拔掉电源<a class="heading-anchor" href="#crash" aria-label="链接到：最值得做的验收：在第 44 条之后拔掉电源">#</a></h2>
+<p>假设工单系统已创建 O-318，但运行时还没写第 45 条就退出。此时 transcript 能证明“发起过建单”，无法证明远端是否成功。新的 worker 应带着原先持久化的幂等键 K 查询或重试，让支持幂等的下游返回同一张工单，再补写结果。遇到既不能查单、又不接受幂等键的接口，就把状态记为“结果待核对”，交给人工确认。数据库的唯一键能挡住两条重复记录，挡不住远端创建两张工单。</p>
+<p>如果今天从零开始做，我会先交付三件能验收的事：会话能按序翻页；换一台 worker 能继续追问并找回指定批次；在建单回执写入前杀掉进程，恢复后外部系统仍只有一张单。跑通以后再根据工具结果大小和冷会话回访率决定外置与归档阈值。好的存储设计最终体现在一个很平常的瞬间：用户隔天回来问“第二批呢”，系统找得到昨天的证据，也记得那张工单已经建过了。</p>
+</article><section class="article-end"><p class="end-mark">— 全文完 —</p><div class="article-attribution"><strong>Denis Wen</strong><p>保持好奇，持续探索。记录 Agent、工程实践，以及沿途的思考。</p><small>本文链接</small><a class="canonical-link" href="https://biubiuqiu.github.io/writing/agent-transcript-storage/">https://biubiuqiu.github.io/writing/agent-transcript-storage/</a><p class="copyright-note">© Denis Wen · 转载文字请注明作者与原文链接；文中引用内容归原作者所有。</p></div><div class="article-share"><button type="button" data-copy-link>复制文章链接 ↗</button><button type="button" data-share>分享文章</button><a href="#article-top">回到顶部 ↑</a></div></section><nav class="article-pagination" aria-label="上一篇与下一篇"><a href="/writing/agent-sandbox-economics/"><span>← 上一篇 · 较早</span><strong>每人一个 Agent 沙盒，要常开多少台机器？</strong></a></nav><section class="article-related"><div class="related-heading"><h2>继续阅读</h2><a href="/writing/">全部文章 ↗</a></div><div class="related-grid"><a class="related-card" href="/writing/agent-sandbox-economics/"><img src="/assets/writing/thumbs/agent-sandbox-economics.svg" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent 研究 · 15 分钟</span><strong>每人一个 Agent 沙盒，要常开多少台机器？</strong></a><a class="related-card" href="/writing/agent-sandbox-workspace/"><img src="/assets/writing/thumbs/agent-sandbox-workspace.svg" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent 研究 · 15 分钟</span><strong>一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果</strong></a><a class="related-card" href="/writing/agent-tool-design/"><img src="/assets/writing/thumbs/agent-tool-design.svg" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent 研究 · 25 分钟</span><strong>Read、Edit、Write、Bash：Agent 工具设计里的巧思</strong></a></div></section></div></div></main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>
