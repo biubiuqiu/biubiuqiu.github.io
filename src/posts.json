@@ -1,5 +1,26 @@
 [
   {
+    "slug": "inside-an-agent-runtime",
+    "title": "拆解一个 Agent Runtime：从三份报价到一封只发一次的邮件",
+    "original_title": "拆解一个 Agent Runtime：从三份报价到一封只发一次的邮件",
+    "date": "2026-11-24",
+    "original_datetime": "2026-11-24",
+    "kind": "research",
+    "category": "Agent 研究",
+    "excerpt": "沿着一次报价比对与审批发件，拆开执行循环、模型接口、工具、沙盒和调度。再故意让进程死在回执落盘前，看下一台机器凭什么接手。",
+    "context": "运行时架构拆解 · 三套 SDK 对照 · 可复现的断点实验",
+    "tags": [
+      "Agent",
+      "运行时",
+      "架构设计",
+      "工具设计"
+    ],
+    "cover": "/assets/hiking/img_2146.webp",
+    "cover_alt": "云间雪峰与冰川",
+    "banner": "/assets/hiking/full/img_2146.jpg",
+    "mobile_banner": "/assets/hiking/img_2146.webp"
+  },
+  {
     "slug": "agent-transcript-storage",
     "title": "Agent 的会话记录怎么存？从一次工具调用到跨机恢复",
     "original_title": "Agent 的会话记录怎么存？从一次工具调用到跨机恢复",
