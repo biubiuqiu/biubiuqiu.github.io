@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
-from writing import featured_writing, build_writing, load_posts
+from writing import featured_writing, build_writing, load_posts, title_phrases
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_URL = "https://biubiuqiu.github.io/"
@@ -18,8 +18,8 @@ LANGUAGES = {
     "ja": {"label": "日本語", "path": "ja", "og_locale": "ja_JP"},
 }
 TOKENS = re.compile(r"\{\{([a-z_0-9]+)\}\}")
-RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery", "featured_writing"}
-SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale", "latest_slug", "latest_title"}
+RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery", "featured_writing", "latest_title"}
+SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale", "latest_slug", "latest_excerpt", "latest_read_time"}
 
 
 def url_for(language: str) -> str:
@@ -91,7 +91,8 @@ def build() -> None:
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
     posts = load_posts(ROOT)
-    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark"}
+    latest = posts[0]
+    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark", "read_time_format"}
     if set(translations) != set(LANGUAGES):
         raise ValueError("Translations and configured language routes must match")
     for language, meta in LANGUAGES.items():
@@ -121,8 +122,10 @@ def build() -> None:
             "theme_menu": theme_menu_for(copy),
             "hiking_gallery": gallery_for(language, copy),
             "featured_writing": featured_writing(posts),
-            "latest_slug": posts[0]["slug"],
-            "latest_title": posts[0]["title"],
+            "latest_slug": latest["slug"],
+            "latest_title": title_phrases(latest["title"], "card-title-phrase"),
+            "latest_excerpt": re.split(r"(?<=[。！？])", latest["excerpt"], maxsplit=1)[0],
+            "latest_read_time": copy["read_time_format"].format(minutes=latest["minutes"]),
             "theme_bootstrap": (ROOT / "src" / "theme-init.js").read_text(encoding="utf-8"),
         }
         def substitute(match: re.Match[str]) -> str:

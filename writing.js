@@ -42,6 +42,7 @@
   var form=document.querySelector('.archive-filters');
   if(form){
     const cards = Array.from(document.querySelectorAll('.archive-card'));
+    const tags = Array.from(document.querySelectorAll('.archive-card .post-tags a'));
     const result = document.querySelector('.archive-result');
     const empty = document.querySelector('.archive-empty');
     const clear = document.querySelector('.filter-clear');
@@ -160,6 +161,10 @@
       const category = form.elements.category.value;
       const tag = form.elements.tag.value;
       const selected = [category, tag].filter(Boolean);
+      tags.forEach(link => {
+        const selectedTag = tag !== '' && new URL(link.href).searchParams.get('tag') === tag;
+        link.classList.toggle('glass-control', selectedTag);
+      });
       let total = 0;
       cards.forEach(card => {
         const matches = (!query || card.dataset.search.toLocaleLowerCase().includes(query)) &&
@@ -241,7 +246,11 @@
   var panel=document.querySelector('.toc-panel');var media=matchMedia('(max-width:900px)');
   function layout(){panel.open=!media.matches;panel.querySelector('summary').tabIndex=media.matches?0:-1;}layout();media.addEventListener('change',layout);
   var links=Array.from(document.querySelectorAll('.toc-content nav a'));var headings=links.map(function(a){return document.getElementById(decodeURIComponent(a.hash.slice(1)));});
-  var progress=document.querySelector('.reading-status progress');var progressText=document.querySelector('[data-progress-text]');var mobileProgress=document.querySelector('.toc-mobile-progress');var remaining=document.querySelector('[data-remaining]');var bar=document.querySelector('.reading-progress-track span');var current=document.querySelector('.toc-current');var minutes=Number(document.querySelector('[data-reading-minutes]').dataset.readingMinutes);
+  const track = document.querySelector('.reading-progress-track');
+  const bar = track.querySelector('span');
+  const remaining = document.querySelector('[data-remaining]');
+  const minutes = Number(document.querySelector('[data-reading-minutes]').dataset.readingMinutes);
+  track.hidden = false;
   var key='denis-reading:'+location.pathname;var resume=document.querySelector('.reading-resume');var saved=null;var ignoreSaved=false;var saveTime=0;var active=-1;var positions=[];var begin=0;var end=0;
   try{saved=JSON.parse(localStorage.getItem(key));}catch(_){}
   if(saved&&saved.id&&document.getElementById(saved.id)&&saved.percent>=5&&saved.percent<95&&!location.hash){
@@ -255,10 +264,11 @@
     var idx=0;for(var i=0;i<positions.length;i++){if(positions[i]<=marker)idx=i;else break;}
     if(bottom>=end)idx=positions.length-1;
     if(idx!==active&&links[idx]){
-      links.forEach(function(a){a.removeAttribute('aria-current');});links[idx].setAttribute('aria-current','location');active=idx;current.textContent='正在阅读 · '+headings[idx].textContent.replace(/#$/,'').trim();
+      links.forEach(function(a){a.removeAttribute('aria-current');});links[idx].setAttribute('aria-current','location');active=idx;
       var list=links[idx].closest('ol');var top=links[idx].offsetTop-list.offsetTop;if(top<list.scrollTop||top+links[idx].offsetHeight>list.scrollTop+list.clientHeight)list.scrollTop=Math.max(0,top-list.clientHeight/3);
     }
-    progress.value=percent;progressText.textContent=percent+'%';mobileProgress.textContent=percent+'%';bar.style.transform='scaleX('+(percent/100)+')';remaining.textContent=percent===100?'正文已读完':percent===0?'预计 '+minutes+' 分钟':'预计剩余 '+Math.max(1,Math.ceil(minutes*(1-percent/100)))+' 分钟';
+    track.setAttribute('aria-valuenow', String(percent));
+    bar.style.transform='scaleX('+(percent/100)+')';remaining.textContent=percent===100?'正文已读完':percent===0?'预计 '+minutes+' 分钟':'预计剩余 '+Math.max(1,Math.ceil(minutes*(1-percent/100)))+' 分钟';
     if(!ignoreSaved&&Date.now()-saveTime>800&&percent>=5){saveTime=Date.now();try{if(percent>=95)localStorage.removeItem(key);else if(headings[idx])localStorage.setItem(key,JSON.stringify({id:headings[idx].id,label:headings[idx].textContent.replace(/#$/,'').trim(),percent:percent}));}catch(_){};}
   }
   var ticking=false;window.addEventListener('scroll',function(){if(!ticking){ticking=true;requestAnimationFrame(function(){update();ticking=false;});}},{passive:true});window.addEventListener('resize',measure);window.addEventListener('load',measure);

@@ -79,13 +79,14 @@ def load_posts(root):
     return sorted(posts,key=lambda p:(p['date'],p['slug']),reverse=True)
 
 
-def tags_for(p):
-    return '<div class="post-tags">'+''.join('<a class="glass-control" href="/writing/?tag='+E(t,quote=True)+'"># '+E(t)+'</a>' for t in p['tags'])+'</div>'
+def tags_for(p, *, on_photo=False):
+    attributes = ' class="glass-control"' if on_photo else ''
+    return '<div class="post-tags">'+''.join('<a'+attributes+' href="/writing/?tag='+E(t,quote=True)+'"># '+E(t)+'</a>' for t in p['tags'])+'</div>'
 
 
-def title_phrases(title, class_name):
+def title_phrases(title, class_name, separator='<wbr>'):
     parts = re.split(r'(?<=[？：])', title, maxsplit=1)
-    return '<wbr>'.join(f'<span class="{class_name}">{E(part)}</span>' for part in parts if part)
+    return separator.join(f'<span class="{class_name}">{E(part)}</span>' for part in parts if part)
 
 
 def featured_writing(posts):
@@ -112,7 +113,7 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
                '<span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>'
                '<a class="writing-index-link" href="/writing/"'+('' if post else ' aria-current="page"')+'>文章</a>'
                '<a href="/atom.xml" aria-label="订阅 Atom RSS">RSS</a></nav>')
-        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=18"><link rel="stylesheet" href="/writing.css?v=10"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=6" defer></script><script src="/writing.js?v='+('4' if post else '5')+'" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls">'+nav+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
+        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#ffffff"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=21"><link rel="stylesheet" href="/writing.css?v=11"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=6" defer></script><script src="/writing.js?v=6" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls">'+nav+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
     def card(p):
         image = E(p.get('thumbnail', p['cover']), quote=True)
         return (f'<a class="related-card" href="/writing/{p["slug"]}/">'
@@ -174,15 +175,15 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
             else:sub+=1;num=str(section)+'.'+str(sub)
             label=re.sub(r'^(?:[一二三四五六七八九十]+、|\d+(?:\.\d+)*[.、]?\s+)\s*','',h['label'])
             toc.append('<li class="toc-'+h['tag']+'"><a class="glass-row" href="#'+E(h['id'],quote=True)+'"><span class="toc-number">'+num+'</span><span>'+E(label)+'</span></a></li>')
-        sidebar='<aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>文章目录</span><span class="toc-mobile-progress">0%</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary><div class="toc-content"><p class="toc-current">从第一节开始阅读</p><nav aria-label="文章目录"><ol>'+''.join(toc)+'</ol></nav><div class="reading-status"><div><span>阅读进度</span><strong data-progress-text>0%</strong></div><progress max="100" value="0" aria-label="文章阅读进度"></progress><span data-remaining>预计 '+str(p['minutes'])+' 分钟</span></div><div class="toc-actions"><a href="/writing/">← 全部文章</a><a href="#article-top">↑ 回到顶部</a></div></div></details></aside>'
+        sidebar='<aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>文章目录</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary><div class="toc-content"><nav aria-label="文章目录"><ol>'+''.join(toc)+'</ol></nav><div class="reading-status"><span data-remaining>预计 '+str(p['minutes'])+' 分钟</span></div><div class="toc-actions"><a href="/writing/">← 全部文章</a><a href="#article-top">↑ 回到顶部</a></div></div></details></aside>'
         updated='<span>更新 <time datetime="'+p['updated']+'">'+p['updated']+'</time></span>' if p.get('updated') else ''
-        hero_title = title_phrases(p['title'], 'hero-title-part')
+        hero_title = title_phrases(p['title'], 'hero-title-part', separator='')
         banner=p.get('banner',p['cover'])
         photo = '<img class="post-hero-photo" src="'+E(banner,quote=True)+'" alt="'+E(p.get('banner_alt',p['cover_alt']),quote=True)+'" style="object-position:'+E(p.get('banner_position','center'),quote=True)+'" width="1536" height="1024" fetchpriority="high">'
         source = (f'<source media="(max-width: 700px)" type="image/webp" srcset="{E(p["mobile_banner"], quote=True)}">'
                   if p.get('mobile_banner') else '')
         picture = f'<picture class="post-hero-media">{source}{photo}</picture>'
-        hero='<header class="post-hero" id="article-top">'+picture+'<div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">'+E(p['category'])+' / '+('文档与源码研究' if is_research else '旧文整理')+'</p><h1>'+hero_title+'</h1><div class="article-meta"><span>'+('发表于 ' if is_research else '原文发表于 ')+'<time datetime="'+p['original_datetime']+'">'+p['date']+'</time></span><span aria-hidden="true">·</span><span title="按每分钟约 300 字估算；动画和代码实践时间另计">约 '+str(p['minutes'])+' 分钟阅读</span></div>'+tags_for(p)+'</div></header>'
+        hero='<header class="post-hero" id="article-top">'+picture+'<div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">'+E(p['category'])+' / '+('文档与源码研究' if is_research else '旧文整理')+'</p><h1>'+hero_title+'</h1><div class="article-meta"><span>'+('发表于 ' if is_research else '原文发表于 ')+'<time datetime="'+p['original_datetime']+'">'+p['date']+'</time></span><span aria-hidden="true">·</span><span title="按每分钟约 300 字估算；动画和代码实践时间另计">约 '+str(p['minutes'])+' 分钟阅读</span></div>'+tags_for(p, on_photo=True)+'</div></header>'
         byline = ('<div class="post-byline"><a href="/">Denis Wen</a>'
                   f'<span>{p["words"]:,} 字</span>{updated}</div>')
         metadata='<div class="article-intro"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a><span aria-hidden="true">/</span><a href="/writing/?category='+E(p['category'],quote=True)+'">'+E(p['category'])+'</a></nav><p class="article-context">'+E(p['context'])+'</p>'+byline+'<div class="reading-resume" hidden><span>上次读到 <strong></strong></span><button type="button" data-resume>继续阅读 →</button><button type="button" data-dismiss-resume aria-label="忽略上次阅读位置">×</button></div></div>'
@@ -193,7 +194,7 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
         pager='<nav class="article-pagination" aria-label="上一篇与下一篇">'+('' if not prev else '<a href="/writing/'+prev['slug']+'/"><span>← 上一篇 · 较早</span><strong>'+E(prev['title'])+'</strong></a>')+('' if not nextp else '<a href="/writing/'+nextp['slug']+'/"><span>下一篇 · 较新 →</span><strong>'+E(nextp['title'])+'</strong></a>')+'</nav>'
         candidates=sorted([q for q in posts if q!=p],key=lambda q:(len(set(q['tags'])&set(p['tags'])),q['date']),reverse=True)[:3]
         related='<section class="article-related"><div class="related-heading"><h2>继续阅读</h2><a href="/writing/">全部文章 ↗</a></div><div class="related-grid">'+''.join(card(q) for q in candidates)+'</div></section>'
-        body='<div class="reading-progress-track" aria-hidden="true"><span></span></div><div class="article-layout">'+sidebar+'<div class="article-column" data-reading-minutes="'+str(p['minutes'])+'">'+metadata+'<article class="article-body" aria-label="文章正文">'+p['content']+'</article>'+notice+end+pager+related+'</div></div>'
+        body='<div class="reading-progress-track" role="progressbar" aria-label="文章阅读进度" aria-valuenow="0" hidden><span></span></div><div class="article-layout">'+sidebar+'<div class="article-column" data-reading-minutes="'+str(p['minutes'])+'">'+metadata+'<article class="article-body" aria-label="文章正文">'+p['content']+'</article>'+notice+end+pager+related+'</div></div>'
         path='writing/'+p['slug']+'/';target=root/path/'index.html';target.parent.mkdir(parents=True,exist_ok=True);target.write_text(shell(p['title'],p['excerpt'],path,body,p,hero));routes.append(path)
     ns='http://www.w3.org/2005/Atom';ET.register_namespace('',ns)
     feed=ET.Element('{'+ns+'}feed')

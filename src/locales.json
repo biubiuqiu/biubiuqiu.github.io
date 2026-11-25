@@ -62,8 +62,6 @@
     "gallery_swipe": "左右滑动切换图片",
     "project_name_story": "名字来自《GTA V》里的幕后高手 Lester Crest。希望它也能冷静、机敏地理解目标、找到办法，把事情做出来。",
     "nav_hiking": "山野",
-    "about_title": "关于我",
-    "about_copy": "喜欢探索 AI Agent 的可能性，也喜欢在山野中行走，看看更广阔的世界。",
     "hiking_intro": "我的第一条徒步路线是虎跳峡。比起喧闹的景区，我更喜欢近距离接触山野，尤其喜欢高原徒步，沿着山路走近雪山、峡谷与森林。",
     "leisure_title": "生活里的其他热爱",
     "tlou_part1": "最后生还者 1",
@@ -94,7 +92,8 @@
     "f1_austria_caption": "奥地利 · 施皮尔贝格红牛环，2025",
     "f1_austria_alt": "维斯塔潘的红牛 RB21 掠过山谷中的赛道，背后是橙色看台和层叠的远山。",
     "f1_singapore_caption": "新加坡 · 滨海湾，2025",
-    "f1_singapore_alt": "白色钢拱和一排吊灯沿街道向远处延伸，维斯塔潘驾驶红牛 RB21 从桥下迎面驶来。"
+    "f1_singapore_alt": "白色钢拱和一排吊灯沿街道向远处延伸，维斯塔潘驾驶红牛 RB21 从桥下迎面驶来。",
+    "read_time_format": "约 {minutes} 分钟阅读"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -159,8 +158,6 @@
     "gallery_swipe": "Swipe left or right to browse",
     "project_name_story": "The name comes from Lester Crest, the resourceful mind behind the scenes in GTA V. I hope it can bring that same calm, practical approach to understanding a goal and getting things done.",
     "nav_hiking": "Outdoors",
-    "about_title": "About me",
-    "about_copy": "I enjoy exploring what AI agents can do, and walking into the mountains to see a wider world.",
     "hiking_intro": "My first hiking route was Tiger Leaping Gorge. I prefer getting close to wild landscapes to noisy tourist spots, especially on high-altitude trails through peaks, gorges, and forests.",
     "leisure_title": "Other things I love",
     "tlou_part1": "The Last of Us I",
@@ -191,7 +188,8 @@
     "f1_austria_caption": "Austria · Red Bull Ring, Spielberg, 2025",
     "f1_austria_alt": "Max Verstappen races his Red Bull RB21 past the orange grandstand with layers of mountains across the valley.",
     "f1_singapore_caption": "Singapore · Marina Bay, 2025",
-    "f1_singapore_alt": "Max Verstappen approaches in his Red Bull RB21 under white steel arches and a row of hanging lamps."
+    "f1_singapore_alt": "Max Verstappen approaches in his Red Bull RB21 under white steel arches and a row of hanging lamps.",
+    "read_time_format": "{minutes} min read"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -256,8 +254,6 @@
     "gallery_swipe": "左右にスワイプして切り替え",
     "project_name_story": "名前はGTA Vの舞台裏で活躍するLester Crestに由来します。彼のように冷静に目標を理解し、機転を利かせて方法を見つけ、形にする助手を目指しています。",
     "nav_hiking": "山歩き",
-    "about_title": "私について",
-    "about_copy": "AIエージェントの可能性を探ること、そして山野を歩き、もっと広い世界を見ることが好きです。",
     "hiking_intro": "最初のトレッキングは虎跳峡でした。にぎやかな観光地より、山野を間近に感じるのが好きです。特に高地の山道を歩き、雪山や峡谷、森に近づく時間を楽しんでいます。",
     "leisure_title": "日々の好きなこと",
     "tlou_part1": "The Last of Us I",
@@ -288,6 +284,7 @@
     "f1_austria_caption": "オーストリア · シュピールベルク、レッドブルリンク、2025年",
     "f1_austria_alt": "オレンジ色の観客席と幾重にも連なる山を背に、フェルスタッペンのレッドブルRB21が駆け抜ける。",
     "f1_singapore_caption": "シンガポール · マリーナベイ、2025年",
-    "f1_singapore_alt": "白い鋼のアーチと街灯が連なる橋の下から、フェルスタッペンのレッドブルRB21がこちらへ迫る。"
+    "f1_singapore_alt": "白い鋼のアーチと街灯が連なる橋の下から、フェルスタッペンのレッドブルRB21がこちらへ迫る。",
+    "read_time_format": "読了目安 {minutes} 分"
   }
 }
