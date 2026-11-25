@@ -13,7 +13,7 @@
     root.dataset.theme = effective;
     root.dataset.themePreference = preference;
     root.style.colorScheme = effective;
-    var color = effective === "dark" ? "#181c20" : "#ffffff";
+    var color = effective === "dark" ? "#201e26" : "#f8f3ed";
     document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
     controls.forEach(function (control) {
       var selectedLabel = "";

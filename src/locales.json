@@ -8,7 +8,6 @@
     "f1_p3": "从排位赛到正赛，每一次超车、每一圈取舍，都是车手与车队在压力下做出的选择。享受速度、策略与不确定性交织的比赛。",
     "f1_summary": "时速 300 km/h 的博弈。",
     "footer_note": "保持好奇，持续探索。",
-    "hero_title": "保持好奇，持续探索。",
     "hiking_label": "山野之间",
     "home_label": "Denis Wen 首页",
     "intro_line_1": "你好，我是 Denis。",
@@ -93,7 +92,11 @@
     "f1_austria_alt": "维斯塔潘的红牛 RB21 掠过山谷中的赛道，背后是橙色看台和层叠的远山。",
     "f1_singapore_caption": "新加坡 · 滨海湾，2025",
     "f1_singapore_alt": "白色钢拱和一排吊灯沿街道向远处延伸，维斯塔潘驾驶红牛 RB21 从桥下迎面驶来。",
-    "read_time_format": "约 {minutes} 分钟阅读"
+    "read_time_format": "约 {minutes} 分钟阅读",
+    "hero_first": "保持好奇，",
+    "hero_second": "持续探索。",
+    "read_articles": "阅读文章",
+    "cover_alt": "粉色晚霞下，雪峰从云海间露出。"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -104,7 +107,6 @@
     "f1_p3": "From qualifying to the race, every overtake and every lap involves choices made under pressure by drivers and teams. That mix of speed, strategy and uncertainty keeps me watching.",
     "f1_summary": "A game of strategy at 300 km/h.",
     "footer_note": "Stay curious. Keep exploring.",
-    "hero_title": "Stay curious. Keep exploring.",
     "hiking_label": "Into the mountains",
     "home_label": "Denis Wen home",
     "intro_line_1": "Hi, I'm Denis.",
@@ -189,7 +191,11 @@
     "f1_austria_alt": "Max Verstappen races his Red Bull RB21 past the orange grandstand with layers of mountains across the valley.",
     "f1_singapore_caption": "Singapore · Marina Bay, 2025",
     "f1_singapore_alt": "Max Verstappen approaches in his Red Bull RB21 under white steel arches and a row of hanging lamps.",
-    "read_time_format": "{minutes} min read"
+    "read_time_format": "{minutes} min read",
+    "hero_first": "Stay curious.",
+    "hero_second": "Keep exploring.",
+    "read_articles": "Read the journal",
+    "cover_alt": "Snow peaks rising through clouds beneath a rose-coloured sky."
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -200,7 +206,6 @@
     "f1_p3": "予選から決勝まで、オーバーテイクも一周ごとの駆け引きも、プレッシャーの中でドライバーとチームが下す選択です。スピード、戦略、予測できない展開を楽しんでいます。",
     "f1_summary": "時速300 kmの駆け引き。",
     "footer_note": "好奇心を持って、探究を続ける。",
-    "hero_title": "好奇心を持って、探究し続ける。",
     "hiking_label": "山野を歩く",
     "home_label": "Denis Wen ホーム",
     "intro_line_1": "こんにちは、Denisです。",
@@ -285,6 +290,10 @@
     "f1_austria_alt": "オレンジ色の観客席と幾重にも連なる山を背に、フェルスタッペンのレッドブルRB21が駆け抜ける。",
     "f1_singapore_caption": "シンガポール · マリーナベイ、2025年",
     "f1_singapore_alt": "白い鋼のアーチと街灯が連なる橋の下から、フェルスタッペンのレッドブルRB21がこちらへ迫る。",
-    "read_time_format": "読了目安 {minutes} 分"
+    "read_time_format": "読了目安 {minutes} 分",
+    "hero_first": "好奇心を持って、",
+    "hero_second": "探究し続ける。",
+    "read_articles": "記事を読む",
+    "cover_alt": "淡い桃色の空の下、雲海から顔をのぞかせる雪峰。"
   }
 }

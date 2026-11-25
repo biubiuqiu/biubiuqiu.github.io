@@ -11,7 +11,7 @@
   root.dataset.theme = theme;
   root.dataset.themePreference = preference;
   root.style.colorScheme = theme;
-  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
 })();
 

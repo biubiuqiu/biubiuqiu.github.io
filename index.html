@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f8f3ed">
     <title>Denis Wen — Lester、AI Agent 与山野</title>
     <meta name="description" content="Denis Wen 的个人主页：AI Agent、正在做的项目 Lester、高原徒步、电影、游戏与 F1。">
     <link rel="canonical" href="https://biubiuqiu.github.io/">
@@ -12,6 +12,8 @@
     <link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/">
     <link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/">
     <link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/">
+    <meta property="og:image" content="https://biubiuqiu.github.io/assets/hiking/originals/IMG_1909.jpeg">
+    <meta property="og:image:alt" content="粉色晚霞下，雪峰从云海间露出。">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="zh_CN">
     <meta property="og:locale:alternate" content="en_US">
@@ -33,22 +35,22 @@
   root.dataset.theme = theme;
   root.dataset.themePreference = preference;
   root.style.colorScheme = theme;
-  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
 })();
 
 </script>
-    <link rel="stylesheet" href="./styles.css?v=21">
-    <link rel="stylesheet" href="./writing.css?v=11">
+    <link rel="stylesheet" href="./styles.css?v=22">
+    <link rel="stylesheet" href="./writing.css?v=12">
     <link rel="stylesheet" href="./liquid-nav.css?v=3">
-    <script src="./theme.js?v=6" defer></script>
+    <script src="./theme.js?v=7" defer></script>
     <script src="./liquid-nav.js?v=3" defer></script>
     <script src="./gallery.js?v=5" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到正文</a>
     <div class="cover">
-      <img class="cover-photo" src="./assets/hiking/full/img_1931.jpg" alt="" width="1536" height="1152" fetchpriority="high">
+      <img class="cover-photo" src="./assets/hiking/originals/IMG_1909.jpeg" alt="粉色晚霞下，雪峰从云海间露出。" width="1536" height="1152" fetchpriority="high">
       <header class="site-header page-width">
         <a class="brand" href="./" aria-label="Denis Wen 首页"><span class="icon icon-square brand-mark" aria-hidden="true"></span>Denis Wen</a>
         <nav class="liquid-nav" aria-label="主导航">
@@ -79,7 +81,14 @@
             </details>
         </div>
       </header>
-      <section class="hero page-width" aria-labelledby="intro-title"><h1 id="intro-title">保持好奇，持续探索。</h1><p class="intro">你好，我是 Denis。<br>探索 AI Agent，也把时间留给山野、电影、游戏和 F1。</p></section>
+      <section class="hero page-width" aria-labelledby="intro-title">
+        <div class="cover-copy">
+          <p class="cover-greeting">你好，我是 Denis。</p>
+          <h1 id="intro-title"><span>保持好奇，</span> <span>持续探索。</span></h1>
+          <p class="intro">探索 AI Agent，也把时间留给山野、电影、游戏和 F1。</p>
+          <a class="cover-read" href="/writing/" hreflang="zh-CN">阅读文章 <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
     </div>
     <main class="page-width" id="main">
       <div class="journal-spread">

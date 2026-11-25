@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#f8f3ed">
     <title>Denis Wen — Lester、AIエージェントと山歩き</title>
     <meta name="description" content="Denis Wenの個人サイト。AIエージェント、制作中のLester、高地トレッキング、映画、ゲーム、F1。">
     <link rel="canonical" href="https://biubiuqiu.github.io/ja/">
@@ -12,6 +12,8 @@
     <link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/">
     <link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/">
     <link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/">
+    <meta property="og:image" content="https://biubiuqiu.github.io/assets/hiking/originals/IMG_1909.jpeg">
+    <meta property="og:image:alt" content="淡い桃色の空の下、雲海から顔をのぞかせる雪峰。">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="ja_JP">
     <meta property="og:locale:alternate" content="zh_CN">
@@ -33,22 +35,22 @@
   root.dataset.theme = theme;
   root.dataset.themePreference = preference;
   root.style.colorScheme = theme;
-  var color = theme === "dark" ? "#181c20" : "#ffffff";
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
   document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
 })();
 
 </script>
-    <link rel="stylesheet" href="../styles.css?v=21">
-    <link rel="stylesheet" href="../writing.css?v=11">
+    <link rel="stylesheet" href="../styles.css?v=22">
+    <link rel="stylesheet" href="../writing.css?v=12">
     <link rel="stylesheet" href="../liquid-nav.css?v=3">
-    <script src="../theme.js?v=6" defer></script>
+    <script src="../theme.js?v=7" defer></script>
     <script src="../liquid-nav.js?v=3" defer></script>
     <script src="../gallery.js?v=5" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">本文へ移動</a>
     <div class="cover">
-      <img class="cover-photo" src="../assets/hiking/full/img_1931.jpg" alt="" width="1536" height="1152" fetchpriority="high">
+      <img class="cover-photo" src="../assets/hiking/originals/IMG_1909.jpeg" alt="淡い桃色の空の下、雲海から顔をのぞかせる雪峰。" width="1536" height="1152" fetchpriority="high">
       <header class="site-header page-width">
         <a class="brand" href="./" aria-label="Denis Wen ホーム"><span class="icon icon-square brand-mark" aria-hidden="true"></span>Denis Wen</a>
         <nav class="liquid-nav" aria-label="メインナビゲーション">
@@ -79,7 +81,14 @@
             </details>
         </div>
       </header>
-      <section class="hero page-width" aria-labelledby="intro-title"><h1 id="intro-title">好奇心を持って、探究し続ける。</h1><p class="intro">こんにちは、Denisです。<br>AIエージェントを探究し、山歩き、映画、ゲーム、F1も楽しんでいます。</p></section>
+      <section class="hero page-width" aria-labelledby="intro-title">
+        <div class="cover-copy">
+          <p class="cover-greeting">こんにちは、Denisです。</p>
+          <h1 id="intro-title"><span>好奇心を持って、</span> <span>探究し続ける。</span></h1>
+          <p class="intro">AIエージェントを探究し、山歩き、映画、ゲーム、F1も楽しんでいます。</p>
+          <a class="cover-read" href="/writing/" hreflang="zh-CN">記事を読む <span aria-hidden="true">→</span></a>
+        </div>
+      </section>
     </div>
     <main class="page-width" id="main">
       <div class="journal-spread">

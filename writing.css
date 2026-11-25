@@ -240,3 +240,33 @@
     color: var(--ink); background: var(--paper); border-color: currentColor;
   }
 }
+
+/* Photography and writing share a warm paper margin and serif headlines. */
+.archive-page .archive-intro {
+  display: grid; align-content: center; position: relative; isolation: isolate;
+  min-height: clamp(190px, 18vw, 260px); padding: 26px 48% 26px 0;
+  border-block: 1px solid var(--line);
+}
+.archive-intro::after {
+  content: ""; position: absolute; inset: 0 0 0 56%; z-index: -1;
+  background: #574653 url("/assets/hiking/originals/IMG_1909.jpeg") center 79% / cover;
+}
+.archive-page .archive-intro h1 { font: 550 clamp(38px, 4.1vw, 63px)/1.25 var(--display); letter-spacing: -.05em; }
+.archive-page .archive-entry h2 { font-family: var(--display); }
+.post-page { background: var(--paper); }
+.post-page .post-hero-content { width: min(1180px, calc(100% - 80px)); text-align: left; }
+.post-page .post-hero-content h1 { font-family: var(--display); }
+.post-page .post-hero-shade {
+  background: linear-gradient(90deg, #18141ec4, #18141e80 50%, #18141e17),
+              linear-gradient(180deg, #18141e59, transparent 35%, #18141e45);
+}
+.post-page .post-hero .article-meta, .post-page .post-hero .post-tags { justify-content: flex-start; }
+.post-page .article-column { border: 0; border-radius: 0; box-shadow: none; padding-block-start: 0; }
+.post-page .article-body h2 { font-family: var(--display); font-size: clamp(22px, 2vw, 29px); line-height: 1.48; }
+.post-page .article-body pre { border-inline-start: 3px solid var(--accent); }
+@media (max-width: 600px) {
+  .archive-page .archive-intro { min-height: 162px; padding: 17px 33% 17px 0; }
+  .archive-intro::after { left: 71%; background-position: 57% 82%; }
+  .archive-page .archive-intro h1 { font-size: clamp(30px, 7vw, 39px); }
+  .post-page .post-hero-content { width: calc(100% - 36px); }
+}

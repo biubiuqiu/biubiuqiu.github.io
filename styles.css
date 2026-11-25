@@ -1,7 +1,7 @@
 @charset "UTF-8";
 /* Writing shares the homepage palette and preserves the original post dates. */
-:root{color-scheme:light;--paper:#fff;--ink:#202326;--muted:#626569;--accent:#a74638;--line:#d8c7c2;--surface:#f7f5f4;--selected:#f0e2dd;--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;--display:"Noto Serif CJK SC","Noto Serif SC","Songti SC",STSong,Georgia,serif}
-:root[data-theme="dark"]{color-scheme:dark;--paper:#181c20;--ink:#eceeed;--muted:#b6b9bc;--accent:#e09884;--line:#4d4140;--surface:#22272c;--selected:#44332e}
+:root{color-scheme:light;--paper:#f8f3ed;--ink:#302936;--muted:#645c65;--accent:#85465a;--line:#d7c9c5;--surface:#efe5e1;--selected:#eed5dc;--sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC","Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;--display:"Noto Serif CJK SC","Noto Serif SC","Songti SC",STSong,Georgia,serif}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#201e26;--ink:#f0e9e5;--muted:#c5bac4;--accent:#edacbb;--line:#50434e;--surface:#302934;--selected:#523747}
 *{box-sizing:border-box}[hidden]{display:none!important}html{background:var(--paper);scroll-behavior:smooth;scroll-padding-top:30px}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.9;-webkit-font-smoothing:antialiased}h1,h2,h3,p,figure{margin:0}h1,h2,h3{color:var(--ink)}a{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}button,summary{-webkit-tap-highlight-color:transparent}button{font:inherit}::selection{background:var(--selected);color:var(--ink)}a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:5px}.page-width{width:min(1300px,calc(100% - 136px));margin-inline:auto}.icon{display:inline-block;flex-shrink:0;width:20px;height:20px;background:currentColor;mask:var(--icon) center/contain no-repeat;-webkit-mask:var(--icon) center/contain no-repeat;vertical-align:middle}.icon-arrow{--icon:url('./assets/icons/arrow-up-right.svg')}.icon-caret{--icon:url('./assets/icons/caret-down.svg')}.icon-appearance{--icon:url('./assets/icons/circle-half.svg')}.icon-check{--icon:url('./assets/icons/check.svg')}.icon-square{--icon:url('./assets/icons/square-fill.svg')}
 /* Photograph-led cover, with a soft lower edge fade behind editable text. */
 .cover{position:relative;isolation:isolate;height:calc(100vw * 582 / 1200);min-height:490px;max-height:740px;background:#1d3042;color:#fff}.cover-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 64%;z-index:-2}.cover::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.58));z-index:-1;pointer-events:none}.site-header{text-shadow:0 1px 7px #0009;display:flex;align-items:center;justify-content:space-between;min-height:94px;gap:24px;color:#fff}.brand{display:flex;align-items:center;gap:13px;font-size:27px;font-weight:650;letter-spacing:-.025em;line-height:1.3;white-space:nowrap}.brand-mark{color:#c37560;width:17px;height:17px}.header-actions,.header-controls,nav{display:flex;align-items:center}.header-actions{gap:30px}nav{gap:30px}nav a{display:flex;align-items:center;min-height:44px;font-size:15px;line-height:1.5;white-space:nowrap}nav a:hover{opacity:.75}.header-controls{gap:22px;border-left:1px solid #ffffff69;padding-left:28px}.hero{position:absolute;bottom:50px;left:0;right:0}h1{font-size:clamp(28px,2.6vw,38px);line-height:1.4;font-weight:650;letter-spacing:-.025em;color:#fff;text-wrap:balance}.intro{margin-top:10px;font-size:16px;line-height:1.85;color:#fff;max-width:52em;text-shadow:0 1px 8px #0007}.hero h1{text-shadow:0 1px 10px #0006}
@@ -122,3 +122,68 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
 .f1-gallery .f1-figure { margin: 0; scroll-margin-top: 5rem; }
 .f1-gallery .media-photo { border-radius: 12px; }
 .f1-gallery .f1-figure figcaption { font-size: .75rem; }
+
+/* The cover pairs the journal's paper with the unaltered mountain photograph. */
+.cover {
+  --photo-start: 39%;
+  background: var(--paper);
+  height: clamp(540px, 45vw, 760px);
+  min-height: 0;
+  max-height: none;
+  border-bottom: 1px solid var(--line);
+}
+.cover .cover-photo {
+  inset: 0 0 0 auto;
+  width: calc(100% - var(--photo-start));
+  object-position: 54% 75%;
+}
+.cover::before { left: var(--photo-start); height: 120px; background: linear-gradient(#271a2c70, transparent); }
+.cover::after { display: none; }
+.cover .brand { color: var(--ink); font-family: Georgia, var(--display); font-weight: 500; text-shadow: none; }
+.cover .brand-mark { width: 12px; height: 12px; color: var(--accent); }
+.cover .hero {
+  position: static;
+  height: calc(100% - 94px);
+  align-content: center;
+  padding-bottom: 28px;
+  pointer-events: none;
+}
+.cover-copy { width: 36%; pointer-events: auto; }
+.cover-greeting { margin-bottom: 16px; color: var(--accent); font-size: 15px; font-weight: 600; }
+.cover .hero h1 {
+  font: 550 clamp(40px, 4vw, 74px)/1.24 var(--display);
+  letter-spacing: -.055em;
+  color: var(--ink);
+  text-shadow: none;
+}
+.cover .hero h1 span { display: block; }
+.cover .intro { text-wrap: balance; max-width: 26em; margin-top: 20px; padding-right: 24px; color: var(--muted); text-shadow: none; }
+.cover-read {
+  display: inline-flex; align-items: center; gap: 18px; min-height: 44px;
+  margin-top: 24px; padding: 7px 20px; border-radius: 24px;
+  background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 600;
+}
+.cover-read:hover { background: var(--accent); }
+:lang(ja) .cover-copy h1 { font-size: clamp(32px, 3.35vw, 58px); }
+.accent-title { padding-left: 0; }
+.accent-title::before { display: none; }
+.journal-spread .latest-title { font-family: var(--display); }
+.journal-spread .project { border-color: var(--line); }
+@media (max-width: 800px) {
+  .cover {
+    --photo-height: clamp(268px, 60vw, 400px);
+    height: auto; padding-top: var(--photo-height);
+  }
+  .cover .cover-photo { width: 100%; height: var(--photo-height); object-position: 52% 76%; }
+  .cover::before { left: 0; }
+  .cover > .site-header.page-width { position: absolute; inset: 0 0 auto; }
+  .cover .brand { color: #fff; text-shadow: 0 1px 6px #19111e; }
+  .cover .brand-mark { color: #f6bdc4; }
+  .cover .hero { height: auto; padding-block: 25px 30px; }
+  .cover-copy { width: 100%; }
+  .cover-greeting { margin-bottom: 10px; font-size: 13px; }
+  .cover .hero h1 { font-size: clamp(30px, 6.4vw, 45px); }
+  .cover .hero h1 span { display: inline-block; }
+  .cover .intro { margin-top: 11px; padding: 0; font-size: 15px; }
+  .cover-read { margin-top: 14px; }
+}
