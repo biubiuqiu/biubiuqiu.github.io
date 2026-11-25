@@ -1,0 +1,20 @@
+{
+  "groups": [
+    {"id":"light","zh-CN":"雪峰与天光","en":"Peaks and sky","ja":"雪峰と空","rows":[["IMG_1909","img_1931"],["IMG_1867","IMG_1912","IMG_2269"]]},
+    {"id":"ice","zh-CN":"冰川与湖泊","en":"Glaciers and lakes","ja":"氷河と湖","rows":[["img_2146","IMG_2127"],["IMG_2051","dsc02281"]]},
+    {"id":"trails","zh-CN":"山路与垭口","en":"Trails and passes","ja":"山道と峠","rows":[["IMG_2178","IMG_2086"],["dsc01901","IMG_2162","dsc00891"]]},
+    {"id":"valleys","zh-CN":"河谷与海岸","en":"Valleys and coastlines","ja":"渓谷と海岸","rows":[["DSC02731","img_1209"],["dsc02288","dsc02645"]]}
+  ],
+  "original_captions": {
+    "IMG_1909":["粉色云层下的雪峰","Peaks beneath a rose-coloured sky","薄紅の雲に浮かぶ雪峰"],
+    "IMG_1867":["星空下的雪山与山谷灯火","Starlight on the peaks, lights in the valley","星空の雪山と谷の灯"],
+    "IMG_1912":["云带间的日照雪峰","Sunlit peaks between cloud banks","雲の帯の間に光る雪峰"],
+    "IMG_2269":["谷底营地上方的一线金光","A glint of gold above the valley camp","谷のキャンプを見下ろす金色の峰"],
+    "IMG_2127":["碎石坡下的冰湖","A glacial lake below the scree","岩屑の斜面に抱かれた氷河湖"],
+    "IMG_2051":["两壁之间的冰川","A glacier framed by rock walls","岩壁の間を流れる氷河"],
+    "IMG_2178":["垭口外的山谷","The valley beyond the pass","峠の向こうの谷"],
+    "IMG_2086":["秋色山路与冰川","Autumn trail beneath the glacier","紅葉の山道と氷河"],
+    "IMG_2162":["流云里的山脊与经幡","Ridge and prayer flags in passing cloud","雲が流れる稜線と祈りの旗"],
+    "DSC02731":["河谷中的桥与山峰倒影","A bridge and reflected peaks in the river valley","谷川に映る山峰と橋"]
+  }
+}

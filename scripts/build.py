@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
+from albums import album_content
 from writing import featured_writing, build_writing, load_posts, title_phrases
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,8 +19,8 @@ LANGUAGES = {
     "ja": {"label": "日本語", "path": "ja", "og_locale": "ja_JP"},
 }
 TOKENS = re.compile(r"\{\{([a-z_0-9]+)\}\}")
-RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery", "featured_writing", "latest_title"}
-SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale", "latest_slug", "latest_excerpt", "latest_read_time"}
+RAW_KEYS = {"alternates", "og_alternates", "locale_menu", "theme_menu", "theme_bootstrap", "hiking_gallery", "featured_writing", "latest_title", "album_sections", "album_links", "album_alternates"}
+SYSTEM_KEYS = RAW_KEYS | {"lang", "canonical", "asset_prefix", "og_locale", "latest_slug", "latest_excerpt", "latest_read_time", "album_count", "album_path", "album_canonical", "home_path"}
 
 
 def url_for(language: str) -> str:
@@ -27,7 +28,7 @@ def url_for(language: str) -> str:
     return BASE_URL + (path + "/" if path else "")
 
 
-def menu_for(current: str, copy: dict[str, str]) -> str:
+def menu_for(current: str, copy: dict[str, str], suffix: str = "") -> str:
     label = html.escape(LANGUAGES[current]["label"])
     accessible = html.escape(copy["switch_label"] + ": " + LANGUAGES[current]["label"], quote=True)
     lines = [
@@ -37,6 +38,7 @@ def menu_for(current: str, copy: dict[str, str]) -> str:
     ]
     for language, meta in LANGUAGES.items():
         path = "/" + (meta["path"] + "/" if meta["path"] else "")
+        path += suffix
         active = ' aria-current="page"' if language == current else ""
         lines.append(
             f'              <a href="{path}" lang="{language}" hreflang="{language}"{active}>{html.escape(meta["label"])}</a>'
@@ -89,10 +91,13 @@ def build() -> None:
             raise ValueError(f"Full-resolution image checksum mismatch: {image['path']}")
 
     template = (ROOT / "src" / "template.html").read_text(encoding="utf-8")
+    viewer = (ROOT / "src/viewer.html").read_text().rstrip()
+    template = template.replace("{{viewer}}", viewer)
+    album_template = (ROOT / "src/album.html").read_text().replace("{{viewer}}", viewer)
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
     posts = load_posts(ROOT)
     latest = posts[0]
-    required = (set(TOKENS.findall(template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark", "read_time_format"}
+    required = (set(TOKENS.findall(template + album_template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark", "read_time_format", "album_count_format"}
     if set(translations) != set(LANGUAGES):
         raise ValueError("Translations and configured language routes must match")
     for language, meta in LANGUAGES.items():
@@ -113,6 +118,8 @@ def build() -> None:
         values = {
             **copy,
             "lang": language,
+            "home_path": "/" + (meta["path"] + "/" if meta["path"] else ""),
+            "album_path": url_for(language).removeprefix(BASE_URL.rstrip("/")) + "gallery/",
             "canonical": url_for(language),
             "asset_prefix": "../" if meta["path"] else "./",
             "og_locale": meta["og_locale"],
@@ -137,14 +144,27 @@ def build() -> None:
         output = ROOT / meta["path"] / "index.html"
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(page, encoding="utf-8")
+        values.update(album_content(ROOT, language, copy["album_count_format"]))
+        values.update(
+            album_canonical=url_for(language) + "gallery/",
+            album_alternates="\n".join(
+                f'<link rel="alternate" hreflang="{other}" href="{url_for(other)}gallery/">'
+                for other in LANGUAGES
+            ),
+            locale_menu=menu_for(language, copy, "gallery/"),
+        )
+        album_dir = output.parent / "gallery"
+        album_dir.mkdir(exist_ok=True)
+        (album_dir / "index.html").write_text(TOKENS.sub(substitute, album_template), encoding="utf-8")
         print(f"Built {output.relative_to(ROOT)} ({language})")
     writing_routes = build_writing(ROOT, BASE_URL, theme_menu_for, translations["zh-CN"], posts)
     namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
     ET.register_namespace("", namespace)
     sitemap = ET.Element(f"{{{namespace}}}urlset")
     for language in LANGUAGES:
-        item = ET.SubElement(sitemap, f"{{{namespace}}}url")
-        ET.SubElement(item, f"{{{namespace}}}loc").text = url_for(language)
+        for suffix in ("", "gallery/"):
+            item = ET.SubElement(sitemap, f"{{{namespace}}}url")
+            ET.SubElement(item, f"{{{namespace}}}loc").text = url_for(language) + suffix
     for route in writing_routes:
         item = ET.SubElement(sitemap, f"{{{namespace}}}url")
         ET.SubElement(item, f"{{{namespace}}}loc").text = BASE_URL + route

@@ -96,7 +96,12 @@
     "hero_first": "保持好奇，",
     "hero_second": "持续探索。",
     "read_articles": "阅读文章",
-    "cover_alt": "粉色晚霞下，雪峰从云海间露出。"
+    "cover_alt": "粉色晚霞下，雪峰从云海间露出。",
+    "album_nav": "图库",
+    "album_title": "山野影集",
+    "album_link": "浏览全部照片",
+    "album_description": "沿途拍下的雪峰、冰川、山路与海岸。",
+    "album_count_format": "{count} 张照片"
   },
   "en": {
     "agent_p1": "I enjoy trying new agent products and looking closely at how they work.",
@@ -195,7 +200,12 @@
     "hero_first": "Stay curious.",
     "hero_second": "Keep exploring.",
     "read_articles": "Read the journal",
-    "cover_alt": "Snow peaks rising through clouds beneath a rose-coloured sky."
+    "cover_alt": "Snow peaks rising through clouds beneath a rose-coloured sky.",
+    "album_nav": "Gallery",
+    "album_title": "Field photographs",
+    "album_link": "Browse all photographs",
+    "album_description": "Photographs of peaks, glaciers, mountain trails and coastlines.",
+    "album_count_format": "{count} photographs"
   },
   "ja": {
     "agent_p1": "新しいエージェント製品を試し、その仕組みを掘り下げるのが好きです。",
@@ -294,6 +304,11 @@
     "hero_first": "好奇心を持って、",
     "hero_second": "探究し続ける。",
     "read_articles": "記事を読む",
-    "cover_alt": "淡い桃色の空の下、雲海から顔をのぞかせる雪峰。"
+    "cover_alt": "淡い桃色の空の下、雲海から顔をのぞかせる雪峰。",
+    "album_nav": "写真",
+    "album_title": "山歩きの写真帖",
+    "album_link": "すべての写真を見る",
+    "album_description": "山歩きで出会った雪峰、氷河、山道と海岸の写真。",
+    "album_count_format": "全{count}枚"
   }
 }

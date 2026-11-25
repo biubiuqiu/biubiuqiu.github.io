@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="{{lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f8f3ed">
+  <title>{{album_title}} · Denis Wen</title>
+  <meta name="description" content="{{album_description}}">
+  <link rel="canonical" href="{{album_canonical}}">
+{{album_alternates}}
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script>{{theme_bootstrap}}</script>
+  <link rel="stylesheet" href="/styles.css?v=24">
+  <link rel="stylesheet" href="/liquid-nav.css?v=3">
+  <link rel="stylesheet" href="/album.css?v=1">
+  <script defer src="/theme.js?v=7"></script>
+  <script defer src="/gallery.js?v=5"></script>
+</head>
+<body class="album-page">
+  <a class="skip-link" href="#main">{{skip_link}}</a>
+  <header class="album-bar page-width">
+    <a class="album-brand" href="{{home_path}}" aria-label="{{home_label}}">Denis Wen</a>
+    <div class="album-tools">{{locale_menu}}{{theme_menu}}</div>
+  </header>
+  <main class="page-width" id="main">
+    <div class="album-heading"><h1>{{album_title}}</h1><p>{{album_count}}</p></div>
+    <nav class="album-index" aria-label="{{album_title}}">{{album_links}}</nav>
+    {{album_sections}}
+  </main>
+  <footer class="site-footer page-width"><a class="footer-brand" href="{{home_path}}">Denis Wen</a><span>{{footer_note}}</span></footer>
+  {{viewer}}
+</body>
+</html>
