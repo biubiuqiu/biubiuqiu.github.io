@@ -1,0 +1,71 @@
+/* Photography sets the scale of the cover; the following feature reads as its caption. */
+.cover {
+  min-height: clamp(36rem, 79svh, 60rem);
+}
+.cover .hero {
+  align-self: start;
+  padding-block: clamp(2rem, 5vh, 5rem) clamp(8rem, 19vh, 14rem);
+}
+.cover-copy { max-width: 52rem; }
+.cover .cover-greeting { display: flex; align-items: center; gap: .8rem; font-size: 1rem; }
+.cover-greeting::before { content: ""; width: 2.25rem; height: 1px; background: currentColor; }
+.cover .hero h1 { font-size: clamp(3.1rem, 5.7vw, 6.8rem); line-height: 1.18; font-weight: 500; }
+.cover .hero h1 span { display: block; }
+.cover .hero h1 span + span { margin-inline-start: .9em; }
+.cover .intro { margin-top: 1.4rem; }
+.cover::after { background: linear-gradient(105deg, #241a2cd6, #32223285 39%, transparent 76%); }
+
+.home-main { padding: 0; }
+.issue-band { background: #332a39; color: #f8f0e9; }
+.issue-inner {
+  display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(0, 3.2fr);
+  gap: clamp(1.5rem, 4vw, 5rem); align-items: baseline;
+  padding-block: clamp(2.1rem, 4vw, 4rem);
+}
+.issue-byline h2 { color: #f2bbc4; font: 550 1rem/1.6 var(--sans); }
+.issue-byline p { color: #d5c4cf; margin-top: .25rem; font-size: .85rem; }
+.issue-inner .latest-title { margin: 0; color: inherit; font: 500 clamp(1.5rem, 2.7vw, 2.8rem)/1.4 var(--display); }
+.issue-inner .latest-title a { text-decoration: none; }
+.issue-inner .latest-title a:is(:hover, :focus-visible) { color: #ffcfda; text-decoration: underline; text-underline-offset: .18em; }
+.issue-inner .latest-excerpt { max-width: 52em; color: #e0d2d8; font-size: 1rem; }
+:root[data-theme="dark"] .issue-band { background: #302733; }
+
+.home-pages { padding-block: clamp(3rem, 6vw, 7rem) 1rem; }
+.hiking-story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: clamp(2rem, 5vw, 5rem); align-items: start; border: 0; padding: 0; }
+.trail-copy { padding-top: 1rem; border-top: 2px solid var(--accent); }
+.trail-copy h2, .home-pages .leisure > h2, .desk-spread .writing-section-heading h2 {
+  font: 500 clamp(2.2rem, 3.9vw, 4rem)/1.25 var(--display); letter-spacing: -.045em;
+}
+.trail-copy .hiking-intro { margin-block: 1.25rem; font-size: 1rem; }
+.hiking-story .hiking-gallery { margin: 0; }
+.hiking-story .featured-photo img { aspect-ratio: 1200/582; }
+.trail-copy .route-list { border-top: 1px solid var(--line); padding-top: 1rem; color: var(--muted); }
+.desk-spread {
+  margin-top: clamp(3rem, 7vw, 7rem); padding-top: clamp(2rem, 4vw, 4rem);
+  border-top: 1px solid var(--line); display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: clamp(1.75rem, 5vw, 5rem);
+}
+.desk-spread .writing-section { margin: 0; padding: 0; border: 0; }
+.desk-spread .project {
+  align-self: start; margin: 0; padding: clamp(1.4rem, 3vw, 3rem); border: 0;
+  color: var(--ink); background: var(--surface);
+}
+.desk-spread .writing-rows a { font: 550 clamp(1.1rem, 1.5vw, 1.5rem)/1.55 var(--display); }
+.f1 .interest-title { font: italic 500 clamp(2.5rem, 5vw, 4.5rem)/1.1 Georgia, serif; }
+@media (max-width: 800px) {
+  .cover { min-height: clamp(31rem, 74svh, 43rem); }
+  .cover .hero { padding-block: 2.75rem 8rem; }
+  .cover .hero h1 { font-size: clamp(2.5rem, 8vw, 4.2rem); }
+  .cover::after { background: linear-gradient(108deg, #251928c7, #32223259 70%, transparent); }
+  .hiking-story, .desk-spread { grid-template-columns: 1fr; gap: 1.75rem; }
+  .trail-copy { max-width: 38em; }
+}
+@media (max-width: 620px) {
+  .issue-inner { grid-template-columns: 1fr; gap: .75rem; }
+  .issue-byline { display: flex; align-items: baseline; gap: 1rem; }
+  .issue-byline p { margin: 0; }
+  .cover .hero h1 span + span { margin-inline-start: .45em; }
+}
+@media (forced-colors: active) {
+  .issue-band, .desk-spread .project { border-block: 1px solid CanvasText; }
+}

@@ -70,7 +70,7 @@ def gallery_for(language, copy):
         caption = html.escape(item[language], quote=True)
         path = prefix + "assets/hiking/" + item["file"]
         full_path = prefix + "assets/hiking/" + item.get("full", item["file"])
-        srcset = f' srcset="{path} {item["width"]}w, {full_path} {item["full_width"]}w" sizes="(max-width: 680px) 100vw, 55vw"' if i == 0 and item.get("full") else ""
+        srcset = f' srcset="{path} {item["width"]}w, {full_path} {item["full_width"]}w" sizes="(max-width: 680px) 100vw, 65vw"' if i == 0 and item.get("full") else ""
         if i == 1:
             rows.append('<div class="photo-thumbnails">')
         kind = "featured-photo" if i == 0 else "thumbnail-photo"
@@ -121,7 +121,7 @@ def build() -> None:
             "locale_menu": menu_for(language, copy),
             "theme_menu": theme_menu_for(copy),
             "hiking_gallery": gallery_for(language, copy),
-            "featured_writing": featured_writing(posts),
+            "featured_writing": featured_writing(posts[1:]),
             "latest_slug": latest["slug"],
             "latest_title": title_phrases(latest["title"], "card-title-phrase"),
             "latest_excerpt": re.split(r"(?<=[。！？])", latest["excerpt"], maxsplit=1)[0],
