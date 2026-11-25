@@ -123,67 +123,53 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
 .f1-gallery .media-photo { border-radius: 12px; }
 .f1-gallery .f1-figure figcaption { font-size: .75rem; }
 
-/* The cover pairs the journal's paper with the unaltered mountain photograph. */
+/* Both masthead and title sit over the full-bleed photograph. */
 .cover {
-  --photo-start: 39%;
-  background: var(--paper);
-  height: clamp(540px, 45vw, 760px);
-  min-height: 0;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: auto;
+  min-height: clamp(540px, 47vw, 760px);
   max-height: none;
-  border-bottom: 1px solid var(--line);
+  background: #423844;
 }
-.cover .cover-photo {
-  inset: 0 0 0 auto;
-  width: calc(100% - var(--photo-start));
-  object-position: 54% 75%;
+.cover .cover-photo { inset: 0; width: 100%; height: 100%; object-position: 52% 81%; }
+.cover::before { height: 145px; background: linear-gradient(#221a2c78, transparent); }
+.cover::after {
+  inset: 0;
+  background: linear-gradient(90deg, #201824aa, #241b2a54 38%, transparent 70%);
 }
-.cover::before { left: var(--photo-start); height: 120px; background: linear-gradient(#271a2c70, transparent); }
-.cover::after { display: none; }
-.cover .brand { color: var(--ink); font-family: Georgia, var(--display); font-weight: 500; text-shadow: none; }
-.cover .brand-mark { width: 12px; height: 12px; color: var(--accent); }
+.cover .brand { font-family: Georgia, var(--display); font-weight: 500; }
+.cover .brand-mark { width: 12px; height: 12px; color: #f3b7c3; }
 .cover .hero {
-  position: static;
-  height: calc(100% - 94px);
-  align-content: center;
-  padding-bottom: 28px;
-  pointer-events: none;
+  position: static; align-self: center; padding-block: 24px clamp(38px, 5vw, 78px);
+  color: #fff; text-shadow: 0 1px 6px #1d152c70;
 }
-.cover-copy { width: 36%; pointer-events: auto; }
-.cover-greeting { margin-bottom: 16px; color: var(--accent); font-size: 15px; font-weight: 600; }
+.cover-copy { max-width: 36rem; }
+.cover-greeting { margin-bottom: 12px; font-size: 15px; font-weight: 550; }
 .cover .hero h1 {
   font: 550 clamp(40px, 4vw, 74px)/1.24 var(--display);
-  letter-spacing: -.055em;
-  color: var(--ink);
-  text-shadow: none;
+  letter-spacing: -.045em; color: #fff;
 }
 .cover .hero h1 span { display: block; }
-.cover .intro { text-wrap: balance; max-width: 26em; margin-top: 20px; padding-right: 24px; color: var(--muted); text-shadow: none; }
+.cover .intro { text-wrap: pretty; max-width: 30em; margin-top: 16px; }
 .cover-read {
   display: inline-flex; align-items: center; gap: 18px; min-height: 44px;
-  margin-top: 24px; padding: 7px 20px; border-radius: 24px;
-  background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 600;
+  margin-top: 20px; padding: 7px 20px; border-radius: 24px;
+  background: #f8f3ed; color: #302936; text-shadow: none; font-size: 14px; font-weight: 600;
 }
-.cover-read:hover { background: var(--accent); }
-:lang(ja) .cover-copy h1 { font-size: clamp(32px, 3.35vw, 58px); }
+.cover-read:hover { background: #f3dbe0; }
+.cover :is(.brand, .cover-read):focus-visible { outline-color: #fff; }
+@media (max-width: 800px) {
+  .cover { min-height: clamp(490px, 72svh, 650px); }
+  .cover .cover-photo { object-position: 53% 78%; }
+  .cover::after { background: linear-gradient(90deg, #21182691, #21182636 74%, transparent); }
+  .cover .hero { padding-block: 24px 70px; }
+  .cover .hero h1 { font-size: clamp(32px, 6vw, 46px); }
+  .cover .hero h1 span { display: inline-block; }
+  .cover-greeting { font-size: 14px; }
+  .cover .intro { font-size: 15px; margin-top: 12px; }
+}
 .accent-title { padding-left: 0; }
 .accent-title::before { display: none; }
 .journal-spread .latest-title { font-family: var(--display); }
 .journal-spread .project { border-color: var(--line); }
-@media (max-width: 800px) {
-  .cover {
-    --photo-height: clamp(268px, 60vw, 400px);
-    height: auto; padding-top: var(--photo-height);
-  }
-  .cover .cover-photo { width: 100%; height: var(--photo-height); object-position: 52% 76%; }
-  .cover::before { left: 0; }
-  .cover > .site-header.page-width { position: absolute; inset: 0 0 auto; }
-  .cover .brand { color: #fff; text-shadow: 0 1px 6px #19111e; }
-  .cover .brand-mark { color: #f6bdc4; }
-  .cover .hero { height: auto; padding-block: 25px 30px; }
-  .cover-copy { width: 100%; }
-  .cover-greeting { margin-bottom: 10px; font-size: 13px; }
-  .cover .hero h1 { font-size: clamp(30px, 6.4vw, 45px); }
-  .cover .hero h1 span { display: inline-block; }
-  .cover .intro { margin-top: 11px; padding: 0; font-size: 15px; }
-  .cover-read { margin-top: 14px; }
-}
