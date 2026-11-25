@@ -171,47 +171,65 @@
 .archive-empty p { font-size: 17px; }
 .archive-empty button { margin-top: 4px; font-size: 14px; }
 
-.archive-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: clamp(28px, 4vw, 60px); list-style: none; padding: 0; margin: 0;
+.archive-masthead {
+  display: grid; grid-template-columns: 1fr minmax(280px, 40%); align-items: end;
+  gap: 12px 24px; padding-bottom: 10px;
 }
-.archive-card { display: flex; flex-direction: column; min-width: 0; padding: 22px 0 14px; border-top: 1px solid var(--line); }
-.card-meta {
-  display: flex; align-items: baseline; gap: 4px 13px; flex-wrap: wrap;
-  font-size: 12px; line-height: 1.65; color: var(--muted); font-variant-numeric: tabular-nums;
+.archive-masthead h1 { font: 550 clamp(32px,4.1vw,58px)/1.2 var(--display); letter-spacing: -.045em; }
+.archive-masthead .archive-filters { margin: 0; }
+.archive-masthead .archive-state { grid-column: 1 / -1; min-height: 32px; }
+.archive-grid { list-style: none; padding: 0; margin: 0; }
+.archive-card {
+  display: grid; grid-template-columns: minmax(135px, .27fr) minmax(0,1fr); align-items: start;
+  gap: 4px clamp(14px,3vw,42px); border-top: 1px solid var(--line); padding: 18px 0 12px;
 }
-.card-category { font-weight: 600; color: var(--accent); }
-.archive-entry {
-  position: relative; isolation: isolate;
-  display: grid; grid-template: "title image" auto "summary image" 1fr / minmax(0, 1fr) 26%;
-  gap: 8px 18px; margin: 10px 0 4px; border-radius: 3px;
+.card-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 12px; line-height: 1.7; font-variant-numeric: tabular-nums; }
+.archive-card:not(.issue-lead) .card-meta { grid-row: span 2; align-self: center; }
+.card-category { color: var(--accent); font-weight: 600; }
+.archive-entry h2 { font: 600 clamp(18px,1.65vw,23px)/1.45 var(--display); text-wrap: pretty; }
+.card-title-phrase { display: inline-block; max-width: 100%; overflow-wrap: anywhere; }
+.archive-entry h2 a:is(:hover,:focus-visible) { color: var(--accent); text-decoration: underline; text-underline-offset: .19em; }
+.archive-grid .post-tags { margin: 0; gap: 0 14px; }
+.archive-card .post-tags a { padding: 0; min-height: 30px; font-size: 12px; border: 0; }
+.archive-card .post-tags a:hover { text-decoration: underline; }
+.issue-lead {
+  grid-template-columns: minmax(0,1.25fr) minmax(245px,.8fr);
+  grid-template-areas: "meta art" "entry art" "tags art";
+  align-content: center; padding: clamp(24px,4vw,52px) 0;
+  gap: 12px clamp(24px,6vw,90px); border-top: 2px solid var(--ink);
 }
-.archive-entry h2 {
-  grid-area: title; font: 600 clamp(18px, 1.6vw, 22px)/1.55 var(--sans);
-  letter-spacing: -.018em; overflow-wrap: anywhere; text-wrap: balance;
+.issue-lead .card-meta { grid-area: meta; align-self: end; }
+.issue-lead .archive-entry { grid-area: entry; align-self: center; }
+.issue-lead h2 { font-size: clamp(28px,3vw,44px); line-height: 1.29; letter-spacing: -.035em; }
+.issue-lead h2 .card-title-phrase { display: block; }
+.issue-lead h2 wbr { display: none; }
+.issue-lead p { margin-top: 14px; color: var(--muted); line-height: 1.8; }
+.issue-lead .post-tags { grid-area: tags; }
+.issue-photo, .issue-diagram { grid-area: art; align-self: center; width: 100%; }
+.issue-photo { max-height: 280px; object-fit: cover; }
+.issue-diagram {
+  padding: clamp(20px,2.4vw,36px); border: 1px solid var(--line); border-radius: 4px;
+  background-color: var(--surface);
+  background-image: radial-gradient(var(--line) .75px, transparent .85px); background-size: 9px 9px;
 }
-.archive-entry h2 a::after { content: ""; position: absolute; inset: 0; border-radius: 4px; z-index: 1; }
-.card-title-phrase { display: inline-block; max-width: 100%; vertical-align: top; }
-.archive-entry h2 a:focus-visible { outline: none; }
-.archive-entry h2 a:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 4px; }
-.archive-entry h2 a:hover, .archive-entry h2 a:focus-visible {
-  color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .2em;
+.issue-diagram figcaption { font: 600 18px/1.5 var(--display); }
+.issue-diagram ol { padding: 0; margin: 14px 0 0 5px; list-style: none; }
+.issue-diagram li {
+  position: relative; display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 14px;
+  padding: 5px 0 10px 17px; color: var(--ink); line-height: 1.6;
 }
-.archive-entry p { position: relative; z-index: 2; grid-area: summary; color: var(--muted); font-size: 14px; line-height: 1.8; overflow-wrap: anywhere; }
-.archive-thumb {
-  grid-area: image; align-self: start; display: block; width: 100%; height: auto;
-  aspect-ratio: 4/3; object-fit: cover; border-radius: 5px; background: var(--surface);
+.issue-diagram li:not(:last-child)::before { content: ""; position: absolute; left: 0; top: 17px; bottom: -16px; width: 1px; background: var(--accent); }
+.issue-diagram li::after { content: ""; position: absolute; left: -3px; top: 14px; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.issue-diagram li span { color: var(--muted); font-size: 13px; }
+@media (max-width: 700px) {
+  .archive-masthead, .archive-card { grid-template-columns: minmax(0,1fr); }
+  .archive-masthead .archive-state { min-height: 24px; }
+  .archive-card:not(.issue-lead) .card-meta { grid-row: auto; }
+  .issue-lead { grid-template-areas: "meta" "entry" "art" "tags"; padding: 22px 0 14px; gap: 10px; }
+  .issue-diagram { padding: 14px 20px; }
+  .issue-diagram ol { margin-top: 6px; }
 }
-.archive-card .post-tags { gap: 0 12px; margin-top: auto; padding-top: 4px; }
-.archive-card .post-tags a {
-  padding: 0; min-height: 34px; border: none; border-radius: 0; font-size: 12px;
-}
-.archive-card .post-tags a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .related-card img { aspect-ratio: 4/3; }
-@media (max-width: 800px) {
-  .archive-grid { grid-template-columns: 1fr; }
-  .archive-entry { grid-template-columns: minmax(0, 1fr) min(25%, 140px); }
-}
 @media (max-width: 600px) {
   .archive-page .writing-header { min-height: 62px; }
   .archive-intro .writing-intro { font-size: 14px; }
@@ -220,11 +238,6 @@
   .archive-state { min-height: 46px; }
   .archive-card { padding: 16px 0 9px; }
   .card-words { display: none; }
-  .archive-entry {
-    grid-template: "title title" auto "summary image" auto / minmax(0, 1fr) clamp(75px, 23vw, 112px);
-    gap: 8px 13px; margin-top: 6px;
-  }
-  .archive-entry h2 { font-size: 18px; line-height: 1.5; }
   .archive-card .post-tags a { min-height: 38px; }
   .related-card img { height: auto; }
 }
@@ -242,17 +255,6 @@
 }
 
 /* Photography and writing share a warm paper margin and serif headlines. */
-.archive-page .archive-intro {
-  display: grid; align-content: center; position: relative; isolation: isolate;
-  min-height: clamp(190px, 18vw, 260px); padding: 26px 48% 26px 0;
-  border-block: 1px solid var(--line);
-}
-.archive-intro::after {
-  content: ""; position: absolute; inset: 0 0 0 56%; z-index: -1;
-  background: #574653 url("/assets/hiking/originals/IMG_1909.jpeg") center 79% / cover;
-}
-.archive-page .archive-intro h1 { font: 550 clamp(38px, 4.1vw, 63px)/1.25 var(--display); letter-spacing: -.05em; }
-.archive-page .archive-entry h2 { font-family: var(--display); }
 .post-page { background: var(--paper); }
 .post-page .post-hero-content { width: min(1180px, calc(100% - 80px)); text-align: left; }
 .post-page .post-hero-content h1 { font-family: var(--display); }
@@ -265,8 +267,5 @@
 .post-page .article-body h2 { font-family: var(--display); font-size: clamp(22px, 2vw, 29px); line-height: 1.48; }
 .post-page .article-body pre { border-inline-start: 3px solid var(--accent); }
 @media (max-width: 600px) {
-  .archive-page .archive-intro { min-height: 162px; padding: 17px 33% 17px 0; }
-  .archive-intro::after { left: 71%; background-position: 57% 82%; }
-  .archive-page .archive-intro h1 { font-size: clamp(30px, 7vw, 39px); }
   .post-page .post-hero-content { width: calc(100% - 36px); }
 }

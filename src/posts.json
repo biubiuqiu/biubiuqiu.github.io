@@ -18,7 +18,24 @@
     "cover": "/assets/hiking/img_2146.webp",
     "cover_alt": "云间雪峰与冰川",
     "banner": "/assets/hiking/full/img_2146.jpg",
-    "mobile_banner": "/assets/hiking/img_2146.webp"
+    "mobile_banner": "/assets/hiking/img_2146.webp",
+    "archive_diagram": {
+      "title": "一封邮件的执行记录",
+      "steps": [
+        [
+          "审批",
+          "确认报价表 v3 和收件人"
+        ],
+        [
+          "发送",
+          "使用同一操作编号重试"
+        ],
+        [
+          "回执",
+          "邮件服务受理一次，记录回执"
+        ]
+      ]
+    }
   },
   {
     "slug": "agent-transcript-storage",

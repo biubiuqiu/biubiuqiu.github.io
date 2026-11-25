@@ -113,7 +113,7 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
                '<span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>'
                '<a class="writing-index-link" href="/writing/"'+('' if post else ' aria-current="page"')+'>文章</a>'
                '<a href="/atom.xml" aria-label="订阅 Atom RSS">RSS</a></nav>')
-        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=22"><link rel="stylesheet" href="/writing.css?v=12"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=6" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls">'+nav+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
+        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=13"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=6" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls">'+nav+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
     def card(p):
         image = E(p.get('thumbnail', p['cover']), quote=True)
         return (f'<a class="related-card" href="/writing/{p["slug"]}/">'
@@ -145,25 +145,37 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
       <button class="filter-clear" type="reset" form="archive-search" hidden>清除条件</button>
     </div>'''
     rows = []
-    for p in posts:
+    for index, p in enumerate(posts):
         slug = p['slug']
         search = E(' '.join([p['title'], p['excerpt'], p['category'], *p['tags']]), quote=True)
         category = E(p['category'], quote=True)
         card_tags = E(json.dumps(p['tags'], ensure_ascii=False), quote=True)
-        image = E(p.get('thumbnail', p['cover']), quote=True)
-        rows.append(f'''<li class="archive-card" data-search="{search}" data-category="{category}" data-tags="{card_tags}">
+        illustration = ''
+        introduction = ''
+        feature_class = ''
+        if index == 0:
+            feature_class = ' issue-lead'
+            introduction = f'<p>{E(p["excerpt"])}</p>'
+            if diagram := p.get('archive_diagram'):
+                steps = ''.join(
+                    f'<li><strong>{E(step)}</strong><span>{E(detail)}</span></li>'
+                    for step, detail in diagram['steps']
+                )
+                illustration = (f'<figure class="issue-diagram"><figcaption>{E(diagram["title"])}</figcaption>'
+                                f'<ol>{steps}</ol></figure>')
+            else:
+                image = E(p.get('thumbnail', p['cover']), quote=True)
+                illustration = f'<img class="issue-photo" src="{image}" alt="" width="480" height="360">'
+        rows.append(f'''<li class="archive-card{feature_class}" data-search="{search}" data-category="{category}" data-tags="{card_tags}">
           <div class="card-meta"><span class="card-category">{category}</span><time datetime="{p["date"]}">{p["date"]}</time>
-            <span>{p["minutes"]} 分钟阅读<span class="card-words"> · {p["words"]:,} 字</span></span></div>
+            <span>{p["minutes"]} 分钟阅读</span></div>
           <div class="archive-entry">
-            <h2><a href="/writing/{slug}/">{title_phrases(p["title"], "card-title-phrase")}</a></h2>
-            <p>{E(p["excerpt"])}</p>
-            <img class="archive-thumb" src="{image}" alt="" width="480" height="360" loading="lazy" decoding="async">
+            <h2><a href="/writing/{slug}/">{title_phrases(p["title"], "card-title-phrase")}</a></h2>{introduction}
           </div>
-          {tags_for(p)}
+          {tags_for(p)}{illustration}
         </li>''')
-    intro = ('<div class="archive-intro"><h1>文章与笔记</h1>'
-             '<p class="writing-intro">记录遇到的问题、尝试过的办法，以及逐渐形成的判断。</p></div>'
-             + filters + '<ul class="archive-grid">' + ''.join(rows) + '</ul>'
+    intro = ('<div class="archive-masthead"><h1>文章与笔记</h1>'
+             + filters + '</div><ul class="archive-grid">' + ''.join(rows) + '</ul>'
              '<div class="archive-empty" hidden><p>没有找到匹配的文章</p>'
              '<button type="reset" form="archive-search">查看全部文章</button></div>')
     routes=['writing/'];target=root/'writing/index.html';target.parent.mkdir(parents=True,exist_ok=True);target.write_text(shell('文章与笔记','Denis Wen 的 Agent 研究、技术实践与问题排查记录。','writing/',intro))

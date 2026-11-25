@@ -145,7 +145,7 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
   color: #fff; text-shadow: 0 1px 6px #1d152c70;
 }
 .cover-copy { max-width: 36rem; }
-.cover-greeting { margin-bottom: 12px; font-size: 15px; font-weight: 550; }
+.cover-greeting { margin-bottom: 10px; font-size: 13px; letter-spacing: .045em; }
 .cover .hero h1 {
   font: 550 clamp(40px, 4vw, 74px)/1.24 var(--display);
   letter-spacing: -.045em; color: #fff;
@@ -154,10 +154,10 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
 .cover .intro { text-wrap: pretty; max-width: 30em; margin-top: 16px; }
 .cover-read {
   display: inline-flex; align-items: center; gap: 18px; min-height: 44px;
-  margin-top: 20px; padding: 7px 20px; border-radius: 24px;
-  background: #f8f3ed; color: #302936; text-shadow: none; font-size: 14px; font-weight: 600;
+  margin-top: 6px; padding: 4px 0; text-decoration: underline; text-underline-offset: .4em;
+  color: #fff; font-size: 14px; font-weight: 600;
 }
-.cover-read:hover { background: #f3dbe0; }
+.cover-read:hover { text-decoration-thickness: 2px; }
 .cover :is(.brand, .cover-read):focus-visible { outline-color: #fff; }
 @media (max-width: 800px) {
   .cover { min-height: clamp(490px, 72svh, 650px); }
@@ -166,10 +166,24 @@ html.viewer-open{overflow:hidden;scrollbar-gutter:stable}
   .cover .hero { padding-block: 24px 70px; }
   .cover .hero h1 { font-size: clamp(32px, 6vw, 46px); }
   .cover .hero h1 span { display: inline-block; }
-  .cover-greeting { font-size: 14px; }
+  .cover-greeting { font-size: 13px; }
   .cover .intro { font-size: 15px; margin-top: 12px; }
 }
 .accent-title { padding-left: 0; }
 .accent-title::before { display: none; }
 .journal-spread .latest-title { font-family: var(--display); }
 .journal-spread .project { border-color: var(--line); }
+
+.journal-notes > section { margin-top: clamp(32px,5vw,72px); padding-top: clamp(28px,4vw,52px); border-top: 1px solid var(--line); }
+.journal-notes .agent { max-width: 75ch; }
+.journal-notes .agent p { margin-top: 12px; }
+.journal-notes .f1 { padding-bottom: 32px; }
+.journal-notes .f1 > p { max-width: 75ch; margin-top: 10px; }
+.f1-gallery { grid-template-columns: repeat(3,minmax(0,1fr)); gap: clamp(12px,2vw,28px); }
+.f1-gallery .media-photo { border-radius: 3px; }
+.f1-gallery figcaption { line-height: 1.6; }
+.f1-gallery figcaption span { display: none; }
+.f1-gallery figcaption a { display: block; }
+@media (max-width: 650px) {
+  .f1-gallery { grid-template-columns: 1fr; gap: 22px; }
+}
