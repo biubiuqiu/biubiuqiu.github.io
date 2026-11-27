@@ -269,3 +269,14 @@
 @media (max-width: 600px) {
   .post-page .post-hero-content { width: calc(100% - 36px); }
 }
+
+/* Keep the same-article language menu usable over both paper and photography. */
+.writing-controls .language-switcher { line-height: 1.5; }
+.writing-controls .language-menu a { color: var(--ink); text-shadow: none; }
+.writing-page:lang(en) .post-hero h1 { line-height: 1.15; }
+.writing-page:lang(en) .post-hero .hero-title-part { overflow-wrap: break-word; }
+@media (max-width: 520px) {
+  .writing-page .writing-controls { gap: 5px; }
+  .writing-controls .language-switcher > summary { min-height: 44px; gap: 2px; }
+  .writing-page .writing-header { flex-wrap: wrap; column-gap: 4px; row-gap: 0; padding-block: 6px; }
+}

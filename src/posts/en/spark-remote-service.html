@@ -1,0 +1,28 @@
+<p class="article-lead">Dependency conflicts kept resurfacing during a Spark integration. We eventually moved execution into a separate service and called it through an API.</p>
+<h2>What we wanted to integrate</h2>
+<p>The goal was to introduce Spark SQL into an existing data processing application. We wanted to try a different execution path for some SQL workloads and leave room for other types of computation later.</p>
+<p>The first obstacle turned out to be the dependency graph. The application already depended on Hive and Hadoop. Adding Spark brought incompatible versions, and fixing one conflict could break code that had worked before.</p>
+<h2>Giving SQL execution its own service</h2>
+<p>We moved the Spark code into its own project. The caller submitted SQL through an API and received the outcome. The service could manage its own Spark dependencies, and the request and response defined what the caller needed to know.</p>
+<ol><li>The caller supplied a database, the SQL statement, and whether it needed the query results.</li><li>The execution service initialized a <code>SparkSession</code> and connected to Hive Metastore.</li><li>It ran the statement and returned column names and rows, or just the execution status.</li></ol>
+<h2>Initializing SparkSession</h2>
+<p>The original implementation initialized the session as follows. The settings came from external configuration.</p>
+<pre><code>SparkSession sparkSession = SparkSession.builder()
+    .appName(sparkProperties.getAppName())
+    .config("spark.ui.port", sparkProperties.getUiPort())
+    .config("hive.metastore.uris", sparkProperties.getMetastoreUris())
+    .config("spark.master", sparkProperties.getMaster())
+    .config("spark.sql.hive.metastore.version", sparkProperties.getHiveVersion())
+    .config("spark.sql.hive.metastore.jars", sparkProperties.getHiveJarsPath())
+    .enableHiveSupport()
+    .getOrCreate();</code></pre>
+<p>One issue worth recording was Hive Metastore version compatibility. When we saw <code>Invalid method name: 'get_table_req'</code>, the relevant checks were the version of the Metastore we had connected to and the corresponding client JAR configuration. Looking only at the SQL would have missed the cause.</p>
+<h2>Returning results</h2>
+<p>The query returned a <code>Dataset&lt;Row&gt;</code>. We extracted its column names, converted each row to a list of strings, and packaged the fields, rows, and execution status in the response. The example collected at most 5,000 rows.</p>
+<pre><code>Dataset&lt;Row&gt; result = sparkSession.sql(sql).limit(5000);
+String[] columns = result.columns();
+List&lt;Row&gt; rows = result.collectAsList();</code></pre>
+<p>This is the core of the original implementation. A separate service also needs policies for authorization, permitted statements, concurrent sessions, timeouts, and result size. The original account did not cover all of those concerns.</p>
+<h2>What the split cost us</h2>
+<p>Splitting out the service isolated its dependencies. It also introduced another deployment to maintain and an API contract to manage. The complexity was still there, but its ownership became clearer.</p>
+<p>The question I kept from this project was one of placement. When most of the friction comes from the runtime environment and its dependencies, where should execution live, and how much of its implementation does a caller really need to know?</p>

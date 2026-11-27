@@ -1,0 +1,12 @@
+<div class="reading-progress-track" role="progressbar" aria-label="{progress}" aria-valuenow="0" hidden><span></span></div>
+<div class="article-layout"><aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>{contents}</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary>
+<div class="toc-content"><nav aria-label="{contents}"><ol>{outline}</ol></nav><div class="reading-status"><span data-remaining>{initial_time}</span></div>
+<div class="toc-actions"><a href="{home}writing/">← {writing_all}</a><a href="#article-top">↑ {top}</a></div></div></details></aside>
+<div class="article-column" data-reading-minutes="{reading_minutes}">
+<div class="article-intro"><nav class="article-breadcrumb" aria-label="{breadcrumbs}"><a href="{home}">{home_name}</a><span aria-hidden="true">/</span><a href="{home}writing/">{writing_title}</a><span aria-hidden="true">/</span><a href="{category_url}">{category_name}</a></nav>
+<p class="article-context">{context}</p><div class="post-byline"><a href="{home}">Denis Wen</a><span>{word_count}</span>{updated_time}</div>
+<div class="reading-resume" hidden><span>{last_read} <strong></strong></span><button type="button" data-resume>{resume} →</button><button type="button" data-dismiss-resume aria-label="{dismiss}">×</button></div></div>
+<article class="article-body" aria-label="{body}">{content}</article>{notice}
+<section class="article-end"><p class="end-mark">— {end} —</p><div class="article-attribution"><strong>Denis Wen</strong><p>{bio}</p><small>{permalink}</small><a class="canonical-link" href="{canonical}">{canonical}</a><p class="copyright-note">© Denis Wen · {copyright}</p></div>
+<div class="article-share"><button type="button" data-copy-link>{copy_link} ↗</button><button type="button" data-share>{share}</button><a href="#article-top">{top} ↑</a></div></section>
+<nav class="article-pagination" aria-label="{adjacent}">{pager}</nav><section class="article-related"><div class="related-heading"><h2>{related}</h2><a href="{home}writing/">{writing_all} ↗</a></div><div class="related-grid">{related_cards}</div></section></div></div>

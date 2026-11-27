@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="{lang}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed">
+<title>{title} — Denis Wen</title><meta name="description" content="{description}"><link rel="canonical" href="{canonical}">
+{alternates}
+<meta property="og:type" content="{og_type}"><meta property="og:title" content="{title}"><meta property="og:description" content="{description}"><meta property="og:url" content="{canonical}"><meta property="og:locale" content="{og_locale}">
+<link rel="alternate" type="application/atom+xml" title="{writing_title}" href="{home}atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>{bootstrap}</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=14"><link rel="stylesheet" href="/liquid-nav.css?v=3">
+<script id="writing-messages" type="application/json">{messages}</script><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=7" defer></script>
+{extras}</head><body class="writing-page {kind}">
+<a class="skip-link" href="#main">{skip_link}</a>
+<header class="writing-header writing-width"><a class="writing-brand" href="{home}" aria-label="{home_label}">Denis Wen<span class="writing-brand-sub"> / {writing_title}</span></a>
+<div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="{navigation}"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="{home}writing/"{index_current}>{writing_nav}</a><a href="{home}atom.xml" aria-label="{subscribe}">RSS</a></nav>{locale_menu}{theme_menu}</div></header>
+{hero}<main class="writing-width writing-main" id="main">{body_html}</main>
+<footer class="writing-footer writing-width"><a href="{home}">← {back_home}</a><span>© Denis Wen · {footer_note}</span><a href="{home}atom.xml">{feed} ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>

@@ -1,0 +1,870 @@
+{
+  "用户限制：不要改数据库": {
+    "en": "User constraint: leave the database unchanged",
+    "ja": "ユーザーの制約：データベースは変更しない"
+  },
+  "读取 auth.ts": {
+    "en": "Read auth.ts",
+    "ja": "auth.ts を読み取る"
+  },
+  "完整测试日志 · 80k（示意）": {
+    "en": "Full test log · 80k (example)",
+    "ja": "テストログ全文 · 80k（例）"
+  },
+  "定位失败：callback 第 42 行": {
+    "en": "Failure traced to callback, line 42",
+    "ja": "失敗箇所：callback の42行目"
+  },
+  "修复回调，准备验证": {
+    "en": "Callback fixed; ready to verify",
+    "ja": "コールバックの修正完了。次は検証"
+  },
+  "当前要求：检查修复结果": {
+    "en": "Current request: verify the fix",
+    "ja": "現在の依頼：修正結果を検証"
+  },
+  "用户目标": {
+    "en": "User goal",
+    "ja": "ユーザーの目標"
+  },
+  "读文件": {
+    "en": "File read",
+    "ja": "ファイルの読み取り"
+  },
+  "测试日志": {
+    "en": "Test log",
+    "ja": "テストログ"
+  },
+  "排查尝试": {
+    "en": "Investigation",
+    "ja": "調査の試行"
+  },
+  "关键决策": {
+    "en": "Key decisions",
+    "ja": "主な判断"
+  },
+  "最新要求": {
+    "en": "Latest request",
+    "ja": "直近の依頼"
+  },
+  "近期工具": {
+    "en": "Recent tool calls",
+    "ja": "直近のツール呼び出し"
+  },
+  "当前进度": {
+    "en": "Progress",
+    "ja": "進捗"
+  },
+  "关键片段：callback 第 42 行失败": {
+    "en": "Key excerpt: callback failed on line 42",
+    "ja": "該当箇所：callback の42行目で失敗"
+  },
+  "日志引用：run-42 / test.log": {
+    "en": "Log reference: run-42 / test.log",
+    "ja": "ログの参照先：run-42 / test.log"
+  },
+  "交接摘要：修复回调；不改数据库；下一步验证": {
+    "en": "Handoff: callback fixed; leave database untouched; verify next",
+    "ja": "引き継ぎ：コールバック修正済み。DB は変更せず、次に結果を検証"
+  },
+  "证据引用：run-42 / test.log": {
+    "en": "Evidence: run-42 / test.log",
+    "ja": "根拠の参照先：run-42 / test.log"
+  },
+  "按引用取回：test.log 第 36–50 行": {
+    "en": "Read by reference: test.log, lines 36–50",
+    "ja": "参照先から取得：test.log の36～50行目"
+  },
+  "需要时只补读相关片段，不重新塞入全部日志": {
+    "en": "Read just the relevant excerpt when needed",
+    "ja": "必要な箇所だけ読み戻す"
+  },
+  "第 1 步：如果每轮都带上全部历史，大日志会不断挤占“桌面”。": {
+    "en": "Step 1: Sending the entire history on every turn lets a large log crowd out everything else on the desk.",
+    "ja": "ステップ1：毎ターン履歴を丸ごと渡すと、巨大なログが作業机を埋めてしまいます。"
+  },
+  "第 2 步：把完整日志保存成工件。本轮只带失败片段和引用；全文仍然可以找回来。": {
+    "en": "Step 2: Save the full log as an artifact. This turn carries the failure excerpt and a reference you can follow back to the original.",
+    "ja": "ステップ2：ログ全文を成果物として保存します。今回は失敗箇所と参照先だけを渡し、必要になったら全文に戻れます。"
+  },
+  "第 3 步：把旧过程写成交接摘要。用户限制、当前进度和下一步继续保留。": {
+    "en": "Step 3: Summarize earlier work for handoff. Include the user’s constraints, current progress, and next step.",
+    "ja": "ステップ3：過去の作業を引き継ぎ用に要約します。ユーザーの制約、現在の進捗、次の一手を含めます。"
+  },
+  "第 4 步：后面又需要证据时，按引用补读。减少本轮输入，不等于删除历史。": {
+    "en": "Step 4: Follow the reference when you need the evidence again. The history survives even as the input gets smaller.",
+    "ja": "ステップ4：再び根拠が必要になったら参照先を読みます。今回の入力を小さくしても履歴は残ります。"
+  },
+  "接近上限，或用户运行 /compact": {
+    "en": "Near the limit, or the user runs /compact",
+    "ja": "上限が近づく、またはユーザーが /compact を実行"
+  },
+  "对话被整理为任务摘要": {
+    "en": "Conversation condensed into a task summary",
+    "ja": "会話をタスクの要約にまとめる"
+  },
+  "精确的内部切分范围未公开": {
+    "en": "Exact internal cutoffs are undisclosed",
+    "ja": "内部の正確な分割位置は非公開"
+  },
+  "持久规则 / 项目指令": {
+    "en": "Persistent rules / project instructions",
+    "ja": "永続的なルール・プロジェクト指示"
+  },
+  "上下文管理由产品完成": {
+    "en": "The product manages context",
+    "ja": "製品側でコンテキストを管理"
+  },
+  "任务摘要继续支持后续工作": {
+    "en": "The task summary supports subsequent work",
+    "ja": "タスクの要約を使って作業を継続"
+  },
+  "按需知识、独立子任务上下文协作": {
+    "en": "Retrieve knowledge on demand; give subtasks their own context",
+    "ja": "必要な知識を随時取得し、サブタスクは独立したコンテキストで処理"
+  },
+  "Claude Code：先看公开机制。这里不推测内部保留了多少条消息。": {
+    "en": "Claude Code: This view covers documented behavior. The internal number of retained messages is unknown.",
+    "ja": "Claude Code：ここでは公開されている挙動を扱います。内部で保持するメッセージ件数は不明です。"
+  },
+  "已知：可以自动压缩，也可以用 /compact 指定关注重点。": {
+    "en": "Compaction can run automatically. With /compact you can specify what to focus on.",
+    "ja": "自動で圧縮できます。/compact を使うと要約で重視する点を指定できます。"
+  },
+  "已知：摘要保留任务线索；持久规则应放在项目指令中。": {
+    "en": "The summary preserves the thread of the task. Put lasting rules in project instructions.",
+    "ja": "要約にはタスクを続ける手がかりが残ります。継続して適用するルールはプロジェクト指示に記述します。"
+  },
+  "只画公开的概念关系，不把 Pi 或 OpenCode 的切分阈值套到 Claude Code 上。": {
+    "en": "The diagram shows public concepts. Pi and OpenCode have their own thresholds; those do not establish Claude Code’s boundary.",
+    "ja": "図は公開情報に基づく概念図です。Pi や OpenCode のしきい値から Claude Code の分割位置を推定することはできません。"
+  },
+  "尚未压缩：先观察完整历史": {
+    "en": "Before compaction: inspect the full history",
+    "ja": "圧縮前：履歴全体を確認"
+  },
+  "规则 + 完整历史": {
+    "en": "Rules + full history",
+    "ja": "ルールと履歴全体"
+  },
+  "选出较早的区间": {
+    "en": "Select the earlier segment",
+    "ja": "古い区間を選ぶ"
+  },
+  "正常路径：准备整段当前对话": {
+    "en": "Standard path: prepare the whole current conversation",
+    "ja": "通常の経路：現在の会話全体を準備"
+  },
+  "标出近期保留区间": {
+    "en": "Mark the recent segment to retain",
+    "ja": "保持する直近の区間を指定"
+  },
+  "较早区间 → 结构化摘要": {
+    "en": "Earlier segment → structured summary",
+    "ja": "古い区間 → 構造化した要約"
+  },
+  "较早 + 近期 → 结构化摘要": {
+    "en": "Earlier + recent segments → structured summary",
+    "ja": "古い区間＋直近の区間 → 構造化した要約"
+  },
+  "正在形成交接摘要（示意）": {
+    "en": "Building the handoff summary (illustration)",
+    "ja": "引き継ぎ用の要約を作成中（模式図）"
+  },
+  "规则 / 当前指令": {
+    "en": "Rules / current instructions",
+    "ja": "ルール・現在の指示"
+  },
+  "目标 · 约束 · 进度 · 下一步": {
+    "en": "Goal · constraints · progress · next step",
+    "ja": "目標・制約・進捗・次の一手"
+  },
+  "保留区间仍会经过上下文投影 / 编辑": {
+    "en": "The retained segment still passes through context projection and editing",
+    "ja": "保持した区間にもコンテキストの抽出・編集を適用"
+  },
+  "近期内容单独保留；长工具输出可能缩短": {
+    "en": "Recent content is retained separately; long tool outputs may be shortened",
+    "ja": "直近の内容は別途保持。長いツール出力は短縮する場合あり"
+  },
+  "Pi：原始会话记录与下一轮模型输入分开管理。": {
+    "en": "Pi manages the original transcript separately from the input for the next model call.",
+    "ja": "Pi は元の会話記録と、次にモデルに渡す入力を別々に管理します。"
+  },
+  "第 2 步：按预算寻找切分点，留出近期区间；具体边界需要保护工具交换。": {
+    "en": "Step 2: Find a cut point within the budget and keep a recent segment. The boundary must preserve tool calls and their results together.",
+    "ja": "ステップ2：予算に収まる分割点を探し、直近の区間を確保します。ツール呼び出しとその結果が分断されないようにします。"
+  },
+  "第 3 步：将较早区间生成摘要；已有摘要可作为迭代上下文。": {
+    "en": "Step 3: Summarize the earlier segment. An existing summary can serve as input to the next revision.",
+    "ja": "ステップ3：古い区間を要約します。次回の更新では既存の要約を入力として利用できます。"
+  },
+  "第 4 步：下一轮使用摘要和保留区间形成投影。这里省略了分支、异常恢复等细节。": {
+    "en": "Step 4: Form the next input from the summary and the retained segment. Branches and error recovery are omitted here.",
+    "ja": "ステップ4：要約と保持区間から次の入力を組み立てます。ここでは分岐や異常時の復旧を省略しています。"
+  },
+  "OpenCode V2：这张图演示普通文本摘要路径，不包括 provider 原生压缩。": {
+    "en": "OpenCode V2: This illustrates its ordinary text-summary path. Provider-native compaction follows a different path.",
+    "ja": "OpenCode V2：通常のテキスト要約を示します。プロバイダー標準の圧縮は別の経路です。"
+  },
+  "第 2 步：选择近期保留范围；正常摘要请求尽量保留现有对话前缀。": {
+    "en": "Step 2: Choose how much recent content to keep. A standard summary request tries to retain the existing conversation prefix.",
+    "ja": "ステップ2：保持する直近の範囲を決めます。通常の要約リクエストでは、既存の会話の先頭部分をできるだけ維持します。"
+  },
+  "第 3 步：摘要请求包含较早与近期内容，尝试复用 prompt cache；超大请求有缩减回退。": {
+    "en": "Step 3: Include earlier and recent content in the summary request to reuse the prompt cache where possible. Oversized requests can fall back to less input.",
+    "ja": "ステップ3：古い内容と直近の内容を要約リクエストに含め、プロンプトキャッシュの再利用を試みます。リクエストが大きすぎる場合は、入力を減らして再試行できます。"
+  },
+  "第 4 步：摘要之外保留近期内容。摘要看过近期内容，不代表近期细节都能被摘要替代。": {
+    "en": "Step 4: Keep recent content alongside the summary. Even a summary that saw recent messages cannot stand in for every detail.",
+    "ja": "ステップ4：要約とは別に直近の内容を保持します。要約の入力に含めても、細部まで要約に残るとは限りません。"
+  },
+  "分支 A · 原始事件 E1–E100": {
+    "en": "Branch A · original events E1–E100",
+    "ja": "ブランチ A · 元のイベント E1～E100"
+  },
+  "新消息 / 工具结果 E101–E104": {
+    "en": "New messages / tool results E101–E104",
+    "ja": "新しいメッセージ・ツール結果 E101～E104"
+  },
+  "继续产生 E105–E108": {
+    "en": "More events arrive: E105–E108",
+    "ja": "さらに E105～E108 が到着"
+  },
+  "用户切换到分支 B": {
+    "en": "User switches to branch B",
+    "ja": "ユーザーがブランチ B に切り替える"
+  },
+  "还未开始": {
+    "en": "Not started",
+    "ja": "未開始"
+  },
+  "抓取快照：分支 A，到 E100": {
+    "en": "Snapshot: branch A through E100",
+    "ja": "スナップショット：ブランチ A の E100 まで"
+  },
+  "后台生成摘要…": {
+    "en": "Summarizing in the background…",
+    "ja": "バックグラウンドで要約中…"
+  },
+  "候选摘要已完成": {
+    "en": "Candidate summary ready",
+    "ja": "要約候補が完成"
+  },
+  "它只覆盖 E1–E100，不包含 E101–E108": {
+    "en": "Covers E1–E100 only; E101–E108 came later",
+    "ja": "対象は E1～E100。後続の E101～E108 は含まない"
+  },
+  "核对分支、前缀和指令版本": {
+    "en": "Check branch, prefix, and instruction version",
+    "ja": "ブランチ・先頭部分・指示のバージョンを照合"
+  },
+  "分支已变 → 候选失效": {
+    "en": "Branch changed → candidate is stale",
+    "ja": "ブランチが変わったため候補は無効"
+  },
+  "条件匹配 → 可以切入": {
+    "en": "Conditions match → safe to commit",
+    "ja": "条件が一致したため適用可能"
+  },
+  "<strong>切入结果</strong><div>": {
+    "en": "<strong>Commit result</strong><div>",
+    "ja": "<strong>適用結果</strong><div>"
+  },
+  "等待安全边界；主会话可以继续积累新事件。": {
+    "en": "Waiting for a safe boundary. The main session can continue recording events.",
+    "ja": "安全に適用できる境界を待っています。メインセッションでは新しいイベントを記録できます。"
+  },
+  "丢弃或重算旧候选。当前分支 B 和新消息不会被旧摘要覆盖。": {
+    "en": "Discard or recompute the stale candidate. Branch B and its new messages are preserved.",
+    "ja": "古い候補を破棄するか再計算します。ブランチ B とその新しいメッセージはそのまま残ります。"
+  },
+  "<span class=\"demo-pill is-summary\">摘要：E1–E100</span><span aria-hidden=\"true\"> + </span><span class=\"demo-pill is-full\">完整保留 E101–E108</span>": {
+    "en": "<span class=\"demo-pill is-summary\">Summary: E1–E100</span><span aria-hidden=\"true\"> + </span><span class=\"demo-pill is-full\">E101–E108 in full</span>",
+    "ja": "<span class=\"demo-pill is-summary\">要約：E1～E100</span><span aria-hidden=\"true\"> + </span><span class=\"demo-pill is-full\">E101～E108 は全文保持</span>"
+  },
+  "第 1 步：主会话在分支 A。此时还没有后台摘要。": {
+    "en": "Step 1: The main session is on branch A. No background summary exists yet.",
+    "ja": "ステップ1：メインセッションはブランチ A にいます。バックグラウンドの要約はまだありません。"
+  },
+  "第 2 步：摘要任务拿走 E100 之前的快照；主会话继续工作。": {
+    "en": "Step 2: The summary task takes a snapshot through E100 while the main session keeps working.",
+    "ja": "ステップ2：要約タスクは E100 までのスナップショットを取得し、メインセッションは作業を続けます。"
+  },
+  "第 3 步：摘要完成时，后面又有新事件。它们不在这份摘要里。": {
+    "en": "Step 3: New events have arrived by the time the summary is ready. They fall outside its snapshot.",
+    "ja": "ステップ3：要約が完成するまでに新しいイベントが到着しました。これらはスナップショットの対象外です。"
+  },
+  "第 4 步：版本条件不匹配，拒绝切入。旧摘要不能覆盖用户的新方向。": {
+    "en": "Step 4: Reject the candidate when the version check fails. A stale summary cannot overwrite the user’s new direction.",
+    "ja": "ステップ4：バージョン条件が合わないため適用を拒否します。古い要約が新しい方針を上書きすることを防ぎます。"
+  },
+  "第 4 步：校验通过后，原子写入摘要，同时保留快照之后的所有事件。": {
+    "en": "Step 4: Once checks pass, commit the summary atomically and retain every event after the snapshot.",
+    "ja": "ステップ4：照合に成功したら、要約をアトミックに書き込み、スナップショット以降の全イベントを保持します。"
+  },
+  "输入上限104k，当前使用": {
+    "en": "Input limit 104k; current usage ",
+    "ja": "入力上限104k、現在使用中："
+  },
+  "k，其中证据": {
+    "en": "k; evidence accounts for ",
+    "ja": "k、うち根拠データ："
+  },
+  "输入 ": {
+    "en": "Input: ",
+    "ja": "入力："
+  },
+  "k，超出输入上限 ": {
+    "en": "k; over budget by ",
+    "ja": "k、上限超過："
+  },
+  "k，尚余 ": {
+    "en": "k; remaining budget: ",
+    "ja": "k、残り："
+  },
+  "整份大日志一进来，即使已有摘要，下一轮仍然超窗。试试“只留引用与片段”。": {
+    "en": "Adding the full log exceeds the window even with a summary. Try keeping just a reference and an excerpt.",
+    "ja": "要約があっても、ログ全文を入れると次の入力は上限を超えます。参照先と抜粋だけに切り替えてみましょう。"
+  },
+  "正文只带引用和必要片段，原始日志另外保存。桌面更空，也仍能回去查证。": {
+    "en": "The input carries a reference and a short excerpt; the original log is stored separately. You save space and can still verify the evidence.",
+    "ja": "入力には参照先と必要な抜粋だけを含めます。元のログは別に保存するので、空きを確保しながら後で根拠を確認できます。"
+  },
+  "拖动滑块，看证据变大后，留给其他历史的空间怎样减少。输出预留不能拿来无限填日志。": {
+    "en": "Move the slider to see how evidence competes with history for space. The reserved output budget cannot absorb unlimited logs.",
+    "ja": "スライダーを動かして、根拠データが増えると他の履歴に使える領域がどう減るか確認してください。出力用の予約領域をログで埋めることはできません。"
+  },
+  "暂停": {
+    "en": "Pause",
+    "ja": "一時停止"
+  },
+  "重播动画": {
+    "en": "Replay",
+    "ja": "もう一度再生"
+  },
+  "播放动画": {
+    "en": "Play",
+    "ja": "再生"
+  },
+  "仅展示第 1–2 行，共 6 行。继续读取从第 3 行开始。": {
+    "en": "Showing lines 1–2 of 6. Continue from line 3.",
+    "ja": "全6行のうち1～2行目を表示。続きは3行目からです。"
+  },
+  "先确定范围，再判断文件。没有看到 retries，不能断言它不存在。": {
+    "en": "Check which lines you have read. The absence of retries in this excerpt says nothing about the rest of the file.",
+    "ja": "まず読んだ範囲を確認しましょう。この抜粋に retries がなくても、ファイル全体に存在しないとは判断できません。"
+  },
+  "仅展示第 3–4 行，共 6 行。仍有第 5–6 行。": {
+    "en": "Showing lines 3–4 of 6. Lines 5–6 remain.",
+    "ja": "全6行のうち3～4行目を表示。5～6行目が残っています。"
+  },
+  "接着读才看到 retries。明确的续读位置，让模型无需猜测上次停在哪里。": {
+    "en": "The next read reveals retries. An explicit continuation point tells the model where to resume.",
+    "ja": "続けて読むと retries が見つかります。再開位置を明示すれば、モデルは前回どこで止まったか推測せずに済みます。"
+  },
+  "指定范围：第 2–4 行，共 6 行。": {
+    "en": "Requested range: lines 2–4 of 6.",
+    "ja": "指定範囲：全6行のうち2～4行目。"
+  },
+  "已知目标位置时，直接读取附近上下文。这样可以检查 retries，而不把整个文件都带进输入。": {
+    "en": "When you know the location, read the surrounding lines. You can inspect retries without sending the entire file.",
+    "ja": "位置が分かっている場合はその前後を読みます。ファイル全体を入力に含めずに retries を検証できます。"
+  },
+  "拒绝：旧代码已经变为 retries: 4。先重新读取当前版本、理解其他改动，再决定怎样修改。": {
+    "en": "Rejected: the code now says retries: 4. Read the current file, understand the intervening change, then decide what to edit.",
+    "ja": "拒否：旧コードはすでに retries: 4 に変わっています。現在のファイルを読み直し、他の変更を理解してから修正方法を決めます。"
+  },
+  "拒绝：匹配了 upload 与 download 两处。增加上下文，不要让工具替你猜。": {
+    "en": "Rejected: both upload and download match. Add enough context to identify the intended target.",
+    "ja": "拒否：upload と download の両方に一致しました。対象を一意に特定できる文脈を加えてください。"
+  },
+  "短片段现在只匹配 download，替换会成功，却没有完成“修改 upload”的意图。唯一匹配也不能代替正确理解。": {
+    "en": "The short fragment now matches only download. Replacement succeeds but changes the wrong setting. Uniqueness alone cannot establish intent.",
+    "ja": "短い断片は今度は download だけに一致します。置換には成功しますが、upload を直す目的は達成できません。一意性だけでは意図を確かめられません。"
+  },
+  "成功：旧代码唯一匹配 upload，只把它从 3 改为 5，download 仍然是 3。匹配验证的是片段前提，不是整个文件版本。": {
+    "en": "Success: the old code matches only upload. It changes from 3 to 5 and download stays at 3. The check covers the fragment, not the entire file version.",
+    "ja": "成功：旧コードに一致した upload だけが3から5に変わり、download は3のままです。照合で確認できるのは断片の前提で、ファイル全体のバージョンではありません。"
+  },
+  "等待提交新的替换。": {
+    "en": "Waiting for a new replacement.",
+    "ja": "新しい置換の送信を待っています。"
+  },
+  "现在 upload 已被别人改成 4。分别试试短片段和完整旧代码，会得到不同结果。": {
+    "en": "Someone changed upload to 4. Try the short fragment and the full old code to see how the outcomes differ.",
+    "ja": "他の人が upload を4に変更しました。短い断片と完全な旧コードをそれぞれ試して、結果を比較してください。"
+  },
+  "恢复原始文件。尝试短片段，再补足上下文。": {
+    "en": "Original file restored. Try the short fragment, then add context.",
+    "ja": "元のファイルに戻しました。短い断片を試し、次に文脈を加えてください。"
+  },
+  "尚未启动测试命令": {
+    "en": "Test command has not started",
+    "ja": "テストコマンドは未起動"
+  },
+  "日志工件：尚未生成": {
+    "en": "Log artifact: not created yet",
+    "ja": "ログ成果物：未生成"
+  },
+  "等待执行。": {
+    "en": "Waiting to run.",
+    "ja": "実行待ち。"
+  },
+  "还没有运行，就没有测试结论。文字里说“已开始”也不等于测试通过。": {
+    "en": "No run means no test verdict. A message saying “started” does not prove that tests passed.",
+    "ja": "まだ実行していないため、テスト結果はありません。「開始した」というメッセージは合格の根拠になりません。"
+  },
+  "测试进程运行中 · job-demo-1": {
+    "en": "Test process running · job-demo-1",
+    "ja": "テストプロセス実行中 · job-demo-1"
+  },
+  "日志持续写入：test-demo.log": {
+    "en": "Appending logs to test-demo.log",
+    "ja": "test-demo.log にログを書き込み中"
+  },
+  "status: running\\njob_id: job-demo-1\\noutput: 正在执行测试…": {
+    "en": "status: running\njob_id: job-demo-1\noutput: Running tests…",
+    "ja": "status: running\njob_id: job-demo-1\noutput: テスト実行中…"
+  },
+  "工具先返回运行状态，模型可以处理不依赖结果的工作。此时不能宣布测试通过，也不应重复启动。": {
+    "en": "The tool returns a running status so the model can work on independent tasks. Wait for the result before claiming success or starting another run.",
+    "ja": "ツールが実行中という状態を返すと、モデルは結果に依存しない作業を進められます。合格と宣言したり、同じテストを再度起動したりせず、結果を待ちます。"
+  },
+  "测试进程已结束 · exit_code: 1": {
+    "en": "Test process exited · exit_code: 1",
+    "ja": "テストプロセス終了 · exit_code: 1"
+  },
+  "全文保存在：test-demo.log": {
+    "en": "Full output saved in test-demo.log",
+    "ja": "全文の保存先：test-demo.log"
+  },
+  "status: completed\\nexit_code: 1\\n…省略前面的长日志…\\nFAIL retry.spec.ts\\nexpected 5, received 3\\ntruncated: true": {
+    "en": "status: completed\nexit_code: 1\n…earlier log output omitted…\nFAIL retry.spec.ts\nexpected 5, received 3\ntruncated: true",
+    "ja": "status: completed\nexit_code: 1\n…前半の長いログは省略…\nFAIL retry.spec.ts\nexpected 5, received 3\ntruncated: true"
+  },
+  "日志太长，只返回片段与全文引用。进程已经结束，但这次测试失败；completed 不等于成功。": {
+    "en": "The tool returns an excerpt and a reference to the full log. The process finished, but this test failed; completed indicates termination, not success.",
+    "ja": "ログが長いため、抜粋と全文への参照先だけを返します。プロセスは終了しましたが、テストは失敗しています。completed は終了を示す状態です。"
+  },
+  "按引用检查失败位置": {
+    "en": "Inspect the failure by reference",
+    "ja": "参照先から失敗箇所を確認"
+  },
+  "只补读相关范围：test-demo.log": {
+    "en": "Read the relevant range in test-demo.log",
+    "ja": "test-demo.log の該当範囲だけを取得"
+  },
+  "读取失败断言附近内容：\\nretry.spec.ts:42\\n配置值仍是 3，需要继续排查。": {
+    "en": "Around the failing assertion:\nretry.spec.ts:42\nThe configured value is still 3. Investigate further.",
+    "ja": "失敗したアサーション付近：\nretry.spec.ts:42\n設定値はまだ3です。引き続き原因を調べます。"
+  },
+  "工具结果给下一步判断提供证据。真正完成任务，需要修改正确并通过相应验证，而不只是收到一条命令结果。": {
+    "en": "The tool result informs the next decision. Finishing the task requires a correct fix and a passing verification run.",
+    "ja": "ツールの結果は次の判断に使う根拠です。タスクを完了するには正しく修正し、対応する検証にも合格する必要があります。"
+  },
+  "选中第 ": {
+    "en": "Selected lines ",
+    "ja": "選択範囲："
+  },
+  " 行": {
+    "en": "",
+    "ja": " 行目"
+  },
+  "offset 是起始行 ": {
+    "en": "Start at line ",
+    "ja": "開始位置は"
+  },
+  "，limit 是最多 ": {
+    "en": " and read at most ",
+    "ja": " 行目、最大取得数は"
+  },
+  " 行。预期终点 ": {
+    "en": " lines. The expected end line is ",
+    "ja": " 行です。計算上の終了位置は"
+  },
+  " 超过文件末尾，实际到第 6 行。": {
+    "en": ", beyond the end of the file, so reading stops at line 6.",
+    "ja": " 行目でファイル末尾を超えるので、実際には6行目で止まります。"
+  },
+  "，因此读到第 ": {
+    "en": ", so the last line returned is ",
+    "ja": " 行目のため、実際の終了位置は"
+  },
+  " 行。": {
+    "en": ".",
+    "ja": " 行目です。"
+  },
+  " 色块只表示选中范围，行号不是文件正文。": {
+    "en": " Highlighting marks the range; line numbers are display metadata.",
+    "ja": " 色は選択範囲を示します。行番号はファイル本文に含まれません。"
+  },
+  "offset · 从第几行开始": {
+    "en": "offset · first line to read",
+    "ja": "offset · 読み始める行"
+  },
+  "limit · 最多取几行": {
+    "en": "limit · maximum number of lines",
+    "ja": "limit · 取得する行数の上限"
+  },
+  "拒绝：匹配 2 处": {
+    "en": "Rejected: two matches",
+    "ja": "拒否：2か所に一致"
+  },
+  "替换 2 处": {
+    "en": "Replaced two matches",
+    "ja": "2か所を置換"
+  },
+  "替换 1 处": {
+    "en": "Replaced one match",
+    "ja": "1か所を置換"
+  },
+  "replace_all=false 时，短片段匹配两处，工具应拒绝；没有修改文件。": {
+    "en": "With replace_all=false, the short fragment matches twice. The tool should reject the edit and leave the file unchanged.",
+    "ja": "replace_all=false で短い断片が2か所に一致するため、ツールは変更を拒否します。ファイルはそのままです。"
+  },
+  "replace_all=true：两处都改成 5。如果只想改 upload，这个参数扩大了不必要的修改范围。": {
+    "en": "With replace_all=true, both values become 5. That reaches beyond the intended change if only upload should change.",
+    "ja": "replace_all=true では両方が5になります。upload だけを変更したい場合は範囲が広すぎます。"
+  },
+  "保留 replace_all=false，但在 old_string 中加入 upload 上下文。唯一定位后，download 保持原样。": {
+    "en": "Keep replace_all=false and include upload in old_string. With a unique target, download stays unchanged.",
+    "ja": "replace_all=false のまま old_string に upload を含めます。対象が一意になり、download は元の値を保ちます。"
+  },
+  "默认单处": {
+    "en": "Single edit (default)",
+    "ja": "単一箇所（既定）"
+  },
+  "全部替换": {
+    "en": "Replace all",
+    "ja": "すべて置換"
+  },
+  "补足上下文": {
+    "en": "Add context",
+    "ja": "文脈を追加"
+  },
+  "完整替换：保留了显式提供的 6 行": {
+    "en": "Full replacement: all six supplied lines remain",
+    "ja": "全体を置換：指定した6行が残る"
+  },
+  "完整替换：现在只剩 1 行": {
+    "en": "Full replacement: only one line remains",
+    "ja": "全体を置換：1行だけが残る"
+  },
+  "content 包含完整目标文件：host、timeout、audit 也都要显式提供。工具没有帮你推断保留区。": {
+    "en": "content must contain the entire desired file, including host, timeout, and audit. The tool cannot infer which other lines to keep.",
+    "ja": "content には目標とするファイル全体を指定します。host、timeout、audit も明示する必要があります。ツールは保持する行を補いません。"
+  },
+  "工具把整个文件替换成 content。host、timeout、audit 没有提供，就不会自动保留；这段片段也不是原来完整的 config 对象。": {
+    "en": "The tool replaces the entire file with content. Omitted fields such as host, timeout, and audit disappear, and the one-line fragment no longer forms the original config object.",
+    "ja": "ファイル全体が content で置き換わります。省略した host、timeout、audit は失われ、1行の断片だけでは元の config オブジェクトを構成できません。"
+  },
+  "只传要改的一行": {
+    "en": "Send only the changed line",
+    "ja": "変更する1行だけ渡す"
+  },
+  "传入完整文件": {
+    "en": "Send the complete file",
+    "ja": "ファイル全体を渡す"
+  },
+  "运行项目测试": {
+    "en": "Run project tests",
+    "ja": "プロジェクトのテストを実行"
+  },
+  "30 秒 = timeout: 30": {
+    "en": "30 seconds = timeout: 30",
+    "ja": "30秒 = timeout: 30"
+  },
+  "30 秒 = timeout: 30000": {
+    "en": "30 seconds = timeout: 30000",
+    "ja": "30秒 = timeout: 30000"
+  },
+  "命令": {
+    "en": "Command",
+    "ja": "コマンド"
+  },
+  "说明": {
+    "en": "Description",
+    "ja": "説明"
+  },
+  "运行项目测试（说明不是命令）": {
+    "en": "Run project tests (descriptive text)",
+    "ja": "プロジェクトのテストを実行（説明文）"
+  },
+  "目录": {
+    "en": "Directory",
+    "ja": "ディレクトリ"
+  },
+  "由会话工作目录语义决定": {
+    "en": "Determined by the session’s working-directory rules",
+    "ja": "セッションの作業ディレクトリの規則に従う"
+  },
+  "返回": {
+    "en": "Return mode",
+    "ja": "実行方式"
+  },
+  "请求前台运行；实际行为受版本和策略控制": {
+    "en": "Foreground requested; behavior depends on version and policy",
+    "ja": "フォアグラウンドを要求。実際の挙動はバージョンとポリシーに従う"
+  },
+  "会话 / 工具的 cwd，不在本次 input 中": {
+    "en": "Uses the session or tool cwd, outside this call’s input",
+    "ja": "セッションまたはツールの cwd を使用。今回の input には含まれない"
+  },
+  "默认": {
+    "en": "Default",
+    "ja": "既定値"
+  },
+  "省略 timeout 时基本实现无默认超时": {
+    "en": "The base implementation has no default time limit when timeout is omitted",
+    "ja": "基本実装では timeout を省略すると時間制限なし"
+  },
+  "范围": {
+    "en": "Scope",
+    "ja": "指定できる範囲"
+  },
+  "所读 schema 不含 background 或 workdir": {
+    "en": "The schema examined has no background or workdir field",
+    "ja": "確認したスキーマには background と workdir がない"
+  },
+  "background: false，前台模式": {
+    "en": "background: false selects foreground mode",
+    "ja": "background: false でフォアグラウンド実行"
+  },
+  "前台省略 timeout 默认 2 分钟": {
+    "en": "Foreground defaults to two minutes when timeout is omitted",
+    "ja": "フォアグラウンドで timeout を省略した場合は既定で2分"
+  },
+  "这里只对照输入契约。timeout 不决定输出保留多少，description 不修改命令，后台返回也不保证测试完成。Pi 使用秒；Claude Code / OpenCode 使用毫秒。": {
+    "en": "This compares input contracts. Output retention is independent of timeout. A description does not change the command, and a background return can arrive before the tests finish. Pi uses seconds; Claude Code and OpenCode use milliseconds.",
+    "ja": "ここでは入力の仕様を比較しています。保持する出力量は timeout では決まらず、description はコマンドを変更しません。バックグラウンド実行ではテスト終了前に制御が戻ります。Pi の単位は秒、Claude Code と OpenCode はミリ秒です。"
+  },
+  "用户目标：统计金额，生成汇总。先检查输入字段与单位。": {
+    "en": "Goal: total the amounts and produce a summary. Check the input columns and units first.",
+    "ja": "目標：金額を集計し、サマリーを作成する。まず入力の列と単位を確認する。"
+  },
+  "输入：orders.csv\\namount\\n120\\n80\\n300": {
+    "en": "Input: orders.csv\namount\n120\n80\n300",
+    "ja": "入力：orders.csv\namount\n120\n80\n300"
+  },
+  "尚未启动": {
+    "en": "Not started",
+    "ja": "未起動"
+  },
+  "还没有执行结果。": {
+    "en": "No execution result yet.",
+    "ja": "実行結果はまだありません。"
+  },
+  "模型提出下一步；实际文件与计算仍在工作空间中。": {
+    "en": "The model proposes the next step. The files and actual computation live in the workspace.",
+    "ja": "モデルは次の一手を提案します。実際のファイルと計算はワークスペースにあります。"
+  },
+  "准备工具调用：写入 analyze.py，运行 python analyze.py。": {
+    "en": "Prepare tool calls: write analyze.py, then run python analyze.py.",
+    "ja": "ツール呼び出しを準備：analyze.py を書き込み、python analyze.py を実行。"
+  },
+  "输入：orders.csv\\n脚本：analyze.py": {
+    "en": "Input: orders.csv\nScript: analyze.py",
+    "ja": "入力：orders.csv\nスクリプト：analyze.py"
+  },
+  "已启动 · task-demo-1": {
+    "en": "Started · task-demo-1",
+    "ja": "起動済み · task-demo-1"
+  },
+  "status: running\\n执行中，暂时不能判断成功。": {
+    "en": "status: running\nStill running; the outcome is unknown.",
+    "ja": "status: running\n実行中のため、結果はまだ判定できません。"
+  },
+  "运行时把请求送到正确工作区。模型写出了代码，CPU 执行的才是代码本身。": {
+    "en": "The runtime sends the request to the correct workspace. The model writes the code and the CPU executes it.",
+    "ja": "ランタイムが正しいワークスペースにリクエストを送ります。コードを書くのはモデルで、命令を実行するのは CPU です。"
+  },
+  "等待执行结果，准备检查是否符合任务。": {
+    "en": "Wait for the result, then check it against the task.",
+    "ja": "実行結果を待ち、依頼されている内容と照合する。"
+  },
+  "输入：orders.csv\\n脚本：analyze.py\\n产物：summary.csv": {
+    "en": "Input: orders.csv\nScript: analyze.py\nArtifact: summary.csv",
+    "ja": "入力：orders.csv\nスクリプト：analyze.py\n成果物：summary.csv"
+  },
+  "已结束 · exit_code: 0": {
+    "en": "Finished · exit_code: 0",
+    "ja": "終了 · exit_code: 0"
+  },
+  "文件可以存放完整输入和中间产物。模型接收必要结果，不必把每行数据都塞进上下文。": {
+    "en": "Files can hold the full input and intermediate outputs. The model receives only the results it needs, keeping individual rows out of its context.",
+    "ja": "ファイルには入力全体と中間成果物を保存できます。モデルには必要な結果だけを渡し、すべてのデータ行をコンテキストに入れずに済みます。"
+  },
+  "读取 summary.csv，对照输入与统计口径，提交可下载产物。": {
+    "en": "Read summary.csv, check the source data and aggregation rules, and deliver a downloadable file.",
+    "ja": "summary.csv を読み、入力と集計条件を確認し、ダウンロード可能な成果物を届ける。"
+  },
+  "已结束 · 产物已核对": {
+    "en": "Finished · artifact verified",
+    "ja": "終了 · 成果物を検証済み"
+  },
+  "核对：3 笔订单，总额 500\\n待通过产物接口交付用户。": {
+    "en": "Verified: 3 orders, total 500\nReady for delivery via the artifact interface.",
+    "ja": "照合済み：注文3件、合計500\n成果物用インターフェースでユーザーに提供します。"
+  },
+  "本例的预期数值已核对。退出码只表明程序执行状态；任务完成还要核对口径并把文件交付出去。": {
+    "en": "The expected numbers check out. The exit code describes program execution; completing the task also requires checking the aggregation rules and delivering the file.",
+    "ja": "期待値との一致を確認しました。終了コードで分かるのはプログラムの実行状態です。タスクを完了するには、集計条件を確かめてファイルを届ける必要があります。"
+  },
+  "文件系统": {
+    "en": "Filesystem",
+    "ja": "ファイルシステム"
+  },
+  "输入、脚本、日志和产物有路径，可以被下一步继续读取。": {
+    "en": "Inputs, scripts, logs, and outputs have paths so subsequent steps can read them.",
+    "ja": "入力、スクリプト、ログ、成果物はパスを持ち、後続の処理で読み取れます。"
+  },
+  "有目录，不代表具备访问隔离；有文件，不代表已经持久化。": {
+    "en": "A directory alone provides no access isolation; a file’s existence does not guarantee persistence.",
+    "ja": "ディレクトリを作るだけではアクセスを分離できません。ファイルが存在していても、永続化されているとは限りません。"
+  },
+  "文件承载跨操作状态，让不同程序之间能够交换数据。": {
+    "en": "Files carry state across operations and let programs exchange data.",
+    "ja": "ファイルは操作をまたいで状態を保持し、プログラム間でデータを受け渡せるようにします。"
+  },
+  "进程与执行": {
+    "en": "Process execution",
+    "ja": "プロセスと実行"
+  },
+  "CPU 运行真实程序，运行时记录输出、退出码与任务状态。": {
+    "en": "The CPU runs programs, and the runtime records output, exit codes, and task status.",
+    "ja": "CPU がプログラムを実行し、ランタイムが出力・終了コード・タスクの状態を記録します。"
+  },
+  "task-demo-1 → python analyze.py\\n状态：running → completed\\n结果：exit_code / stdout / stderr": {
+    "en": "task-demo-1 → python analyze.py\nState: running → completed\nResult: exit_code / stdout / stderr",
+    "ja": "task-demo-1 → python analyze.py\n状態：running → completed\n結果：exit_code / stdout / stderr"
+  },
+  "任务 ID 不等于进程存活；超时也不证明副作用没有发生。": {
+    "en": "A task ID cannot tell you whether the process is alive. A timeout cannot establish whether a side effect occurred.",
+    "ja": "タスク ID だけではプロセスの生存を確認できません。タイムアウトしても、副作用が発生しなかったとは断言できません。"
+  },
+  "计算有时间跨度，所以 Agent 需要知道“还在运行”与“已经结束”的区别。": {
+    "en": "Execution takes time, so the agent needs to distinguish a running process from one that has exited.",
+    "ja": "処理には時間がかかるため、エージェントは実行中と終了済みを区別する必要があります。"
+  },
+  "依赖环境": {
+    "en": "Dependencies",
+    "ja": "依存環境"
+  },
+  "解释器、库、命令行程序组成可以复用的执行基础。": {
+    "en": "Interpreters, libraries, and CLI tools provide a reusable execution environment.",
+    "ja": "インタープリター、ライブラリ、CLI ツールを組み合わせて再利用可能な実行環境を作ります。"
+  },
+  "Python + csv 标准库\\n需要时：浏览器 / 图表库 / 编解码工具": {
+    "en": "Python + csv standard library\nAs needed: browser / plotting library / codecs",
+    "ja": "Python と標準の csv モジュール\n必要に応じて：ブラウザー・グラフライブラリ・コーデック"
+  },
+  "安装依赖受版本与网络影响；不必把所有能力放到同一个实例。": {
+    "en": "Installation depends on package versions and network availability. Capabilities can be distributed across instances.",
+    "ja": "インストールはパッケージのバージョンとネットワークに依存します。すべての機能を同じインスタンスに置く必要はありません。"
+  },
+  "固定基础环境可减少每次从零准备，任务依赖仍需要版本管理。": {
+    "en": "A pinned base environment saves repeated setup. Task-specific dependencies still need version control.",
+    "ja": "ベース環境を固定すれば毎回の準備を減らせます。タスク固有の依存関係には引き続きバージョン管理が必要です。"
+  },
+  "资源预算": {
+    "en": "Resource budget",
+    "ja": "リソース予算"
+  },
+  "限制一次任务使用的内存、CPU、进程数与时间等资源。": {
+    "en": "Bound memory, CPU, process count, and execution time per task.",
+    "ja": "タスクごとにメモリ、CPU、プロセス数、実行時間を制限します。"
+  },
+  "示意配置：内存上限、CPU 配额\\n磁盘容量、并发数、任务期限": {
+    "en": "Example: memory limit, CPU quota\nDisk space, concurrency, deadline",
+    "ja": "設定例：メモリ上限、CPU 割り当て\nディスク容量、同時実行数、タスクの期限"
+  },
+  "限制资源不是限制数据访问；CPU 配额也不是网络策略。": {
+    "en": "Resource limits and data-access policies address separate concerns. A CPU quota cannot enforce a network policy.",
+    "ja": "リソースの制限とデータアクセスの制御は別の仕組みです。CPU の割り当て量でネットワークポリシーを適用することはできません。"
+  },
+  "资源约束让一个失控任务不至于无限占用其他任务需要的容量。": {
+    "en": "Limits keep a runaway task from consuming all the capacity that other tasks need.",
+    "ja": "制限を設けると、暴走したタスクが他のタスクに必要な容量まで占有する事態を防げます。"
+  },
+  "访问边界": {
+    "en": "Access boundaries",
+    "ja": "アクセス境界"
+  },
+  "由执行系统约束文件读写、外连目标和可用权限。": {
+    "en": "The execution system enforces file permissions, outbound destinations, and available privileges.",
+    "ja": "実行基盤がファイルの読み書き、外部接続の宛先、利用可能な権限を制御します。"
+  },
+  "允许：工作目录、授权服务\\n拒绝：其他用户目录、未授权出口": {
+    "en": "Allow: working directory, authorized services\nDeny: other users’ directories, unauthorized egress",
+    "ja": "許可：作業ディレクトリ、認可済みサービス\n拒否：他ユーザーのディレクトリ、未許可の外部接続"
+  },
+  "隔离取决于真实配置与实现，提示词中的禁止不能替代底层约束。": {
+    "en": "Isolation depends on implementation and configuration. A prohibition in a prompt cannot enforce it.",
+    "ja": "分離の強さは実装と設定で決まります。プロンプトで禁止しても基盤側の制御の代わりにはなりません。"
+  },
+  "计算能力越开放，越要明确它能影响到哪里；授权与隔离需要协同。": {
+    "en": "The broader the execution capability, the more important it is to define what it may affect. Authorization and isolation work together.",
+    "ja": "実行能力が広いほど、影響を及ぼせる範囲を明確にします。認可と分離は組み合わせて機能します。"
+  },
+  "临时文件 + 重建": {
+    "en": "Rebuild with temporary files",
+    "ja": "一時ファイルで再構築"
+  },
+  "独立保存": {
+    "en": "Saved separately",
+    "ja": "独立して保存"
+  },
+  "未另存的工作文件丢失": {
+    "en": "Unsaved workspace files are lost",
+    "ja": "別途保存していない作業ファイルは消失"
+  },
+  "进程终止，内存丢失": {
+    "en": "Processes stop and memory is lost",
+    "ja": "プロセスは終了し、メモリ状態は消失"
+  },
+  "执行实例与临时文件一同销毁。聊天历史不能把没有另存的文件凭空恢复出来。": {
+    "en": "Destroying the instance also discards its temporary files. Chat history cannot recreate files that were never saved elsewhere.",
+    "ja": "インスタンスを破棄すると一時ファイルも失われます。別途保存していないファイルは会話履歴から復元できません。"
+  },
+  "持久文件 + 重建": {
+    "en": "Rebuild with persistent files",
+    "ja": "永続ファイルで再構築"
+  },
+  "持久卷中保留": {
+    "en": "Retained on the persistent volume",
+    "ja": "永続ボリュームに保持"
+  },
+  "需要重新启动进程": {
+    "en": "Processes must restart",
+    "ja": "プロセスの再起動が必要"
+  },
+  "重建执行实例后挂载保留的文件。文件仍在，但内存变量、后台进程与原连接不会随挂载恢复。": {
+    "en": "Mount the retained files after rebuilding. Files survive, but mounting them does not restore in-memory variables, background processes, or existing connections.",
+    "ja": "インスタンスの再構築後に保存済みファイルをマウントします。ファイルは残りますが、メモリ内の変数やバックグラウンドプロセス、元の接続までは復元されません。"
+  },
+  "受支持的快照恢复": {
+    "en": "Restore a supported snapshot",
+    "ja": "対応するスナップショットから復元"
+  },
+  "需匹配的文件状态": {
+    "en": "Requires matching filesystem state",
+    "ja": "対応するファイル状態が必要"
+  },
+  "可恢复受支持的执行状态": {
+    "en": "Supported execution state can be restored",
+    "ja": "対応する実行状態は復元可能"
+  },
+  "快照可保存执行状态，但有运行时、CPU、文件系统和网络等兼容条件，不是任意机器上的无条件续跑。": {
+    "en": "Snapshots can capture execution state. Resuming requires compatible runtimes, CPUs, filesystems, and network conditions.",
+    "ja": "スナップショットは実行状態を保存できます。再開にはランタイム、CPU、ファイルシステム、ネットワークなどの互換性が必要です。"
+  },
+  "第 ${minute + 1} 分钟，${working} 席执行，${warm} 席保留，合计 ${total} 席": {
+    "en": "Minute ${minute + 1}: ${working} running, ${warm} kept warm, ${total} slots total",
+    "ja": "経過 ${minute + 1} 分：実行中 ${working} 枠、待機 ${warm} 枠、合計 ${total} 枠"
+  },
+  "${keepMinutes} 分钟": {
+    "en": "${keepMinutes} min",
+    "ja": "${keepMinutes} 分"
+  }
+}

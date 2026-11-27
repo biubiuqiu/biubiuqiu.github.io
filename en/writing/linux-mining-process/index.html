@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed">
+<title>Investigating a Cryptominer Disguised as sshd — Denis Wen</title><meta name="description" content="High CPU usage led from a suspicious process to its executable, scheduled jobs, and configuration file."><link rel="canonical" href="https://biubiuqiu.github.io/en/writing/linux-mining-process/">
+<link rel="alternate" hreflang="zh-CN" href="https://biubiuqiu.github.io/writing/linux-mining-process/">
+<link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/writing/linux-mining-process/">
+<link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/writing/linux-mining-process/">
+<link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/writing/linux-mining-process/">
+<meta property="og:type" content="article"><meta property="og:title" content="Investigating a Cryptominer Disguised as sshd"><meta property="og:description" content="High CPU usage led from a suspicious process to its executable, scheduled jobs, and configuration file."><meta property="og:url" content="https://biubiuqiu.github.io/en/writing/linux-mining-process/"><meta property="og:locale" content="en_US">
+<link rel="alternate" type="application/atom+xml" title="Writing &amp; notes" href="/en/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=14"><link rel="stylesheet" href="/liquid-nav.css?v=3">
+<script id="writing-messages" type="application/json">{"manual_copy": "Select and copy the text manually.", "link_copied": "Article link copied", "share_copied": "Article link copied and ready to share", "share_failed": "Sharing is unavailable. Use Copy article link instead.", "copy_code": "Copy code", "copy_block": "Copy code block", "copied": "Copied ✓", "code_copied": "Code copied", "results": "{n} articles", "matches": "{n} articles found", "single_result": "1 article", "single_match": "1 article found", "filter_count": "Filters, {n} selected", "filters": "Filters", "saved_position": "Saved position", "estimate": "About {n} min", "remaining": "About {n} min left", "finished": "Finished reading"}</script><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=7" defer></script>
+<meta property="article:published_time" content="2024-05-28"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="https://biubiuqiu.github.io/assets/hiking/originals/IMG_1867.jpeg"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Investigating a Cryptominer Disguised as sshd", "description": "High CPU usage led from a suspicious process to its executable, scheduled jobs, and configuration file.", "datePublished": "2024-05-28", "author": {"@type": "Person", "name": "Denis Wen", "url": "https://biubiuqiu.github.io/"}, "mainEntityOfPage": "https://biubiuqiu.github.io/en/writing/linux-mining-process/", "image": "https://biubiuqiu.github.io/assets/hiking/originals/IMG_1867.jpeg", "wordCount": 407, "timeRequired": "PT2M", "inLanguage": "en", "keywords": ["Linux", "Processes", "Troubleshooting"], "dateModified": "2026-11-13"}</script></head><body class="writing-page post-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="writing-header writing-width"><a class="writing-brand" href="/en/" aria-label="Denis Wen home">Denis Wen<span class="writing-brand-sub"> / Writing &amp; notes</span></a>
+<div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="Writing navigation"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="/en/writing/">Writing</a><a href="/en/atom.xml" aria-label="Subscribe to the Atom feed">RSS</a></nav>          <details class="language-switcher">
+            <summary aria-label="Language: English"><span>English</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
+            <div class="language-menu">
+              <a href="/writing/linux-mining-process/" lang="zh-CN" hreflang="zh-CN">中文</a>
+              <a href="/en/writing/linux-mining-process/" lang="en" hreflang="en" aria-current="page">English</a>
+              <a href="/ja/writing/linux-mining-process/" lang="ja" hreflang="ja">日本語</a>
+            </div>
+          </details>            <details class="theme-switcher" data-theme-control data-theme-menu-label="Appearance" hidden>
+              <summary aria-label="Appearance" title="Appearance"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="Appearance">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>System</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>Light</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>Dark</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header>
+<header class="post-hero" id="article-top"><picture class="post-hero-media"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/hiking/reading/IMG_1867.webp"><img class="post-hero-photo" src="/assets/hiking/originals/IMG_1867.jpeg" alt="Snowy mountains under a starry sky and lights in the valley" style="object-position:center 58%" width="1536" height="1024" fetchpriority="high"></picture><div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">Systems diagnostics / From the archives</p><h1><span class="hero-title-part">Investigating a Cryptominer Disguised as sshd</span></h1><div class="article-meta"><span>Originally published <time datetime="2024-05-28T10:19:12">2024-05-28</time></span><span aria-hidden="true">·</span><span title="Estimated at 220 words per minute, excluding time spent on demos and code.">2 min read</span></div><div class="post-tags"><a class="glass-control" href="/en/writing/?tag=Linux"># Linux</a><a class="glass-control" href="/en/writing/?tag=Processes"># Processes</a><a class="glass-control" href="/en/writing/?tag=Troubleshooting"># Troubleshooting</a></div></div></header><main class="writing-width writing-main" id="main"><div class="reading-progress-track" role="progressbar" aria-label="Reading progress" aria-valuenow="0" hidden><span></span></div>
+<div class="article-layout"><aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>Contents</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary>
+<div class="toc-content"><nav aria-label="Contents"><ol><li class="toc-h2"><a class="glass-row" href="#section-1"><span class="toc-number">01</span><span>A familiar process name with unusual CPU usage</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-2"><span class="toc-number">02</span><span>What kept starting it?</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-3"><span class="toc-number">03</span><span>What the configuration revealed</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-4"><span class="toc-number">04</span><span>Where the investigation stopped</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-5"><span class="toc-number">05</span><span>The sequence I kept</span></a></li></ol></nav><div class="reading-status"><span data-remaining>About 2 min</span></div>
+<div class="toc-actions"><a href="/en/writing/">← All articles</a><a href="#article-top">↑ Back to top</a></div></div></details></aside>
+<div class="article-column" data-reading-minutes="2">
+<div class="article-intro"><nav class="article-breadcrumb" aria-label="Breadcrumbs"><a href="/en/">Home</a><span aria-hidden="true">/</span><a href="/en/writing/">Writing &amp; notes</a><span aria-hidden="true">/</span><a href="/en/writing/?category=Systems%20diagnostics">Systems diagnostics</a></nav>
+<p class="article-context">Linux / Processes and cron jobs · Investigation archive</p><div class="post-byline"><a href="/en/">Denis Wen</a><span>407 words</span><span>Updated <time datetime="2026-11-13">2026-11-13</time></span></div>
+<div class="reading-resume" hidden><span>Last read <strong></strong></span><button type="button" data-resume>Resume reading →</button><button type="button" data-dismiss-resume aria-label="Dismiss saved reading position">×</button></div></div>
+<article class="article-body" aria-label="Article body"><p class="article-lead">In <code>top</code>, a process named sshd was consistently consuming a large share of the CPU. Starting with the file the process was actually running led me to its scheduled jobs and, eventually, a mining configuration.</p>
+<h2 id="section-1">A familiar process name with unusual CPU usage<a class="heading-anchor" href="#section-1" aria-label="Link to: A familiar process name with unusual CPU usage">#</a></h2>
+<p>The first clue was CPU usage. The name looked like the standard SSH service, but its resource consumption warranted a closer look. A process’s display name says little about where its executable came from, so I checked the files associated with its PID.</p>
+<pre><code># List the files opened by this process
+lsof -p &lt;PID&gt;
+
+# Find the executable the process is actually running
+ls -l /proc/&lt;PID&gt;/exe</code></pre>
+<h2 id="section-2">What kept starting it?<a class="heading-anchor" href="#section-2" aria-label="Link to: What kept starting it?">#</a></h2>
+<p>Next, I inspected the cron jobs for the user in question.</p>
+<pre><code>crontab -l -u &lt;username&gt;</code></pre>
+<p>The original investigation found two suspicious jobs. One attempted to download a program and its configuration every six hours. The other tried to start the program masquerading as <code>sshd</code> every minute. The program lived in a temporary directory, and the job used a file lock to prevent overlapping executions.</p>
+<p>This explained why killing the running process might only provide brief relief. The scheduler could start it again. Finding the executable and finding what launched it were both necessary.</p>
+<h2 id="section-3">What the configuration revealed<a class="heading-anchor" href="#section-3" aria-label="Link to: What the configuration revealed">#</a></h2>
+<p>The configuration included CPU computation settings, RandomX options, and mining pool connection information. Taken together with the high resource usage and the cron jobs, these details identified the program as a cryptominer.</p>
+<p>I have omitted the malicious download URL, mining pool addresses, and original cron commands. The public account documents the investigation without reproducing a working malicious download command.</p>
+<h2 id="section-4">Where the investigation stopped<a class="heading-anchor" href="#section-4" aria-label="Link to: Where the investigation stopped">#</a></h2>
+<p>The original account ends with removal of the affected user’s scheduled jobs. It contains no complete investigation of the initial entry point, review of other persistence mechanisms, or verification of recovery. The evidence identifies an abnormal process but cannot establish that the host was fully cleaned.</p>
+<p>The removal operation in the original account deleted the user’s entire crontab. That scope matters. In an actual incident, preserve the evidence first and distinguish legitimate jobs from malicious entries before removing anything.</p>
+<h2 id="section-5">The sequence I kept<a class="heading-anchor" href="#section-5" aria-label="Link to: The sequence I kept">#</a></h2>
+<ol><li>Use the CPU anomaly to identify the process that needs investigation.</li><li>Resolve its actual executable instead of relying on its name.</li><li>Find the scheduler or other source repeatedly starting it.</li><li>Use configuration and behavior together to infer its purpose, and document how far remediation was verified.</li></ol>
+<p>What stayed with me was how much a familiar name can conceal. Following the executable path and the launch chain one step further was what made this case understandable.</p>
+</article><aside class="article-notice"><strong>About this archived post</strong><p>The date is from the original blog. This edition preserves the investigation, clarifies its scope and omits environment-specific details and external screenshots. Original title: “Notes on a Linux Cryptomining Infection”. The examples have not been retested on current versions.</p></aside>
+<section class="article-end"><p class="end-mark">— End of article —</p><div class="article-attribution"><strong>Denis Wen</strong><p>Notes on agents, engineering and what I learn along the way.</p><small>Permalink</small><a class="canonical-link" href="https://biubiuqiu.github.io/en/writing/linux-mining-process/">https://biubiuqiu.github.io/en/writing/linux-mining-process/</a><p class="copyright-note">© Denis Wen · Please credit the author and link to the original when republishing. Quoted material belongs to its respective authors.</p></div>
+<div class="article-share"><button type="button" data-copy-link>Copy article link ↗</button><button type="button" data-share>Share article</button><a href="#article-top">Back to top ↑</a></div></section>
+<nav class="article-pagination" aria-label="Adjacent articles"><a href="/en/writing/sqoop-null-character/"><span>← Older article</span><strong>How an Invisible Character Shifted the Columns in a Data Export</strong></a><a href="/en/writing/agent-context-management/"><span>Newer article →</span><strong>How Agents Stay on Track During Long Tasks: Context Management in Claude Code, Pi, and OpenCode</strong></a></nav><section class="article-related"><div class="related-heading"><h2>Further reading</h2><a href="/en/writing/">All articles ↗</a></div><div class="related-grid"><a class="related-card" href="/en/writing/sqoop-null-character/"><img src="/assets/writing/thumbs/sqoop-null-character.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Troubleshooting · 3 min</span><strong>How an Invisible Character Shifted the Columns in a Data Export</strong></a><a class="related-card" href="/en/writing/inside-an-agent-runtime/"><img src="/assets/hiking/img_2146.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent research · 13 min</span><strong>Inside an Agent Runtime: Three Quotes, One Email, and No Duplicate Send</strong></a><a class="related-card" href="/en/writing/agent-transcript-storage/"><img src="/assets/hiking/dsc02281.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent research · 10 min</span><strong>Storing Agent Transcripts: From a Tool Call to Recovery on Another Machine</strong></a></div></section></div></div>
+</main>
+<footer class="writing-footer writing-width"><a href="/en/">← Back to home</a><span>© Denis Wen · Stay curious. Keep exploring.</span><a href="/en/atom.xml">RSS feed ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>

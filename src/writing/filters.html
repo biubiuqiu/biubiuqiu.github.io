@@ -1,0 +1,13 @@
+<form class="archive-filters" id="archive-search" role="search" hidden>
+  <div class="filter-bar"><label class="archive-search"><span class="sr-only">{search}</span>
+    <input type="search" name="q" placeholder="{placeholder}" enterkeyhint="search" autocomplete="off"></label>
+    <button type="button" class="filter-toggle glass-control" aria-expanded="false" aria-controls="archive-options"><span class="filter-adjust" aria-hidden="true"></span>{filters}<span class="filter-count" hidden></span></button></div>
+  <div class="filter-panel" id="archive-options" hidden>
+    <div class="filter-field"><span class="filter-label" id="category-label">{category}</span>
+      <select name="category" aria-labelledby="category-label"><option value="">{all_categories}</option>{category_options}</select></div>
+    <div class="filter-field"><span class="filter-label" id="tag-label">{tags}</span>
+      <select name="tag" aria-labelledby="tag-label"><option value="">{all_tags}</option>{tag_options}</select></div>
+  </div>
+</form>
+<div class="archive-state"><p class="archive-result" role="status" aria-live="polite" aria-atomic="true">{initial_count}</p>
+  <button class="filter-clear" type="reset" form="archive-search" hidden>{clear}</button></div>

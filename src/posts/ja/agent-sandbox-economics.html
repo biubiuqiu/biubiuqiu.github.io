@@ -1,0 +1,93 @@
+<p class="article-lead">300人がエージェントに一台ずつ専用のコンピューターを与えたとする。朝、Python で注文を集計し、レポートを作った。ユーザーは10分かけて数字を確認し、「次は地域別のグラフにして」と戻ってくる。その間レポートは残したいが、インタープリターも動かし続ける価値はあるか。全員が同じ1分間に戻ったら何台必要か。</p>
+
+<p>ファイルを残す、プロセスを残す、マシンを丸ごと残す。ユーザーから見た体験は似ていても、プラットフォームの負担は大きく違う。まず、Bash を実行し、コードを書き、ファイルを届けられる環境から考えよう。<a href="/ja/writing/agent-sandbox-workspace/">前の記事：なぜエージェントにサンドボックスが必要なのか</a></p>
+
+<h2 id="personal-computer">複数の会話で使う Lester の一台の Computer</h2>
+<p>Lester で一人が三つの会話を開いても、論理上の Computer は一つだ。サンドボックス表には <code>user_id</code> の一意制約があり、各会話のコマンドは <code>/workspace/conversations/&lt;id&gt;</code> から起動する。ファイルツールは会話のディレクトリを基準にパスを検査する。端末、Python、Git、インストール済みのブラウザーは同じ環境を使える。新しい会話は準備済みの道具を再利用でき、前のレポートにも置き場所がある。<a class="source-ref" href="#ref-lester">[1]</a></p>
+<p>具体的な設計で気に入っている点がある。Docker バックエンドは名前付きボリュームを <code>/workspace</code>にマウントし、アイドル時の回収には <code>docker stop</code>を呼び、再開には <code>start</code>を使う。戻ったとき、ディスク上の <code>orders.csv</code> はまだ開けるが、元の Python プロセスにあった <code>df</code> は消えている。スクリプトを再実行すれば次のグラフを描ける。ファイルはコンテナの停止と起動をまたげるが、標準のローカルボリュームは元のホストに残る。別のマシンが引き継ぐには取得経路が要る。<a class="source-ref" href="#ref-lester">[1]</a></p>
+<p>「一人一つ」を三つの判断に分けたい。<strong>ファイルの所有権</strong>は、誰がその環境に戻れるかを決める。<strong>どのタスクを一緒に実行できるか</strong>は、複数の会話が同じファイルを編集し同じポートを占有できるかを決める。<strong>計算をどこに配置するか</strong>はタスク間の空き時間を誰が負担するかを決める。ディレクトリでファイルを整理しても、共有環境ではポートが競合しうる。信頼できる個人のタスクはツールチェーンを共有し、権限や依存条件が衝突するタスクには別の環境を与えられる。三つは独立に改善できる。</p>
+
+<h2 id="time-between-turns">マシンを返せる待ち時間を特定する</h2>
+<p>GitHub Copilot の本番トレースを使った研究が規模感を示す。2026年6月に抽出した約1,300万セッションを調べたところ、複数ターンのセッションではユーザー待ちが総時間に占める割合の中央値は80.1%だった。これは対話のターン間の時間である。回収できるサンドボックス時間に換算するには、バックグラウンド処理の有無も知る必要がある。<a class="source-ref" href="#ref-traces">[2]</a></p>
+<p>レポートに戻る。集計条件の確認待ちでスクリプトが終了し、結果がディスクにあれば回収しやすい。モデル呼び出しと進行管理がサンドボックス外なら次のコマンドの生成中にも資源を返せるかもしれない。一方、ユーザーがレポートを読んでいても、裏のブラウザーは PDF を出力中かもしれない。CPU が数秒ほぼゼロでも停止すれば出力は途切れる。</p>
+<p>前景コマンド、バックグラウンドジョブ、公開を続けるプレビューを実行サービスで記録したい。「人の確認待ち」など理由の分かる停止は進行管理側で示す。短いコマンド間はウォーム状態を維持し、長い待ちが明らかなら早めに回収する。Lester の標準アイドル閾値は30分。Google の Agent Substrate は休止 API をいつ呼ぶかをアプリに委ねる。自分の環境で呼び出し間隔の分布を測り、短い休止に許す再開待ちを決めよう。<a class="source-ref" href="#ref-lester">[1]</a> <a class="source-ref" href="#ref-google-cost">[3]</a></p>
+
+<h2 id="worker-pool">Google は一つの Pod に複数のサンドボックスをどう収容するか</h2>
+<p>Google には名前の似た二つの設計がある。Agent Sandbox on GKE は Sandbox ごとに専用 Pod を割り当てる。ここで扱う <strong>Agent Substrate</strong> はさらに一層を設ける。Kubernetes は Worker Pod を配備し、一つの Worker に複数の Actor が同時に載る。Actor は安定した識別子を持ち、それぞれ gVisor または microVM で隔離する。gVisor 構成では Worker が <code>runsc</code> を呼んでサンドボックスを管理する。Kubernetes が Worker Pod を配置し、Substrate は仕様と残容量に応じて Actor を配置する。<a class="source-ref" href="#ref-architecture">[4]</a> <a class="source-ref" href="#ref-sizing">[5]</a> <a class="source-ref" href="#ref-gke">[6]</a></p>
+<p>二つの設計を重ねよう。レポートの利用者に長く有効な作業環境 ID を与え、実行時に Actor に対応付ける。初回の作図は Worker A、後続のコマンドは Actor ID で A に戻す。休止後の空きは他の人が使える。次の作図では互換性と空きのある Worker B が引き継げる。クライアントは作業環境 ID だけを保持する。Substrate の制御面は Actor と Worker の対応を PostgreSQL に記録する。Lester の個人作業環境をこのプールにつなぐ部分は私の設計案だ。<a class="source-ref" href="#ref-architecture">[4]</a></p>
+<p>プール化は障害と権限の単位も変える。20個の稼働 Actor を載せた Worker が失われれば、同時に最大20件の復元要求が生じる。マシン当たりの密度によって、単一障害用に必要な余力も決まる。ネットワーク上の主体も Actor に追従させる。Google は個別の ID を割り当て、出口ゲートウェイで ID に応じて認証情報を付与できる。同じ Pod にいる二人がそれぞれの権限で外部サービスを利用できる。<a class="source-ref" href="#ref-gke">[6]</a></p>
+
+<h2 id="capacity">300の作業環境にマシンは何台必要か</h2>
+<p>各ユーザーが10分に一度ちょうど1分間ツールを実行し、その後1分間環境を保持するとする。サンドボックス一つに約束した資源を与えられる容量を「枠」と呼ぶ。1周期の占有は <strong>300 × 2 ＝ 600 枠・分</strong>で平均60枠。この平均だけで調達すれば、開始時刻の偏りを見落とす。</p>
+
+<figure class="pool-lab" id="pool-lab">
+  <figcaption><strong>仕事量は同じ、二通りの開始パターン</strong><span>300人が10分周期で開始する。各タスクは1分実行し、各ワーカーノードの容量は12枠。</span></figcaption>
+  <p class="pool-fallback" data-pool-fallback>実行後1分間保持し、毎分30人ずつ開始すれば、ピークは60枠、5台。全員が最初の1分に開始すればピークは300枠、25台。平均はどちらも60枠。</p>
+  <div data-pool-interactive hidden>
+    <div class="pool-controls">
+      <fieldset><legend>タスクの開始時刻</legend><div class="pool-options">
+        <label><input type="radio" name="pool-arrivals" value="spread" checked><span>毎分30人</span></label>
+        <label><input type="radio" name="pool-arrivals" value="burst"><span>300人同時開始</span></label>
+      </div></fieldset>
+      <div class="pool-keep"><label for="pool-grace">実行後の保持時間 <output for="pool-grace" id="pool-grace-value">1分</output></label><input type="range" id="pool-grace" min="0" max="4" value="1" step="1"></div>
+    </div>
+    <dl class="pool-totals" aria-live="polite" aria-atomic="true">
+      <div><dt>平均占有数</dt><dd><strong data-pool-mean>60</strong> 枠</dd></div>
+      <div><dt>ピーク占有数</dt><dd><strong data-pool-peak>60</strong> 枠</dd></div>
+      <div><dt>ピーク時のノード数</dt><dd><strong data-pool-nodes>5</strong> 台</dd></div>
+    </dl>
+    <div class="pool-key"><span><i class="pool-active-key"></i>ツール実行中</span><span><i class="pool-warm-key"></i>実行後の保持時間</span></div>
+    <div class="pool-plot">
+      <div class="pool-axis" aria-hidden="true"><span>300</span><span>150</span><span>0</span></div>
+      <ol class="pool-series" role="list" data-pool-series aria-label="1分目から10分目までの枠の占有数"></ol>
+    </div>
+    <span class="pool-x-label">周期内の経過分</span>
+  </div>
+</figure>
+
+<p>連続するタスクを10分周期に単純化し、ウォーム状態は次の周期に持ち越す。各サンドボックスが 1 vCPU と 2 GiB を専有し、システムとランタイムの分を引いて各ノードに 12 vCPU と 24 GiB が残るなら、Worker 一つに12個載る。分散開始と一斉開始のピークはそれぞれ5台と25台。待ち行列なしを仮定し、制御面、障害用予備、ノード起動時間は含めていない。単価と実機性能は別途測定する。</p>
+<p>Google が11月16日に公開したモデルは節約効果が薄れる条件も示す。 <code>us-central1</code> のオンデマンド料金で、100個のコーディングエージェントについて、1セッション1常駐 Pod を基準に比較した。同じ CPU 保証と勤務時間なら、一人毎時2プロンプトで休止によるノード費削減は約40%。毎時4回では約4%に縮む。勤務時間外はプールをゼロにする想定だ。比較では CPU 保証をそろえ、オーバーコミットによる節約を休止の成果に加えないようにしたい。<a class="source-ref" href="#ref-google-cost">[3]</a></p>
+<p>二つの指標を別々に記録したい。一つ目は<strong>解放した枠・分</strong>で、ほかのタスクが使える分に価値がある。二つ目は<strong>支払わずに済んだノード時間</strong>で、ノード一台分の課金を止めたとき初めて請求に現れる。各マシンに長時間タスクが一つずつ散らばると、この二つは大きく乖離する。新規タスクを既存の空きに詰め、撤去予定 Worker はドレインし、分散した空きを一台分にまとめる。個々の空き時間で回収できる価値を、スナップショットの書き込み、保管、読み戻しの増分費用と比べる。利益が出ても、復元がユーザーの待てる時間内に終わらなければならない。</p>
+
+<h2 id="portable-state">Worker を交換するときレポートは何を持ち出すか</h2>
+<p>実行層が「ステートレス」かを判断するにはマシン交換を試す。Worker A を失った状態で同じユーザーを B に送り、何を取り戻せるか確かめる。稼働中のサンドボックスにはメモリもプロセスもある。重要な状態の唯一のコピーを Worker の外に出すことで、ホストを交換可能にできる。</p>
+<div class="pool-table" role="region" aria-label="マシン交換後の状態別の復元方法" tabindex="0">
+<table><thead><tr><th scope="col">ユーザーが続けたい作業</th><th scope="col">永続化するもの</th><th scope="col">B での続け方</th></tr></thead><tbody>
+<tr><th scope="row">保存済みレポートを編集</th><td>作業ファイルとコミット済み成果物の版</td><td>ユーザーの永続ボリュームを再マウントするか、コミット済みの版を開く</td></tr>
+<tr><th scope="row">同じライブラリで別のグラフを描く</th><td>ベースイメージの版、依存ロックファイル、個別に加えた変更</td><td>読み取り専用レイヤーを再利用し、ロックファイルから不足分を補う。キャッシュは再構築可能</td></tr>
+<tr><th scope="row">メモリ上の df の操作を続ける</th><td>互換性があるプロセス・メモリのスナップショットと対応するファイルの版</td><td>条件が合えばインタープリターを復元。不一致なら再起動し、ファイルから再計算</td></tr>
+<tr><th scope="row">レポートが公開されたか確認</th><td>タスク記録、操作 ID、外部サービスの受領記録</td><td>外部サービスと結果を照合し、成果物を元の会話にひも付ける</td></tr>
+</tbody></table></div>
+<p><strong>ファイルの信頼性は「保存した」と伝えるタイミングで決まる。</strong>唯一のコピーがノードにあり、終了時に S3 に送る構成では、保存通知の直後に障害が起きると、その書き込みはスナップショットにすら入らない。確認済みファイルがノード喪失に耐えると約束するなら、成功を返す前に永続化する。EFS Regional の文書は、同期書き込みやファイルのクローズ後の AZ 間での永続性を明記している。ファイルツールは所定のコミット条件を満たしてから応答する。Bash から実行されたプログラムのユーザー空間バッファにあるデータは、実際のフラッシュを待つ必要がある。<a class="source-ref" href="#ref-efs">[7]</a></p>
+<p>多くの作業が数本のスクリプトの修正と少数の成果物の公開なら、成果物を版付きでオブジェクトストレージに置き、成功後にその版を指すマニフェストをコミットする方が軽い。端末を開き、名前を変え、実行中にも編集するなら永続ファイルシステムが合う。両立もできる。編集用ファイルは外付けの作業ボリューム、公開版とバックアップはオブジェクトストレージに置けば、数百 MiB の参照データを休止のたびに移さずに済む。</p>
+<p><strong>プロセスの継続性は別に費用を見積もる。</strong>Agent Substrate は条件に応じてメモリ、ルートファイルシステムの変更、永続ディレクトリを復元できる。ハードウェアやランタイムが非互換ならファイルを残してプロセスを再起動できる場合があり、テンプレート更新時は永続ディレクトリだけを戻す場合もある。外部 CSI ボリュームは元のストレージから再マウントする。同期休止はリモート転送完了を待つが、非同期ではリモートコピーが一時的に <code>PENDING</code>の状態でもよい。マシンを撤去するかの判断には、別のホストで復元可能な最新の版を使う。<a class="source-ref" href="#ref-gke">[6]</a> <a class="source-ref" href="#ref-sizing">[5]</a> <a class="source-ref" href="#ref-snapshots">[8]</a></p>
+<p>逆向きにも落とし穴がある。スナップショット内の <code>df</code> が月曜日の値で、再マウントした作業環境が別のタスクにより火曜日のデータに更新されていたら、復元に成功しても計算を誤る。入力ファイルか作業環境のコミット版をマニフェストに記録したい。不一致ならインタープリターを起動し直し、再計算の理由を示す。ファイルの永続性とプロセスの復元性は別の契約であり、両者をつなぐには整合した一時点が要る。</p>
+
+<h2 id="handoff">旧 Worker から遅れて届いた書き込み</h2>
+<p>A がレポートを書いている途中で通信が切れ、制御面にハートビートが届かず、B が作業環境を引き継いだとする。10秒後、A は古いファイルハンドルを持ったまま再接続する。両者に書き込み権限があれば、新しいルーティングが有効でも A は B の編集を上書きできる。</p>
+<p>Lester はユーザー単位の PostgreSQL トランザクションロックで、複数の API レプリカが同時に Computer を作るのを防いでいる。引き継ぎでは生き残った旧所有者にも対処が要る。交代のたびに単調増加する世代番号を与える。A は41、B は42。公開サービスはコミット時に現在の世代を確認し、遅れてきた41を拒否する。これが fencing token だ。Bash が書き込み可能な NFS に直接書く経路は検査を通らない。旧ノードの書き込みを先に遮断するか、世代別コピーに書いて公開時に世代を照合する。DB のリース更新だけでは開いたままのハンドルを制御できない。<a class="source-ref" href="#ref-lester">[1]</a> <a class="source-ref" href="#ref-fencing">[9]</a></p>
+<p>遅れるのは外部の受領通知も同じだ。公開先が受理した後、応答前に A が切断された。B がスナップショットから公開を再生すれば、読者に二通届くかもしれない。公開ごとに永続タスク記録で安定した操作 ID を割り当て、外部 API が対応すれば再利用して重複を防ぎ、受領結果を記録する。冪等性も照会もない操作は「結果の確認待ち」にしておく。Lester は GitHub 公開時の受領記録を永続化し、結果が不明な書き込みは先に照合する。安心して「続ける」を押せるかどうかには、端末を残すこと以上にこの点が効く。<a class="source-ref" href="#ref-lester">[1]</a> <a class="source-ref" href="#ref-retries">[10]</a></p>
+
+<h2 id="first-result">スケールアウト時、最初の有用なコマンドは何秒で終わるか</h2>
+<p>午前9時に100の作業環境が一斉に起動する。それぞれが遠隔ストレージから 128 MiB の圧縮スナップショットを取得し、全件を10秒で読み終えるにはネットワークだけで <strong>1.25 GiB/s</strong> の実効帯域が要る。展開とランダム読み取りはまだ含まない。CPU に空きのある Worker を増やしても共有帯域が復元を制限する。一斉縮退でもスナップショット書き込みが集中する。Google の容量ガイドは帯域、ノードのディスク、同時アップロード数を別々に見積もる。<a class="source-ref" href="#ref-sizing">[5]</a></p>
+<p>E2B のオープンソースランタイムは別の設計を選ぶ。テンプレートは起動済み Firecracker microVM のスナップショットで、メモリページは初回アクセス時に読み込み、ルートファイルシステムは読み取り専用イメージ上のコピーオンライトである。 <code>ls</code> だけならすぐ開始できるが、大きなライブラリを初めて読み込んで作図するときにページフォールトや遠隔読み取りが集中することがある。「復元要求から準備完了まで」「最初の有用なコマンドが完了するまで」の P95 を両方測り、コールドノードで実際のレポートスクリプトを試したい。<a class="source-ref" href="#ref-e2b">[11]</a></p>
+<p>観測結果で打ち手は変わる。空き枠が尽きて仕事が並べば Worker を増やし、新しい Worker Pod を収容できなくなればノードプールを広げる。枠が余っていても復元が詰まるなら遠隔帯域とノードキャッシュのヒット率を見る。縮退時は対象 Worker への新規割り当てを止め、処理中のジョブが終わるか必要なスナップショットがリモートから復元可能になってから撤去する。</p>
+<p>次の Lester ならユーザー単位の作業環境を維持し、確認済みファイルと公開の受領記録をホスト交換後も検証できるようにする。ツールの開始・終了、バックグラウンド処理、復元時間を一週間集め、最も忙しい数分で容量を決め、一週間のノード時間で費用を計算する。ファイルから再計算できるレポートは安価な再起動、メモリを残したい Notebook だけはスナップショットを選ぶ。空きの回収益が第二のスケジューラーを維持する費用に見合う段階で、複数サンドボックス Worker を導入する。</p>
+<p>受け入れ試験には冒頭のレポートを使う。ユーザーはデータを確認してから戻り、同じ入力を指定する。別のワーカーノードで正しい図ができ、一度だけ公開される。さらに、明け渡した10分間の容量が請求にも表れれば、より多くのユーザーへ展開する根拠になる。</p>
+
+<section class="research-sources">
+<h2 id="sources">資料とソースコード</h2>
+<p>資料の確認日は2026年11月19日。容量図は本文の仮定を使い、Google のノード費用は公開モデルに基づく。</p>
+<ol>
+<li id="ref-lester">Lester のユーザー単位の Computer、会話ディレクトリ、Docker のライフサイクル。<a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/docs/architecture.md#computers-and-sandboxes">アーキテクチャ解説</a> · <a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/backend/migrations/000002_user_sandboxes.up.sql">ユーザーの一意制約</a> · <a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/backend/internal/sandbox/docker.go#L68-L169">Docker バックエンドのソース</a></li>
+<li id="ref-traces">Banruo Liu らによる Copilot 本番トレースの測定。図12参照。<a href="https://arxiv.org/html/2608.00101v1">Agentic Coding in the Wild</a></li>
+<li id="ref-google-cost">勤務時間外の縮退、CPU 保証、プロンプト頻度を扱う Google の費用モデル。<a href="https://developers.googleblog.com/en/agents-are-sessions-not-requests-size-gke-node-pools-for-ai-agent-sessions/">GKE コーディングエージェントのノード費用モデル</a></li>
+<li id="ref-architecture">Agent Substrate の Actor 配置、制御面、ノードの構成。<a href="https://ate.dev/docs/concepts/architecture/">Agent Substrate のアーキテクチャ</a></li>
+<li id="ref-sizing">Google による Worker 密度、スナップショット帯域、ノードのドレインの見積もり。<a href="https://docs.cloud.google.com/kubernetes-engine/docs/how-to/design-substrate-infrastructure">GKE インフラ容量ガイド</a></li>
+<li id="ref-gke">Google による二つのサンドボックス構成、Actor の ID、段階的な復元の説明。<a href="https://docs.cloud.google.com/kubernetes-engine/docs/concepts/machine-learning/agent-workloads">GKE エージェントワークロードの構成</a></li>
+<li id="ref-efs">AWS による Regional ファイルシステムの同期書き込み、クローズ、永続性の説明。<a href="https://docs.aws.amazon.com/efs/latest/ug/features.html">Amazon EFS のデータ整合性</a></li>
+<li id="ref-snapshots">Agent Substrate のリモートスナップショットの状態と互換条件。<a href="https://ate.dev/docs/reference/api-guide/">Agent Substrate API ガイド</a></li>
+<li id="ref-fencing">Martin Kleppmann による期限切れリースとストレージ側の世代確認の解説。<a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">How to do distributed locking</a></li>
+<li id="ref-retries">操作 ID、外部への副作用、結果の照合。<a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/">AWS の冪等 API 設計</a> · <a href="https://github.com/biubiuqiu/lester-agent/blob/c8d46d374cdaffe1355379767677fccbfee76493/docs/github-code-tasks.md">Lester の GitHub 公開受領記録</a></li>
+<li id="ref-e2b">E2B によるテンプレートスナップショット、デマンドページング、コピーオンライトのルートファイルシステムの実装解説。<a href="https://github.com/e2b-dev/runtime#why-its-fast">E2B Runtime</a></li>
+</ol></section>

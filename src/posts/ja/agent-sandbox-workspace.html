@@ -1,0 +1,94 @@
+<p class="article-lead">モデルは分析用のコードを書ける。では、そのコードはどこで動くのか。生成したファイルはどこに置かれ、次のステップでも見つけられるのか。質問に答える段階からタスクを完遂する段階へ進むには、長いコンテキストに加えて、計算し、結果を保存し、仮説を検証できる作業環境が必要になる。</p>
+<aside class="research-scope"><strong>本稿の範囲 · 2026-11-14</strong><p>タスクの実行を出発点に、公式文書を参照しながらサンドボックスを支える OS の仕組みを考える。図、ファイル名、インターフェースは説明用の例であり、実装案は特定製品の内部構造を示すものではない。各隔離技術の性能や安全性を比較する実験は行っていない。</p></aside>
+<nav class="article-toc" aria-label="目次"><strong>読み進め方</strong><a href="#why-compute">なぜ計算の場が必要か</a><a href="#sandbox-task">アニメーション：サンドボックスでタスクを実行する</a><a href="#workspace-parts">作業環境の構成</a><a href="#isolation">どこで隔離するのか</a><a href="#state-lifetime">ファイルが残れば、プロセスも残るのか</a><a href="#allocation">ユーザー単位か、セッション単位か</a><a href="#runtime-design">最小構成のランタイム</a><a href="#sandbox-sources">参考資料</a></nav>
+<h2 id="why-compute">1. モデルが提案した手順をどこで実行するか</h2>
+<p>たとえば、ユーザーが注文 CSV をアップロードし、金額を集計してレポートを作り、結果を確認してほしいと頼んだとする。モデルは列を理解し、集計条件を決め、Python を書ける。実データを使った集計結果にたどり着くには、さらにコードを実行する必要がある。</p>
+<p>モデル推論そのものも計算資源を使う。ここでいう<strong>計算環境</strong>とは、モデルがツール経由で使う外部の実行環境である。CPU がプログラムを実行し、メモリが処理中のデータを保持し、ファイルシステムが入力と成果物を保存し、OS がプロセスを管理する。モデルは通常ツールで実行を依頼し、Python は別のプロセスとして動く。</p>
+<p>エージェントに操作できるコンピューターを一台渡すと考えればよい。スクリプトを置き、実行し、エラーを読み、修正して再実行し、実在するファイルを届けられる。サンドボックスに残る成果物、ログ、終了ステータスが次の判断の根拠になる。</p>
+<div class="sandbox-overview" aria-label="モデル、ランタイム、作業環境の関係"><section><span>次の一手を決める</span><h3>モデル</h3><p>目標の解釈、ツール呼び出しの生成、結果の解釈を担う。</p></section><div class="sandbox-link" aria-label="ツール要求と実行結果の往復">ツール要求 ↓<br>観測結果 ↑</div><section><span>ツールの契約を実行に移す</span><h3>エージェントランタイム</h3><p>作業環境を特定し、権限を確認し、処理を配信して状態を記録する。</p></section><div class="sandbox-link" aria-label="ランタイムが操作を作業環境に送る">操作を配信 ↓<br>結果と成果物 ↑</div><section class="sandbox-overview-space"><span>計算を実行する</span><h3>制約付きの作業環境</h3><p>ファイル、プロセス、依存関係、資源、アクセス境界。</p></section></div>
+<h3>1.1 すべてのデータをモデルに計算させない理由</h3>
+<p>走査、並べ替え、集計、形式変換の手順が明確なら、モデルが規則を書き、プログラムが各行に適用する方が適している。大きなファイルの合計を求めるだけなら、全行をモデルのコンテキストに通す必要はない。</p>
+<p>Anthropic のコード実行に関する記事でも、実行環境でデータを絞り込んで変換し、必要な結果だけをモデルに返す方法を紹介している。操作間の中間状態はファイルに保持できる。<a class="source-ref" href="#sb-source-1">[1]</a> つまり、<strong>作業環境はコンテキストの外にも広がっている</strong>。モデルには集計、サンプル、失敗情報を渡し、入力全体と成果物は別の場所に置ける。</p>
+<p>実行できたことは正しさの証明にはならない。金額を文字列として連結するのか数値として足すのか、返金を控除するのか、単位は何か。すべてタスクの定義とコードに依存する。集計条件を決めてから、実行して結果を確かめる。</p>
+<h3>1.2 固定のツールを百個用意するだけではいけないのか</h3>
+<p>注文照会や予定の登録など、境界が明確な業務には固定ツールが向く。一方、作業環境では、新しい形式を解析し、フィルタースクリプトを書き、既存ライブラリで文書を変換し、結果を別のツールに渡すといった手順をその場で組み合わせられる。要望が増えるたびに新しい API を待つ必要がない。</p>
+<p><strong>すべてのエージェントに専用サンドボックスが必要なわけではない。</strong>許可済みの業務 API を選んで組み合わせるだけなら、実行はツールサーバーで完結する。動的なコード、大きなファイル、複数ステップにまたがる成果物、常駐プロセスを扱うとき、専用環境が生きてくる。MCP などのプロトコルが定めるのは接続と呼び出しの取り決めであり、実行するマシンは別に必要だ。</p>
+<h2 id="sandbox-task">2. 依頼から納品できるファイルまでを追う</h2>
+<figure class="context-demo sandbox-lab" id="sandbox-task-demo" data-sandbox-demo="task"><figcaption><span class="demo-kicker">ステップごとのアニメーション／実例</span><h3>図1　モデルが計画し、作業環境が実行し、結果がモデルに戻る</h3><p>「次へ」または「再生」を選ぶ。例の CSV には 120、80、300 の注文が3件あり、合計は500。アニメーションは手順の説明で、実際のコマンドは実行しない。</p></figcaption><div class="sandbox-stage-list"><span>理解</span><span>準備</span><span>計算</span><span>照合</span></div><div class="sandbox-task-panels"><section><h4>モデル／ランタイム</h4><div class="sandbox-thought">ユーザーの依頼：注文金額を集計し、サマリーファイルを作成する。</div></section><section class="sandbox-workbench"><h4>作業環境 · workspace-demo</h4><div class="sandbox-file-list">入力：orders.csv</div><div class="sandbox-process">プロセス：未起動</div></section></div><div class="sandbox-observation"><strong>モデルに返る観測結果</strong><pre>未実行。集計が終わったとはいえない。</pre></div><div class="demo-controls" hidden><button type="button" data-sandbox-action="prev">← 前へ</button><button type="button" class="demo-play" data-sandbox-action="play">再生</button><button type="button" data-sandbox-action="next">次へ →</button><button type="button" data-sandbox-action="reset">リセット</button><span class="demo-count">1 / 4</span></div><p class="demo-explanation" aria-live="polite">集計条件を決めてから実行環境を呼び出す。</p></figure>
+<p>この例では、モデルが全行を暗算する必要はない。それでもデータを理解し、適切なプログラムを提案し、実行結果に応じて調整する必要がある。エラーも新しい観測結果だ。正常終了後も、ファイルの存在、行数、集計条件を確認する。</p>
+<pre><code># カレントディレクトリに orders.csv があり、金額は整数の人民元とする
+import csv
+from pathlib import Path
+
+with open("orders.csv", newline="", encoding="utf-8") as f:
+    rows = list(csv.DictReader(f))
+
+total = sum(int(row["amount"]) for row in rows)
+Path("summary.csv").write_text(
+    f"order_count,total_amount\n{len(rows)},{total}\n",
+    encoding="utf-8",
+)
+print({"order_count": len(rows), "total_amount": total})</code></pre>
+<p>このデータで期待する結果は3件、500元。実データに小数金額、欠損値、重複注文、複数通貨が含まれるなら、それぞれの処理規則と検証が要る。例には本番用の検証を含めていない。生成したファイルはまだ作業環境にあり、ダウンロードや成果物 API を通してユーザーに届ける必要がある。</p>
+<h2 id="workspace-parts">3. この「コンピューター」は何を提供するのか</h2>
+<p>ディレクトリにはファイルを置ける。しかし、プロセスの実行場所、依存関係の供給元、接続できるネットワーク、資源の制限主体はディレクトリだけでは決まらない。作業環境を五つの機能に分けてみよう。</p>
+<figure class="context-demo sandbox-lab" id="sandbox-parts-demo" data-sandbox-demo="parts"><figcaption><span class="demo-kicker">構成図／選択して詳細を表示</span><h3>図2　ディレクトリを支える実行・管理機能</h3><p>カードを切り替えると、各機能で可能になることと、別途設計が必要な保証を確認できる。</p></figcaption><div class="sandbox-part-tabs" hidden></div><div class="sandbox-part-card"><h4>ファイルシステム</h4><p>入力、スクリプト、中間結果、成果物をパスで特定できる。</p><div class="sandbox-part-example">/workspace/orders.csv</div><small>パスがあるだけでデータが永久保存されるわけではない。</small></div><p class="demo-explanation" aria-live="polite">複数の機能が組み合わさって作業環境が成立する。ディレクトリ名だけでは何も保証されない。</p></figure>
+<h3>3.1 ファイルシステムで中間状態を会話の外に置く</h3>
+<p>入力 CSV、分析スクリプト、グラフ、テストログにそれぞれパスを割り当てる。次のツール呼び出しは必要なファイルを読み、全内容をプロンプトに戻さずに続行できる。あるプログラムが CSV を出力し、別のプログラムがグラフにするなど、ファイルはプログラム間の受け渡しにも使える。</p>
+<p>同じパスでも中身は変わる。会話の要約にあるファイルが、すでに削除、上書き、移動されていることもある。復元後は以前の記述を信じ込まず、実際の状態を確認する。</p>
+<h3>3.2 プロセスによって実行中の作業を追跡できる</h3>
+<p>Python の実行、ブラウザーの起動、コンパイル、テスト待ちにはプロセスが関わる。PID、終了コード、標準出力、標準エラー、子プロセス、実行時間がある。長いコマンドの終了前にモデルが次の推論に進むこともあるため、ランタイムはタスク ID で追跡する。</p>
+<p>モデルと実行プロセスは別のマシンに置ける。ランタイムは管理された接続でコマンドを送り、出力を集めて返す。ブラウザー、GPU、大規模計算には個別の実行サービスを使ってもよい。全機能を一つのサンドボックスに入れる必要はない。</p>
+<h3>3.3 依存関係と資源から実行条件を見積もる</h3>
+<p>スクリプトには Python やライブラリが、ページの表示にはブラウザーが、動画処理にはコーデックが要る。ベースイメージが再利用できるソフトウェアを提供し、プロジェクトのファイルと設定を加えて作業環境になる。依存関係はバージョン、取得元、キャッシュも含めて設計し、ネットワーク経由のインストールが失敗する場合に備える。</p>
+<p>CPU、メモリ、ディスク容量、プロセス数、実行時間で仕事の規模が決まる。無限ループにホスト全体を占有させてはいけない。プログラムが起動できても、データセット全体を読み込むメモリが足りるとは限らない。</p>
+<h2 id="isolation">4. 作業環境にサンドボックスという境界を設ける理由</h2>
+<p>ここまでで、<strong>作業環境が役立つ理由</strong>が分かった。では、生成したプログラムがパスを誤ったり、資源を使いすぎたり、信頼できない内容を読み込んだりしたとき、影響はどこまで広がるだろう。</p>
+<p>専用計算環境とセキュリティ上の隔離境界は別の性質だ。通常のディレクトリとシェルでも作業はできるが、それだけで確実に隔離できるわけではない。サンドボックスではランタイムと OS が、見える資源、実行できる操作、影響の範囲を制限する。</p>
+<div class="sandbox-boundary" aria-label="作業環境のアクセス境界"><p class="sandbox-boundary-label">制約付き実行環境／概念図</p><div class="sandbox-boundary-inside"><strong>エージェントが生成したプログラム</strong><span>許可された作業ディレクトリを読み書き</span><span>制限された計算資源を利用</span><span>許可された外部サービスに接続</span></div><div class="sandbox-boundary-gate">OS または実行サービスがポリシーに従って境界を検査</div><div class="sandbox-boundary-outside"><span>他ユーザーのデータ</span><span>ホスト上の機密ディレクトリ</span><span>許可されていないネットワークと認証情報</span></div><small>これらの保護には明示的な設定と検証が必要だ。図に線を引いただけではアクセスを遮断できない。</small></div>
+<h3>4.1 各仕組みが受け持つ役割</h3>
+<div class="sandbox-table-scroll" role="region" aria-label="隔離機構の比較表。横にスクロールできます" tabindex="0"><table><thead><tr><th>仕組み</th><th>主な制約</th><th>そこからは保証できないこと</th></tr></thead><tbody><tr><td>Namespaces</td><td>プロセス、マウント、ネットワークなどの見え方と名前の範囲</td><td>namespace に入れば任意のコードを安全に実行できること</td></tr><tr><td>Cgroups</td><td>CPU、メモリ、プロセスなどの使用量計測と制限</td><td>メモリ制限でファイル読み取りやネットワーク接続まで制限できること</td></tr><tr><td>Capabilities / Seccomp / LSM</td><td>権限、許可するシステムコール、アクセス範囲の縮小</td><td>システムコールのフィルター一つでサンドボックスが完結すること</td></tr><tr><td>ファイル・ネットワークポリシー</td><td>マウント範囲、読み書き権限、外部接続先、出口</td><td>ファイルを隔離すればネットワークも自動的に隔離できること</td></tr></tbody></table></div>
+<p>Docker の文書は namespace と資源制御の役割を区別している。Linux の文書も、seccomp によるシステムコールのフィルタリングだけでは完全なサンドボックスにならないと明記している。<a class="source-ref" href="#sb-source-2">[2]</a><a class="source-ref" href="#sb-source-3">[3]</a> 技術名を一つ選んで終わりにせず、マウント、権限、ネットワークポリシーまで設計する必要がある。</p>
+<p>「ほかのディレクトリにアクセスしない」というプロンプトは行動指針だ。OS がアクセスを拒否して初めて実行上の境界になる。モデルが承認しても下位層は権限違反を拒否できる。また、ネットワーク要求を送れることと、リモートの業務データを変更する権限は別だ。</p>
+<h3>4.2 コンテナ、gVisor、microVM では境界を置く場所が違う</h3>
+<p>通常の Linux コンテナではプロセスがホストのカーネルを共有する。gVisor はユーザー空間に Linux 型のアプリケーションカーネルを実装し、 <code>runsc</code>  を通してコンテナツールと連携する。<a class="source-ref" href="#sb-source-4">[4]</a> Firecracker は KVM 上で microVM を動かし、ワークロードはゲストカーネルを使う。<a class="source-ref" href="#sb-source-5">[5]</a></p>
+<div class="sandbox-kernel-map" aria-label="実行境界の階層"><section><h4>通常のコンテナ</h4><span>タスクのプロセス</span><span>共有するホストカーネル</span></section><section><h4>gVisor</h4><span>タスクのプロセス</span><span>ユーザー空間のアプリケーションカーネル</span><span>ホストカーネル</span></section><section><h4>MicroVM</h4><span>タスクのプロセス＋ゲストカーネル</span><span>仮想化境界／VMM</span><span>ホストカーネル＋KVM</span></section></div>
+<p>図は論理階層の比較であり、システムコールの全経路を示すものではない。選定では互換性、ワークロード、起動・運用コスト、テナント間の信頼関係も考える。一律の性能順位は導けない。microVM にも出口制御は必要で、Firecracker はネットワークフィルタリングをホスト側に委ねている。<a class="source-ref" href="#sb-source-5">[5]</a></p>
+<p>ローカルのコーディング支援では既存の開発ディレクトリでコマンドを制限できる。一方、クラウドのエージェントには新しいリモート環境を用意できる。Claude Code の sandboxed Bash 文書が説明するのはファイルとネットワークの制約で、呼び出しごとに仮想マシンを新設するという意味ではない。<a class="source-ref" href="#sb-source-6">[6]</a></p>
+<h2 id="state-lifetime">5. どの状態が残るのかを明示する</h2>
+<p>会話、ファイル、プロセスは三種類の異なる状態だ。会話履歴があってもファイルが残った証拠にはならない。ファイルが残っていても、実行中の Python プロセス、メモリ上の変数、ブラウザー接続は失われているかもしれない。</p>
+<figure class="context-demo sandbox-lab" id="sandbox-state-demo" data-sandbox-demo="state"><figcaption><span class="demo-kicker">復元方式の比較／実例</span><h3>図3　環境を作り直すと、ファイルとプロセスはどうなるか</h3><p>三つの設計を切り替えて比べる。ここでいう回収とは実行インスタンスを終了して再作成すること。元のプロセスを保持したまま凍結するだけの操作は含まない。</p></figcaption><div class="sandbox-state-tabs" hidden></div><div class="sandbox-state-grid"><div><span>会話履歴</span><strong data-state-chat>独立して保存</strong></div><div><span>作業ファイル</span><strong data-state-files>消失する可能性あり</strong></div><div><span>メモリとプロセス</span><strong data-state-process>再起動</strong></div></div><p class="demo-explanation" aria-live="polite">一時ディレクトリはインスタンスとともに破棄される。会話履歴が残っても、別途保存していないファイルは復元できない。</p></figure>
+<p>Kubernetes の文書では、Pod と寿命をともにする一時ボリュームと、個々の Pod より長く残る永続ボリュームを区別している。<a class="source-ref" href="#sb-source-7">[7]</a> 作業環境の回収方針とストレージの方針は合わせて設計する。</p>
+<p>重要なファイルを永続化し、アイドル時は計算資源を解放し、次回はストレージを再マウントしてプロセスを新しく起動する方式がある。別の方式では checkpoint/restore で実行状態も保存する。gVisor はこれに対応するが、復元にはファイルシステムの整合性、ネットワーク接続、環境の互換性も関係する。任意のマシンであらゆる状態をそのまま再現できるわけではない。<a class="source-ref" href="#sb-source-8">[8]</a></p>
+<p><strong>私の見方。</strong>一時停止、プロセスのスナップショット、ファイル永続化、オブジェクトストレージへのアーカイブ、バックアップは用途が異なる。終了時のアップロードはアーカイブには使えるが、その前に突然停止した場合の書き込みは守れない。どこまでデータ損失を防ぐかを約束するには、書き込み確認の時点、永続化経路、想定障害、復旧目標を明確にする。終了フックだけでは足りない。</p>
+<h2 id="allocation">6. ユーザーごとに一つか、セッションごとに一つか</h2>
+<p>これはプロダクトと資源管理の選択であり、モデルが決める構造ではない。<strong>サンドボックス、コンテナ、Pod、作業ディレクトリの間に必然的な一対一対応はない。</strong>一つのスケジューリング単位に複数の隔離インスタンスを収容できる。それを採用するかは隔離機構とプラットフォーム設計次第だ。</p>
+<div class="sandbox-table-scroll" role="region" aria-label="作業環境の割り当て方式。横にスクロールできます" tabindex="0"><table><thead><tr><th>割り当て方式</th><th>利点</th><th>設計上の課題</th></tr></thead><tbody><tr><td>呼び出しごとの一時環境</td><td>片付けが簡単で、独立した小規模計算に向く</td><td>ステップ間で状態を明示的に受け渡す。依存関係の準備が重複しうる</td></tr><tr><td>セッションごとの作業環境</td><td>タスクの状態が明確で、セッション同士を分けやすい</td><td>インスタンスが増え、依存関係とファイル共有の設計が必要</td></tr><tr><td>ユーザーごとの作業環境</td><td>個人ファイルと依存関係を再利用できる</td><td>同時セッションがファイル、ポート、依存バージョン、バックグラウンドプロセスを取り合う</td></tr></tbody></table></div>
+<p><strong>実装案。</strong>長期的なファイル所有権を短命な実行インスタンスから切り離す。ユーザーに永続的なファイル領域を持たせ、タスクには制約付きの作業ディレクトリか独立した実行インスタンスを割り当てる。セッションごとのサブディレクトリは整理には役立つが、ディレクトリ間のアクセス制限はランタイムと OS が実施する必要がある。</p>
+<h2 id="runtime-design">7. 作業環境にツール呼び出しをつなぐ</h2>
+<p>自分で実装するなら、モデルには安定したツールの意味を提示し、実機の特定はランタイムに任せる。たとえば次のようになる。</p>
+<pre><code>{
+  "workspace_id": "ws-demo",
+  "operation": "exec",
+  "command": ["python", "analyze.py"],
+  "cwd": "/workspace",
+  "timeout_ms": 30000,
+  "request_id": "run-demo-1"
+}</code></pre>
+<p>これは独自インターフェースの例だ。認証済みの主体を、その主体がアクセス可能な作業環境に結び付ける。クライアントから渡された ID だけではアクセスを認めない。<code>request_id</code>  も呼び出しを関連付ける識別子にすぎない。サーバーが重複排除と副作用の記録を規定して初めて、冪等性に使える。</p>
+<p>実行サービスは環境が準備できたか、コマンドが継続中か、終了コード、出力の切り詰め、成果物の場所、キャンセル後に子プロセスを片付けたかを答える。後続操作を正しい環境へ送るルーティングも要る。複数の実行者が引き継ぎ得るなら、リースなどの並行制御で二重実行を防ぐ。</p>
+<p>目標の解釈、モデルへの要求、コンテキスト選択、タスクの進行は外部ランタイムに置ける。サンドボックスは配信された計算とその状態を受け持つ。明確なインターフェースでつなぐことで個別に増減でき、障害がモデル、配信、実行のどこにあったかも追いやすい。</p>
+<p><strong>私ならこう検証する。</strong>入力を読み、スクリプトを書き、実行し、修正し、成果物を渡すまでを一つのタスクで試す。途中で計算インスタンスを停止し、保持すると約束したファイルが残っているか確かめる。出力超過、メモリ不足、タイムアウト、同時書き込みを起こし、実際の状態が返るか確認する。コンテナが起動したかを見るだけより、使える作業環境かどうかがよく分かる。</p>
+<p>エージェントにサンドボックスが必要だというとき、私が指しているのは、<strong>提案した手順を計算、ファイル、検証可能な結果に変えられ、操作の影響が明確な境界で制約される環境</strong>である。計算でできることが増え、保存した状態で複数のステップがつながり、観測で誤りを直せる。隔離によってそれらの能力を範囲を決めて提供できる。</p>
+<h2 id="sandbox-sources">参考資料</h2>
+<p>確認日：2026-11-14。以下の公式資料は各仕組みの説明に参照した。アニメーションとインターフェースは説明用の例や実装案であり、実行時の画面や製品ベンチマークではない。</p>
+<ol class="article-sources">
+<li id="sb-source-1"><a href="https://www.anthropic.com/research/code-execution-with-mcp" target="_blank" rel="noopener noreferrer">Anthropic · Code execution with MCP</a>：実行環境でのデータの絞り込み、プログラムの組み合わせ、中間状態の保存。</li>
+<li id="sb-source-2"><a href="https://docs.docker.com/engine/security/" target="_blank" rel="noopener noreferrer">Docker Engine security</a>：namespace、cgroup、権限制御の役割。</li>
+<li id="sb-source-3"><a href="https://docs.kernel.org/userspace-api/seccomp_filter.html" target="_blank" rel="noopener noreferrer">Linux Kernel · Seccomp BPF</a>：システムコールフィルターの役割と限界。</li>
+<li id="sb-source-4"><a href="https://gvisor.dev/docs/" target="_blank" rel="noopener noreferrer">gVisor · What is gVisor?</a>：アプリケーションカーネルと runsc。</li>
+<li id="sb-source-5"><a href="https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md" target="_blank" rel="noopener noreferrer">Firecracker · Design</a>：KVM、microVM、ホスト側ネットワーク、隔離の階層。</li>
+<li id="sb-source-6"><a href="https://code.claude.com/docs/en/sandboxing" target="_blank" rel="noopener noreferrer">Claude Code · Sandboxed Bash</a>：ローカルコマンドに適用するファイルとネットワークの境界。</li>
+<li id="sb-source-7"><a href="https://kubernetes.io/docs/concepts/storage/volumes/" target="_blank" rel="noopener noreferrer">Kubernetes · Volumes</a>：一時ストレージと永続ストレージのライフサイクル。</li>
+<li id="sb-source-8"><a href="https://gvisor.dev/docs/user_guide/checkpoint_restore/" target="_blank" rel="noopener noreferrer">gVisor · Checkpoint/Restore</a>：プロセス状態の復元と環境上の制約。</li>
+</ol>

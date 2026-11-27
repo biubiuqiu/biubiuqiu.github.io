@@ -6,7 +6,7 @@ import json
 import math
 import re
 from html.parser import HTMLParser
-from pathlib import Path
+from urllib.parse import quote
 import xml.etree.ElementTree as ET
 
 E = html.escape
@@ -44,7 +44,7 @@ class Outline(HTMLParser):
         if not any(t in ('nav','button','script','style','pre') for t,c in self.stack): self.text.append(data)
 
 
-def enrich(content):
+def enrich(content, anchor_label, reading_rate):
     content = re.sub(r'<nav\b[^>]*class="article-toc"[^>]*>.*?</nav>', '', content, flags=re.S)
     parser = Outline(content); parser.feed(content)
     used = set(re.findall(r'\bid="([^"]+)"',content))
@@ -57,20 +57,30 @@ def enrich(content):
         old=content[h['start']:h['end']]
         opening=h['opening']
         if 'id=' not in opening: opening=opening[:-1]+' id="'+h['id']+'">'
-        suffix='<a class="heading-anchor" href="#'+E(h['id'],quote=True)+'" aria-label="链接到：'+E(h['label'],quote=True)+'">#</a>'
+        suffix='<a class="heading-anchor" href="#'+E(h['id'],quote=True)+'" aria-label="'+E(anchor_label + h['label'],quote=True)+'">#</a>'
         content=content[:h['start']]+opening+old[len(h['opening']):-len('</'+h['tag']+'>')]+suffix+'</'+h['tag']+'>'+content[h['end']:]
     text=' '.join(parser.text)
     # Mixed-language count: one CJK character or one Latin/number word is a unit.
     count=len(re.findall(r'[\u3400-\u9fff\u3040-\u30ff]|[A-Za-z0-9]+(?:[\x27-][A-Za-z0-9]+)*',text))
-    return content,parser.headings,count,max(1,math.ceil(count/300))
+    return content,parser.headings,count,max(1,math.ceil(count/reading_rate))
 
 
-def load_posts(root):
+def load_posts(root, language, ui):
     posts=json.loads((root/'src/posts.json').read_text())
+    directory = root / "src/posts"
+    if language != "zh-CN":
+        directory /= language
+        metadata = json.loads((directory / "metadata.json").read_text())
+        if set(metadata) != {p["slug"] for p in posts}:
+            raise ValueError(f"Incomplete article metadata: {language}")
+        for p in posts:
+            p.update(metadata[p["slug"]])
     for p in posts:
         if not p['original_datetime'].startswith(p['date']): raise ValueError('Original publication date mismatch')
-        raw=(root/'src/posts'/(p['slug']+'.html')).read_text()
-        p['content'],p['headings'],p['words'],p['minutes']=enrich(raw)
+        raw=(directory/(p['slug']+'.html')).read_text()
+        if language != "zh-CN":
+            raw = raw.replace('href="/writing/', f'href="/{language}/writing/')
+        p['content'],p['headings'],p['words'],p['minutes']=enrich(raw, ui["anchor"], 220 if language == "en" else 300)
         if not (root/p['cover'].lstrip('/')).is_file(): raise ValueError('Missing cover')
         if not (root/p.get('banner',p['cover']).lstrip('/')).is_file(): raise ValueError('Missing banner')
         for key in ('thumbnail', 'mobile_banner'):
@@ -79,71 +89,62 @@ def load_posts(root):
     return sorted(posts,key=lambda p:(p['date'],p['slug']),reverse=True)
 
 
-def tags_for(p, *, on_photo=False):
+def tags_for(p, home, *, on_photo=False):
     attributes = ' class="glass-control"' if on_photo else ''
-    return '<div class="post-tags">'+''.join('<a'+attributes+' href="/writing/?tag='+E(t,quote=True)+'"># '+E(t)+'</a>' for t in p['tags'])+'</div>'
+    return '<div class="post-tags">'+''.join('<a'+attributes+' href="'+home+'writing/?tag='+quote(t,safe='')+'"># '+E(t)+'</a>' for t in p['tags'])+'</div>'
 
 
 def title_phrases(title, class_name, separator='<wbr>'):
-    parts = re.split(r'(?<=[？：])', title, maxsplit=1)
+    parts = re.split(r'(?<=[？：])|(?<=[:?])\s+', title, maxsplit=1)
     return separator.join(f'<span class="{class_name}">{E(part)}</span>' for part in parts if part)
 
 
-def featured_writing(posts):
-    rows=[]
+def featured_writing(posts, home, ui):
+    rows = []
     for p in posts[:3]:
-        rows.append('<li><time datetime="'+p['date']+'">'+p['date']+'</time><div><a href="/writing/'+p['slug']+'/" lang="zh-CN">'+E(p['title'])+'<span aria-hidden="true"> ↗</span></a><p lang="zh-CN">'+E(p['excerpt'])+'</p><small class="featured-read-meta" lang="zh-CN">'+str(p['minutes'])+' 分钟阅读 · '+format(p['words'],',')+' 字</small></div></li>')
+        meta = ui["read_time"].format(n=p["minutes"]) + " · " + ui["units"].format(n=f'{p["words"]:,}')
+        rows.append(f'<li><time datetime="{p["date"]}">{p["date"]}</time><div><a href="{home}writing/{p["slug"]}/">{E(p["title"])}<span aria-hidden="true"> ↗</span></a><p>{E(p["excerpt"])}</p><small class="featured-read-meta">{E(meta)}</small></div></li>')
     return '<ul class="writing-rows">'+''.join(rows)+'</ul>'
 
 
-def build_writing(root,base_url,theme_menu_for,copy,posts):
-    bootstrap=(root/'src/theme-init.js').read_text();theme=theme_menu_for(copy)
+def build_writing(root, base_url, language, locales, menu_for, theme_menu_for, copy, ui, posts):
+    home = "/" + (locales[language]["path"] + "/" if locales[language]["path"] else "")
+    output = root / locales[language]["path"]
+    origin = base_url.rstrip("/")
+    locale_base = origin + home
+    templates = {name: (root / "src/writing" / (name + ".html")).read_text() for name in ("article", "filters", "page")}
+    common = {k: E(v) for k, v in (copy | ui).items()}
+    bootstrap = (root / "src/theme-init.js").read_text()
+    theme = theme_menu_for(copy)
     def shell(title,description,path,body,post=None,hero=''):
-        extras='' if post else '<link rel="stylesheet" href="/archive-filter.css?v=1">'
+        extras = '<link rel="stylesheet" href="/archive-filter.css?v=1">'
         if post:
             slug=post['slug']
             assets={'agent-context-management':(['context-demos'],['context-demos']), 'agent-tool-design':(['context-demos','tool-demos','parameter-demos'],['tool-demos','parameter-demos']), 'agent-sandbox-workspace':(['context-demos','sandbox-demos'],['sandbox-demos']), 'agent-sandbox-economics':(['sandbox-capacity'],['sandbox-capacity'])}
             css,js=assets.get(slug,([],[]))
-            extras=''.join('<link rel="stylesheet" href="/'+x+'.css?v=1">' for x in css)+''.join('<script src="/'+x+'.js?v=1" defer></script>' for x in js)
-            schema={'@context':'https://schema.org','@type':'BlogPosting','headline':post['title'],'description':description,'datePublished':post['date'],'author':{'@type':'Person','name':'Denis Wen','url':base_url},'mainEntityOfPage':base_url+path,'image':base_url.rstrip('/')+post['cover'],'wordCount':post['words'],'timeRequired':'PT'+str(post['minutes'])+'M','inLanguage':'zh-CN','keywords':post['tags']}
+            extras=''.join('<link rel="stylesheet" href="/'+x+'.css?v=1">' for x in css)+''.join('<script src="'+home+x+'.js?v=1" defer></script>' for x in js)
+            schema={'@context':'https://schema.org','@type':'BlogPosting','headline':post['title'],'description':description,'datePublished':post['date'],'author':{'@type':'Person','name':'Denis Wen','url':base_url},'mainEntityOfPage':locale_base+path,'image':origin+post['cover'],'wordCount':post['words'],'timeRequired':'PT'+str(post['minutes'])+'M','inLanguage':language,'keywords':post['tags']}
             if post.get('updated'): schema['dateModified']=post['updated']
-            extras+='<meta property="article:published_time" content="'+post['date']+'"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="'+base_url.rstrip('/')+post['cover']+'"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">'+json.dumps(schema,ensure_ascii=False).replace('<','\\u003c')+'</script>'
-        nav = ('<nav class="liquid-nav writing-nav" aria-label="文章导航">'
-               '<canvas class="liquid-optics" aria-hidden="true"></canvas>'
-               '<span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>'
-               '<a class="writing-index-link" href="/writing/"'+('' if post else ' aria-current="page"')+'>文章</a>'
-               '<a href="/atom.xml" aria-label="订阅 Atom RSS">RSS</a></nav>')
-        return '<!doctype html>\n<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed"><title>'+E(title)+' — Denis Wen</title><meta name="description" content="'+E(description,quote=True)+'"><link rel="canonical" href="'+base_url+path+'"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+E(title,quote=True)+'"><meta property="og:description" content="'+E(description,quote=True)+'"><meta property="og:url" content="'+base_url+path+'"><link rel="alternate" type="application/atom+xml" title="Denis Wen 的文章" href="/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml"><script>'+bootstrap+'</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=13"><link rel="stylesheet" href="/liquid-nav.css?v=3"><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=6" defer></script>'+extras+'</head><body class="writing-page '+('post-page' if post else 'archive-page')+'"><a class="skip-link" href="#main">跳到正文</a><header class="writing-header writing-width"><a class="writing-brand" href="/" aria-label="Denis Wen 首页">Denis Wen<span class="writing-brand-sub"> / 文章与笔记</span></a><div class="writing-controls">'+nav+theme+'</div></header>'+hero+'<main class="writing-width writing-main" id="main">'+body+'</main><footer class="writing-footer writing-width"><a href="/">← 返回主页</a><span>© Denis Wen · 保持好奇，持续探索。</span><a href="/atom.xml">RSS 订阅 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>'
+            extras+='<meta property="article:published_time" content="'+post['date']+'"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="'+origin+post['cover']+'"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">'+json.dumps(schema,ensure_ascii=False).replace('<',r'\u003c')+'</script>'
+        alternates = [f'<link rel="alternate" hreflang="{lang}" href="{base_url}{(meta["path"] + "/") if meta["path"] else ""}{path}">' for lang, meta in locales.items()]
+        alternates.append(f'<link rel="alternate" hreflang="x-default" href="{base_url}{path}">')
+        message_keys = "manual_copy link_copied share_copied share_failed copy_code copy_block copied code_copied results matches single_result single_match filter_count filters saved_position estimate remaining finished".split()
+        messages = json.dumps({key: ui[key] for key in message_keys}, ensure_ascii=False).replace("<", r"\u003c")
+        return templates["page"].format_map(common | dict(lang=language, home=home, title=E(title), description=E(description), canonical=locale_base+path,
+            alternates="\n".join(alternates), og_type="article" if post else "website", og_locale=locales[language]["og_locale"],
+            bootstrap=bootstrap, messages=messages, extras=extras, kind="post-page" if post else "archive-page",
+            index_current="" if post else ' aria-current="page"', locale_menu=menu_for(language, copy, path), theme_menu=theme, hero=hero, body_html=body))
     def card(p):
         image = E(p.get('thumbnail', p['cover']), quote=True)
-        return (f'<a class="related-card" href="/writing/{p["slug"]}/">'
+        return (f'<a class="related-card" href="{home}writing/{p["slug"]}/">'
                 f'<img src="{image}" alt="" width="480" height="360" loading="lazy" decoding="async">'
-                f'<span>{E(p["category"])} · {p["minutes"]} 分钟</span><strong>{E(p["title"])}</strong></a>')
+                f'<span>{E(p["category"])} · {ui["minutes"].format(n=p["minutes"])}</span><strong>{E(p["title"])}</strong></a>')
 
     categories = sorted({p['category'] for p in posts})
     tags = sorted({tag for p in posts for tag in p['tags']})
     category_options = ''.join(f'<option>{E(c)}</option>' for c in categories)
     tag_options = ''.join(f'<option>{E(t)}</option>' for t in tags)
-    filters = f'''<form class="archive-filters" id="archive-search" role="search" hidden>
-      <div class="filter-bar">
-        <label class="archive-search"><span class="sr-only">搜索文章</span>
-          <input type="search" name="q" placeholder="搜索标题、摘要或标签" enterkeyhint="search" autocomplete="off">
-        </label>
-        <button type="button" class="filter-toggle glass-control" aria-expanded="false" aria-controls="archive-options">
-          <span class="filter-adjust" aria-hidden="true"></span>筛选<span class="filter-count" hidden></span>
-        </button>
-      </div>
-      <div class="filter-panel" id="archive-options" hidden>
-        <div class="filter-field"><span class="filter-label" id="category-label">分类</span>
-          <select name="category" aria-labelledby="category-label"><option value="">全部分类</option>{category_options}</select></div>
-        <div class="filter-field"><span class="filter-label" id="tag-label">标签</span>
-          <select name="tag" aria-labelledby="tag-label"><option value="">全部标签</option>{tag_options}</select></div>
-      </div>
-    </form>
-    <div class="archive-state">
-      <p class="archive-result" role="status" aria-live="polite" aria-atomic="true">共 {len(posts)} 篇文章</p>
-      <button class="filter-clear" type="reset" form="archive-search" hidden>清除条件</button>
-    </div>'''
+    filters = templates["filters"].format_map(common | dict(category_options=category_options, tag_options=tag_options, initial_count=ui["results"].format(n=len(posts))))
     rows = []
     for index, p in enumerate(posts):
         slug = p['slug']
@@ -168,17 +169,19 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
                 illustration = f'<img class="issue-photo" src="{image}" alt="" width="480" height="360">'
         rows.append(f'''<li class="archive-card{feature_class}" data-search="{search}" data-category="{category}" data-tags="{card_tags}">
           <div class="card-meta"><span class="card-category">{category}</span><time datetime="{p["date"]}">{p["date"]}</time>
-            <span>{p["minutes"]} 分钟阅读</span></div>
+            <span>{ui["read_time"].format(n=p["minutes"])}</span></div>
           <div class="archive-entry">
-            <h2><a href="/writing/{slug}/">{title_phrases(p["title"], "card-title-phrase")}</a></h2>{introduction}
+            <h2><a href="{home}writing/{slug}/">{title_phrases(p["title"], "card-title-phrase")}</a></h2>{introduction}
           </div>
-          {tags_for(p)}{illustration}
+          {tags_for(p, home)}{illustration}
         </li>''')
-    intro = ('<div class="archive-masthead"><h1>文章与笔记</h1>'
+    intro = (f'<div class="archive-masthead"><h1>{common["writing_title"]}</h1>'
              + filters + '</div><ul class="archive-grid">' + ''.join(rows) + '</ul>'
-             '<div class="archive-empty" hidden><p>没有找到匹配的文章</p>'
-             '<button type="reset" form="archive-search">查看全部文章</button></div>')
-    routes=['writing/'];target=root/'writing/index.html';target.parent.mkdir(parents=True,exist_ok=True);target.write_text(shell('文章与笔记','Denis Wen 的 Agent 研究、技术实践与问题排查记录。','writing/',intro))
+             + f'<div class="archive-empty" hidden><p>{common["no_matches"]}</p><button type="reset" form="archive-search">{common["show_all"]}</button></div>')
+    routes = ["writing/"]
+    target = output / "writing/index.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(shell(copy["writing_title"], copy["writing_intro"], "writing/", intro))
     for index,p in enumerate(posts):
         is_research=p.get('kind')=='research'
         toc=[];section=0;sub=0
@@ -187,36 +190,45 @@ def build_writing(root,base_url,theme_menu_for,copy,posts):
             else:sub+=1;num=str(section)+'.'+str(sub)
             label=re.sub(r'^(?:[一二三四五六七八九十]+、|\d+(?:\.\d+)*[.、]?\s+)\s*','',h['label'])
             toc.append('<li class="toc-'+h['tag']+'"><a class="glass-row" href="#'+E(h['id'],quote=True)+'"><span class="toc-number">'+num+'</span><span>'+E(label)+'</span></a></li>')
-        sidebar='<aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>文章目录</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary><div class="toc-content"><nav aria-label="文章目录"><ol>'+''.join(toc)+'</ol></nav><div class="reading-status"><span data-remaining>预计 '+str(p['minutes'])+' 分钟</span></div><div class="toc-actions"><a href="/writing/">← 全部文章</a><a href="#article-top">↑ 回到顶部</a></div></div></details></aside>'
-        updated='<span>更新 <time datetime="'+p['updated']+'">'+p['updated']+'</time></span>' if p.get('updated') else ''
+        updated = f'<span>{ui["updated"]} <time datetime="{p["updated"]}">{p["updated"]}</time></span>' if p.get("updated") else ""
         hero_title = title_phrases(p['title'], 'hero-title-part', separator='')
         banner=p.get('banner',p['cover'])
         photo = '<img class="post-hero-photo" src="'+E(banner,quote=True)+'" alt="'+E(p.get('banner_alt',p['cover_alt']),quote=True)+'" style="object-position:'+E(p.get('banner_position','center'),quote=True)+'" width="1536" height="1024" fetchpriority="high">'
         source = (f'<source media="(max-width: 700px)" type="image/webp" srcset="{E(p["mobile_banner"], quote=True)}">'
                   if p.get('mobile_banner') else '')
         picture = f'<picture class="post-hero-media">{source}{photo}</picture>'
-        hero='<header class="post-hero" id="article-top">'+picture+'<div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">'+E(p['category'])+' / '+('文档与源码研究' if is_research else '旧文整理')+'</p><h1>'+hero_title+'</h1><div class="article-meta"><span>'+('发表于 ' if is_research else '原文发表于 ')+'<time datetime="'+p['original_datetime']+'">'+p['date']+'</time></span><span aria-hidden="true">·</span><span title="按每分钟约 300 字估算；动画和代码实践时间另计">约 '+str(p['minutes'])+' 分钟阅读</span></div>'+tags_for(p, on_photo=True)+'</div></header>'
-        byline = ('<div class="post-byline"><a href="/">Denis Wen</a>'
-                  f'<span>{p["words"]:,} 字</span>{updated}</div>')
-        metadata='<div class="article-intro"><nav class="article-breadcrumb" aria-label="面包屑"><a href="/">首页</a><span aria-hidden="true">/</span><a href="/writing/">文章与笔记</a><span aria-hidden="true">/</span><a href="/writing/?category='+E(p['category'],quote=True)+'">'+E(p['category'])+'</a></nav><p class="article-context">'+E(p['context'])+'</p>'+byline+'<div class="reading-resume" hidden><span>上次读到 <strong></strong></span><button type="button" data-resume>继续阅读 →</button><button type="button" data-dismiss-resume aria-label="忽略上次阅读位置">×</button></div></div>'
-        notice='' if is_research else '<aside class="article-notice"><strong>关于这篇旧文</strong><p>日期沿用原博客。本文保留当时的实践过程，整理了结构并补充适用范围说明，移除了具体环境信息和外部截图。原题：'+E(p['original_title'])+'。文中的示例不代表已经按当前环境重新验证。</p></aside>'
-        canonical=base_url+'writing/'+p['slug']+'/'
-        end='<section class="article-end"><p class="end-mark">— 全文完 —</p><div class="article-attribution"><strong>Denis Wen</strong><p>保持好奇，持续探索。记录 Agent、工程实践，以及沿途的思考。</p><small>本文链接</small><a class="canonical-link" href="'+canonical+'">'+canonical+'</a><p class="copyright-note">© Denis Wen · 转载文字请注明作者与原文链接；文中引用内容归原作者所有。</p></div><div class="article-share"><button type="button" data-copy-link>复制文章链接 ↗</button><button type="button" data-share>分享文章</button><a href="#article-top">回到顶部 ↑</a></div></section>'
-        prev=posts[index+1] if index+1<len(posts) else None;nextp=posts[index-1] if index else None
-        pager='<nav class="article-pagination" aria-label="上一篇与下一篇">'+('' if not prev else '<a href="/writing/'+prev['slug']+'/"><span>← 上一篇 · 较早</span><strong>'+E(prev['title'])+'</strong></a>')+('' if not nextp else '<a href="/writing/'+nextp['slug']+'/"><span>下一篇 · 较新 →</span><strong>'+E(nextp['title'])+'</strong></a>')+'</nav>'
+        kind = ui["research" if is_research else "archive"]
+        date_label = ui["published" if is_research else "original_date"]
+        read_time = copy["read_time_format"].format(minutes=p["minutes"])
+        hero = (f'<header class="post-hero" id="article-top">{picture}<div class="post-hero-shade" aria-hidden="true"></div>'
+                f'<div class="article-header post-hero-content"><p class="writing-eyebrow">{E(p["category"])} / {kind}</p>'
+                f'<h1>{hero_title}</h1><div class="article-meta"><span>{date_label} <time datetime="{p["original_datetime"]}">{p["date"]}</time></span>'
+                f'<span aria-hidden="true">·</span><span title="{ui["estimate_tip"]}">{read_time}</span></div>{tags_for(p, home, on_photo=True)}</div></header>')
+        notice = ""
+        if not is_research:
+            detail = common["archive_detail"].format(title=E(p["original_title"]))
+            notice = f'<aside class="article-notice"><strong>{ui["archive_note"]}</strong><p>{detail}</p></aside>'
+        pager = []
+        for position, label in ((index+1, "← " + ui["older"]), (index-1, ui["newer"] + " →")):
+            if 0 <= position < len(posts):
+                other = posts[position]
+                pager.append(f'<a href="{home}writing/{other["slug"]}/"><span>{label}</span><strong>{E(other["title"])}</strong></a>')
         candidates=sorted([q for q in posts if q!=p],key=lambda q:(len(set(q['tags'])&set(p['tags'])),q['date']),reverse=True)[:3]
-        related='<section class="article-related"><div class="related-heading"><h2>继续阅读</h2><a href="/writing/">全部文章 ↗</a></div><div class="related-grid">'+''.join(card(q) for q in candidates)+'</div></section>'
-        body='<div class="reading-progress-track" role="progressbar" aria-label="文章阅读进度" aria-valuenow="0" hidden><span></span></div><div class="article-layout">'+sidebar+'<div class="article-column" data-reading-minutes="'+str(p['minutes'])+'">'+metadata+'<article class="article-body" aria-label="文章正文">'+p['content']+'</article>'+notice+end+pager+related+'</div></div>'
-        path='writing/'+p['slug']+'/';target=root/path/'index.html';target.parent.mkdir(parents=True,exist_ok=True);target.write_text(shell(p['title'],p['excerpt'],path,body,p,hero));routes.append(path)
+        path = "writing/" + p["slug"] + "/"
+        body = templates["article"].format_map(common | dict(outline="".join(toc), initial_time=ui["estimate"].format(n=p["minutes"]), home_name=ui["home"],
+            home=home, reading_minutes=p["minutes"], category_url=home+"writing/?category="+quote(p["category"], safe=""), category_name=E(p["category"]),
+            context=E(p["context"]), word_count=ui["units"].format(n=f'{p["words"]:,}'), updated_time=updated,
+            content=p["content"], notice=notice, canonical=locale_base+path, pager="".join(pager), related_cards="".join(card(q) for q in candidates)))
+        target=output/path/'index.html';target.parent.mkdir(parents=True,exist_ok=True);target.write_text(shell(p['title'],p['excerpt'],path,body,p,hero));routes.append(path)
     ns='http://www.w3.org/2005/Atom';ET.register_namespace('',ns)
-    feed=ET.Element('{'+ns+'}feed')
+    feed=ET.Element('{'+ns+'}feed', {'{http://www.w3.org/XML/1998/namespace}lang': language})
     def node(parent,name,text=None,**attrs):
         x=ET.SubElement(parent,'{'+ns+'}'+name,attrs);x.text=text;return x
-    node(feed,'title','Denis Wen · 文章与笔记');node(feed,'id',base_url+'writing/');node(feed,'link',href=base_url+'writing/');node(feed,'link',href=base_url+'atom.xml',rel='self');node(feed,'updated',max(p.get('updated',p['date']) for p in posts)+'T00:00:00+08:00')
+    node(feed,'title','Denis Wen · '+copy['writing_title']);node(feed,'id',locale_base+'writing/');node(feed,'link',href=locale_base+'writing/');node(feed,'link',href=locale_base+'atom.xml',rel='self');node(feed,'updated',max(p.get('updated',p['date']) for p in posts)+'T00:00:00+08:00')
     author=node(feed,'author');node(author,'name','Denis Wen')
     for p in posts:
-        item=node(feed,'entry');url=base_url+'writing/'+p['slug']+'/'
+        item=node(feed,'entry');url=locale_base+'writing/'+p['slug']+'/'
         node(item,'title',p['title']);node(item,'id',url);node(item,'link',href=url);node(item,'published',p['date']+'T00:00:00+08:00');node(item,'updated',p.get('updated',p['date'])+'T00:00:00+08:00');node(item,'summary',p['excerpt'])
         for t in p['tags']:node(item,'category',term=t)
-    ET.ElementTree(feed).write(root/'atom.xml',encoding='utf-8',xml_declaration=True)
-    return routes
+    ET.ElementTree(feed).write(output/'atom.xml',encoding='utf-8',xml_declaration=True)
+    return [home.lstrip("/") + path for path in routes]

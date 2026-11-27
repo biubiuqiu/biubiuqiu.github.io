@@ -1,0 +1,28 @@
+<p class="article-lead">Sparkを既存システムに組み込もうとすると、依存関係の衝突が繰り返し起きた。最終的には実行部分を独立したサービスに切り出し、APIを通じて呼び出す構成にした。</p>
+<h2>Spark SQLを組み込みたかった理由</h2>
+<p>既存のデータ処理にSpark SQLを導入し、一部のSQL処理について別の実行方法を試したかった。将来、ほかの計算にも広げられる余地を残すことも狙いだった。</p>
+<p>実際に統合を始めると、最初の壁は依存関係だった。プロジェクトにはすでにHiveやHadoop関連のライブラリがあり、Sparkを追加すると必要なバージョンが衝突する。ひとつ解消しても、それまで動いていたコードに影響が及ぶことがあった。</p>
+<h2>SQLを実行する部分を独立させる</h2>
+<p>Spark関連コードを独立したプロジェクトに移し、呼び出し側はAPIでSQLを送り、結果を受け取る形にした。これならSparkの依存関係はサービス内で管理できる。呼び出し側との取り決めは、リクエストとレスポンスに集約される。</p>
+<ol><li>呼び出し側はデータベース、SQL、検索結果の返却が必要かどうかを指定する。</li><li>実行サービスは<code>SparkSession</code>を初期化し、Hive Metastoreに接続する。</li><li>SQLを実行し、列名と行データに整形した結果、または実行ステータスを返す。</li></ol>
+<h2>SparkSessionの初期化</h2>
+<p>当時の初期化コードは次のとおり。各設定値は外部から渡している。</p>
+<pre><code>SparkSession sparkSession = SparkSession.builder()
+    .appName(sparkProperties.getAppName())
+    .config("spark.ui.port", sparkProperties.getUiPort())
+    .config("hive.metastore.uris", sparkProperties.getMetastoreUris())
+    .config("spark.master", sparkProperties.getMaster())
+    .config("spark.sql.hive.metastore.version", sparkProperties.getHiveVersion())
+    .config("spark.sql.hive.metastore.jars", sparkProperties.getHiveJarsPath())
+    .enableHiveSupport()
+    .getOrCreate();</code></pre>
+<p>特に注意が必要だったのはHive Metastoreのバージョン互換性だ。<code>Invalid method name: 'get_table_req'</code>が出たときは、SQLを見直すだけでは原因に届かない。接続先のMetastoreのバージョンと、それに対応するクライアントJARの設定を確認する必要がある。</p>
+<h2>結果の返し方</h2>
+<p>クエリの結果は<code>Dataset&lt;Row&gt;</code>で受け取る。列名を取り出し、各行を文字列のリストに変換してから、フィールド名の一覧、行データ、実行ステータスをまとめて返した。この例では収集する結果を最大5,000行に制限している。</p>
+<pre><code>Dataset&lt;Row&gt; result = sparkSession.sql(sql).limit(5000);
+String[] columns = result.columns();
+List&lt;Row&gt; rows = result.collectAsList();</code></pre>
+<p>ここで取り上げたのは当時の実装の中核部分だ。独立したサービスとして運用するには、認可、実行してよい文の範囲、セッションの並行実行、タイムアウト、結果サイズにも取り決めが要る。当時の記事ではこれらを網羅していない。</p>
+<h2>サービスを分けて得たものと増えた仕事</h2>
+<p>サービスを分けたことで依存関係を隔離できた。一方で、デプロイ先がひとつ増え、APIの取り決めや運用保守が必要になった。複雑さは残るものの、どこで引き受けるのかが明確になった。</p>
+<p>実行環境や依存関係の結び付きが統合の主な障害なら、処理の置き場所から考え直してよい。呼び出し側が実装の細部をどこまで知る必要があるのか。この問いが今回の経験から残った。</p>

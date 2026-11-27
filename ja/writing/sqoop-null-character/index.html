@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed">
+<title>見えない1文字がデータ同期の列をずらした理由 — Denis Wen</title><meta name="description" content="手作業の二分探索で問題の行を絞り込み、パーサーの状態遷移をたどる。同期時の列ずれを引き起こしたNUL文字の調査記録。"><link rel="canonical" href="https://biubiuqiu.github.io/ja/writing/sqoop-null-character/">
+<link rel="alternate" hreflang="zh-CN" href="https://biubiuqiu.github.io/writing/sqoop-null-character/">
+<link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/writing/sqoop-null-character/">
+<link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/writing/sqoop-null-character/">
+<link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/writing/sqoop-null-character/">
+<meta property="og:type" content="article"><meta property="og:title" content="見えない1文字がデータ同期の列をずらした理由"><meta property="og:description" content="手作業の二分探索で問題の行を絞り込み、パーサーの状態遷移をたどる。同期時の列ずれを引き起こしたNUL文字の調査記録。"><meta property="og:url" content="https://biubiuqiu.github.io/ja/writing/sqoop-null-character/"><meta property="og:locale" content="ja_JP">
+<link rel="alternate" type="application/atom+xml" title="記事とノート" href="/ja/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=14"><link rel="stylesheet" href="/liquid-nav.css?v=3">
+<script id="writing-messages" type="application/json">{"manual_copy": "文字を選択して手動でコピーしてください。", "link_copied": "記事のリンクをコピーしました", "share_copied": "共有用リンクをコピーしました", "share_failed": "共有できません。記事のリンクをコピーしてください。", "copy_code": "コードをコピー", "copy_block": "コードブロックをコピー", "copied": "コピー済み ✓", "code_copied": "コードをコピーしました", "results": "全 {n} 件", "matches": "該当する記事 {n} 件", "single_result": "全 1 件", "single_match": "該当する記事 1 件", "filter_count": "絞り込み、{n} 件選択中", "filters": "絞り込み", "saved_position": "前回の位置", "estimate": "約 {n} 分", "remaining": "残り約 {n} 分", "finished": "読了"}</script><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=7" defer></script>
+<meta property="article:published_time" content="2022-02-09"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="https://biubiuqiu.github.io/assets/hiking/originals/IMG_2162.jpeg"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "見えない1文字がデータ同期の列をずらした理由", "description": "手作業の二分探索で問題の行を絞り込み、パーサーの状態遷移をたどる。同期時の列ずれを引き起こしたNUL文字の調査記録。", "datePublished": "2022-02-09", "author": {"@type": "Person", "name": "Denis Wen", "url": "https://biubiuqiu.github.io/"}, "mainEntityOfPage": "https://biubiuqiu.github.io/ja/writing/sqoop-null-character/", "image": "https://biubiuqiu.github.io/assets/hiking/originals/IMG_2162.jpeg", "wordCount": 1009, "timeRequired": "PT4M", "inLanguage": "ja", "keywords": ["データ同期", "Sqoop", "トラブルシューティング"], "dateModified": "2026-11-13"}</script></head><body class="writing-page post-page">
+<a class="skip-link" href="#main">本文へ移動</a>
+<header class="writing-header writing-width"><a class="writing-brand" href="/ja/" aria-label="Denis Wen ホーム">Denis Wen<span class="writing-brand-sub"> / 記事とノート</span></a>
+<div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="記事ナビゲーション"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="/ja/writing/">記事</a><a href="/ja/atom.xml" aria-label="Atom フィードを購読">RSS</a></nav>          <details class="language-switcher">
+            <summary aria-label="言語: 日本語"><span>日本語</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
+            <div class="language-menu">
+              <a href="/writing/sqoop-null-character/" lang="zh-CN" hreflang="zh-CN">中文</a>
+              <a href="/en/writing/sqoop-null-character/" lang="en" hreflang="en">English</a>
+              <a href="/ja/writing/sqoop-null-character/" lang="ja" hreflang="ja" aria-current="page">日本語</a>
+            </div>
+          </details>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外観" hidden>
+              <summary aria-label="外観" title="外観"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外観">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>システムに合わせる</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>ライト</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>ダーク</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header>
+<header class="post-hero" id="article-top"><picture class="post-hero-media"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/hiking/reading/IMG_2162.webp"><img class="post-hero-photo" src="/assets/hiking/originals/IMG_2162.jpeg" alt="霧に包まれた雪山と稜線" style="object-position:center 58%" width="1536" height="1024" fetchpriority="high"></picture><div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">トラブルシューティング / 過去記事の再録</p><h1><span class="hero-title-part">見えない1文字がデータ同期の列をずらした理由</span></h1><div class="article-meta"><span>初出 <time datetime="2022-02-09T18:21:56">2022-02-09</time></span><span aria-hidden="true">·</span><span title="1分あたり約300文字で計算。デモやコードを試す時間は含みません。">読了目安 4 分</span></div><div class="post-tags"><a class="glass-control" href="/ja/writing/?tag=%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E6%9C%9F"># データ同期</a><a class="glass-control" href="/ja/writing/?tag=Sqoop"># Sqoop</a><a class="glass-control" href="/ja/writing/?tag=%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0"># トラブルシューティング</a></div></div></header><main class="writing-width writing-main" id="main"><div class="reading-progress-track" role="progressbar" aria-label="読書の進捗" aria-valuenow="0" hidden><span></span></div>
+<div class="article-layout"><aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>目次</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary>
+<div class="toc-content"><nav aria-label="目次"><ol><li class="toc-h2"><a class="glass-row" href="#section-1"><span class="toc-number">01</span><span>同じ設定なのに値が別の列に入る</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-2"><span class="toc-number">02</span><span>問題を1行のデータに絞る</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-3"><span class="toc-number">03</span><span>なぜ通常の文字として扱われなかったのか</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-4"><span class="toc-number">04</span><span>当時採った対処</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-5"><span class="toc-number">05</span><span>この調査から残った考え方</span></a></li></ol></nav><div class="reading-status"><span data-remaining>約 4 分</span></div>
+<div class="toc-actions"><a href="/ja/writing/">← すべての記事</a><a href="#article-top">↑ ページの先頭へ</a></div></div></details></aside>
+<div class="article-column" data-reading-minutes="4">
+<div class="article-intro"><nav class="article-breadcrumb" aria-label="現在位置"><a href="/ja/">ホーム</a><span aria-hidden="true">/</span><a href="/ja/writing/">記事とノート</a><span aria-hidden="true">/</span><a href="/ja/writing/?category=%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0">トラブルシューティング</a></nav>
+<p class="article-context">Sqoop 1.4.7／Hive 2.1.1 · 過去の実践記録</p><div class="post-byline"><a href="/ja/">Denis Wen</a><span>1,009 文字</span><span>更新 <time datetime="2026-11-13">2026-11-13</time></span></div>
+<div class="reading-resume" hidden><span>前回の続き <strong></strong></span><button type="button" data-resume>続きから読む →</button><button type="button" data-dismiss-resume aria-label="前回の読書位置を消去">×</button></div></div>
+<article class="article-body" aria-label="記事本文"><p class="article-lead">同じコマンドで同期しても、大半のテーブルは正常で、一部のテーブルだけが繰り返し型変換エラーになった。手掛かりは、普段は目に見えない1文字だった。</p>
+<h2 id="section-1">同じ設定なのに値が別の列に入る<a class="heading-anchor" href="#section-1" aria-label="この節へのリンク：同じ設定なのに値が別の列に入る">#</a></h2>
+<p>当時の環境はSqoop 1.4.7とHive 2.1.1だった。HiveからMySQLへデータを同期すると、特定のテーブルで値が別の列にずれ、型変換エラーが起きた。同じ設定で正常に同期できるテーブルもあったため、入力データ自体を調べることにした。</p>
+<h2 id="section-2">問題を1行のデータに絞る<a class="heading-anchor" href="#section-2" aria-label="この節へのリンク：問題を1行のデータに絞る">#</a></h2>
+<p>問題の行を特定するのに2日かかった。使ったのは手作業による二分探索だ。たとえば1万件あるなら、まず5千件を同期し、その成否を見て対象をさらに半分にする。これを繰り返し、エラーを再現する行にたどり着いた。</p>
+<p>HDFSからHiveのデータファイルを取り出して<code>cat</code>で見ると、普通の内容に見える。ところが<code>vim</code>で開くと、途中に<code>^@</code>と表示される文字があった。比較を続けると、この文字を含む行は失敗し、含まない行は正常に同期できることが分かった。</p>
+<p>この<code>^@</code>はNUL文字で、Unicodeでは<code>U+0000</code>に当たる。空文字列は長さがゼロだが、ここには通常は見えない文字が1つ、実際に入っている。</p>
+<h2 id="section-3">なぜ通常の文字として扱われなかったのか<a class="heading-anchor" href="#section-3" aria-label="この節へのリンク：なぜ通常の文字として扱われなかったのか">#</a></h2>
+<p>フィールドの区切り文字は<code>--fields-terminated-by</code>で指定済みだ。それでもNULが通常の文字として通過せず、解析に影響するのはなぜだろうか。</p>
+<p>そこでSqoop 1.4.7のソースコードを読んだ。レコードパーサーは状態機械で入力を処理しており、次の4種類の文字を区別する。</p>
+<table><thead><tr><th>オプション</th><th>パーサーでの役割</th></tr></thead><tbody><tr><td><code>--enclosed-by</code></td><td>フィールドの囲み文字</td></tr><tr><td><code>--escaped-by</code></td><td>エスケープ文字</td></tr><tr><td><code>--fields-terminated-by</code></td><td>フィールドの区切り文字</td></tr><tr><td><code>--lines-terminated-by</code></td><td>レコードの区切り文字</td></tr></tbody></table>
+<p>手掛かりは、囲み文字を取得するメソッドのコメントにあった。指定がないときは<code>\000</code>で「なし」を表す。一方、入力に含まれるNULはJavaで<code>\u0000</code>と書ける。どちらの表記も同じ文字を表している。</p>
+<pre><code>char a = '\u0000';
+char b = '\000';
+System.out.println(a == b); // true</code></pre>
+<p>問題のファイルを読み込み、デバッガで文字の値を確認しながら、状態機械が囲み文字やエスケープ文字を判定する箇所を追った。列ずれは、入力に実在する文字とパーサーの既定値の衝突によるものだった。</p>
+<h2 id="section-4">当時採った対処<a class="heading-anchor" href="#section-4" aria-label="この節へのリンク：当時採った対処">#</a></h2>
+<p><code>--enclosed-by</code>と<code>--escaped-by</code>を明示し、入力データと衝突する既定値を避けた。どの文字を使うかは入力形式に照らして検証する必要がある。適当に別の文字を選ぶと、今度はその文字がデータと衝突する可能性がある。</p>
+<h2 id="section-5">この調査から残った考え方<a class="heading-anchor" href="#section-5" aria-label="この節へのリンク：この調査から残った考え方">#</a></h2>
+<p>役に立ったのは、段階ごとに原因の範囲を狭めたことだった。正常な行と失敗する行を突き合わせ、表示の違いから不可視文字を見つけ、パーサーの状態遷移にたどり着く。エラーが表に出たのは型変換の段階でも、列がずれたのはその前の解析段階だった。</p>
+<p class="article-reference">調査で参照したソースコード：<a href="https://github.com/apache/sqoop/tree/branch-1.4.7" target="_blank" rel="noopener noreferrer">Apache Sqoop · branch-1.4.7 ↗</a></p>
+</article><aside class="article-notice"><strong>この記事について</strong><p>公開日は旧ブログのものです。当時の手順を残して構成と適用範囲を整理し、環境固有の情報や外部のスクリーンショットを省きました。原題は「Sqoop 1.4.7でHiveからMySQLに同期する際の特殊文字エラーを解決する」。例は現在のバージョンで再検証したものではありません。</p></aside>
+<section class="article-end"><p class="end-mark">— おわり —</p><div class="article-attribution"><strong>Denis Wen</strong><p>エージェントやエンジニアリング、試行錯誤の過程で考えたことを書いています。</p><small>記事のリンク</small><a class="canonical-link" href="https://biubiuqiu.github.io/ja/writing/sqoop-null-character/">https://biubiuqiu.github.io/ja/writing/sqoop-null-character/</a><p class="copyright-note">© Denis Wen · 転載の際は著者名と記事へのリンクを明記してください。引用部分の権利は各著者に帰属します。</p></div>
+<div class="article-share"><button type="button" data-copy-link>記事のリンクをコピー ↗</button><button type="button" data-share>記事を共有</button><a href="#article-top">ページの先頭へ ↑</a></div></section>
+<nav class="article-pagination" aria-label="前後の記事"><a href="/ja/writing/spark-remote-service/"><span>← 前の記事</span><strong>依存関係の衝突をきっかけにSparkを別サービスに切り出した話</strong></a><a href="/ja/writing/linux-mining-process/"><span>次の記事 →</span><strong>sshdを装った暗号資産マイニングプロセスの調査</strong></a></nav><section class="article-related"><div class="related-heading"><h2>あわせて読みたい</h2><a href="/ja/writing/">すべての記事 ↗</a></div><div class="related-grid"><a class="related-card" href="/ja/writing/linux-mining-process/"><img src="/assets/writing/thumbs/linux-mining-process.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>システム調査 · 4 分</span><strong>sshdを装った暗号資産マイニングプロセスの調査</strong></a><a class="related-card" href="/ja/writing/inside-an-agent-runtime/"><img src="/assets/hiking/img_2146.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>エージェント研究 · 22 分</span><strong>エージェントランタイムの仕組み：3件の見積もりから、メールを一度だけ送るまで</strong></a><a class="related-card" href="/ja/writing/agent-transcript-storage/"><img src="/assets/hiking/dsc02281.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>エージェント研究 · 17 分</span><strong>エージェントの会話記録をどう保存するか：ツール呼び出しから別のマシンでの再開まで</strong></a></div></section></div></div>
+</main>
+<footer class="writing-footer writing-width"><a href="/ja/">← ホームに戻る</a><span>© Denis Wen · 好奇心を持って、探究を続ける。</span><a href="/ja/atom.xml">RSS 購読 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>

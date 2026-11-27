@@ -41,7 +41,7 @@
 
 </script>
     <link rel="stylesheet" href="../styles.css?v=24">
-    <link rel="stylesheet" href="../writing.css?v=13">
+    <link rel="stylesheet" href="../writing.css?v=14">
     <link rel="stylesheet" href="../liquid-nav.css?v=3">
     <link rel="stylesheet" href="../home.css?v=2">
     <script src="../theme.js?v=7" defer></script>
@@ -57,7 +57,7 @@
         <nav class="liquid-nav" aria-label="Primary navigation">
           <canvas class="liquid-optics" aria-hidden="true"></canvas>
           <span class="liquid-lens" aria-hidden="true"><canvas></canvas></span>
-          <a href="/writing/" hreflang="zh-CN">Writing</a>
+          <a href="/en/writing/" hreflang="en">Writing</a>
           <a href="#hiking">Outdoors</a>
           <a href="#interests">Interests</a>
           <a href="#projects">Lester</a>
@@ -88,7 +88,7 @@
           <p class="cover-greeting">Hi, I&#x27;m Denis.</p>
           <h1 id="intro-title"><span>Stay curious.</span> <span>Keep exploring.</span></h1>
           <p class="intro">Exploring AI agents, with time for trails, films, games, and F1.</p>
-          <a class="cover-read" href="/writing/" hreflang="zh-CN">Read the journal <span aria-hidden="true">→</span></a>
+          <a class="cover-read" href="/en/writing/" hreflang="en">Read the journal <span aria-hidden="true">→</span></a>
         </div>
       </section>
     </div>
@@ -96,12 +96,12 @@
       <section class="latest-story issue-band" aria-labelledby="about-title">
         <div class="issue-inner page-width">
           <div class="issue-byline">
-            <h2 id="about-title">Latest article · in Chinese</h2>
-            <p>15 min read</p>
+            <h2 id="about-title">Latest article</h2>
+            <p>13 min read</p>
           </div>
           <div>
-            <h3 class="latest-title" lang="zh-CN"><a href="/writing/inside-an-agent-runtime/" hreflang="zh-CN"><span class="card-title-phrase">拆解一个 Agent Runtime：</span><wbr><span class="card-title-phrase">从三份报价到一封只发一次的邮件</span></a></h3>
-            <p class="latest-excerpt" lang="zh-CN">沿着一次报价比对与审批发件，拆开执行循环、模型接口、工具、沙盒和调度。</p>
+            <h3 class="latest-title" lang="en"><a href="/en/writing/inside-an-agent-runtime/" hreflang="en"><span class="card-title-phrase">Inside an Agent Runtime:</span><wbr><span class="card-title-phrase">Three Quotes, One Email, and No Duplicate Send</span></a></h3>
+            <p class="latest-excerpt" lang="en">Follow a quote comparison through approval and delivery to see how the execution loop, model interface, tools, sandbox, and scheduler fit together.</p>
           </div>
         </div>
       </section>
@@ -120,7 +120,7 @@
 </div>
 </section></section>
         <div class="desk-spread">
-          <section class="writing-section" id="writing" aria-labelledby="writing-title"><div class="writing-section-heading"><h2 class="accent-title" id="writing-title">Writing &amp; notes</h2><a class="writing-all" href="/writing/">All articles ↗</a></div><p class="writing-section-intro">Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates. Articles are in Chinese.</p><ul class="writing-rows"><li><time datetime="2026-11-24">2026-11-24</time><div><a href="/writing/agent-transcript-storage/" lang="zh-CN">Agent 的会话记录怎么存？从一次工具调用到跨机恢复<span aria-hidden="true"> ↗</span></a><p lang="zh-CN">一份 2 MB 的订单明细，该进数据库、对象存储，还是下一轮提示词？沿着一次建单，对照 Claude Agent SDK、LangChain / LangGraph 与 OpenAI Agents SDK 的实际读写边界。</p><small class="featured-read-meta" lang="zh-CN">11 分钟阅读 · 3,121 字</small></div></li><li><time datetime="2026-11-19">2026-11-19</time><div><a href="/writing/agent-sandbox-economics/" lang="zh-CN">每人一个 Agent 沙盒，要常开多少台机器？<span aria-hidden="true"> ↗</span></a><p lang="zh-CN">从 Lester 的个人工作区到 Google Agent Substrate 的多沙盒 Pod，算算 300 人错峰和同时开工各需多少机器，再追踪一次换机后，文件、进程和发布回执怎样接得上。</p><small class="featured-read-meta" lang="zh-CN">15 分钟阅读 · 4,404 字</small></div></li><li><time datetime="2026-11-14">2026-11-14</time><div><a href="/writing/agent-sandbox-workspace/" lang="zh-CN">一个 Agent，为什么需要一个沙盒？从计算空间到可交付的结果<span aria-hidden="true"> ↗</span></a><p lang="zh-CN">模型提出步骤，程序在哪里执行？从文件、进程、依赖与状态出发，理解沙盒如何让 Agent 真正完成更多事情。</p><small class="featured-read-meta" lang="zh-CN">15 分钟阅读 · 4,486 字</small></div></li></ul></section>
+          <section class="writing-section" id="writing" aria-labelledby="writing-title"><div class="writing-section-heading"><h2 class="accent-title" id="writing-title">Writing &amp; notes</h2><a class="writing-all" href="/en/writing/">All articles ↗</a></div><p class="writing-section-intro">Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates.</p><ul class="writing-rows"><li><time datetime="2026-11-24">2026-11-24</time><div><a href="/en/writing/agent-transcript-storage/">Storing Agent Transcripts: From a Tool Call to Recovery on Another Machine<span aria-hidden="true"> ↗</span></a><p>Where should a 2 MB order breakdown live: the database, object storage, or the next prompt? Follow an order as it is created and compare what the Claude Agent SDK, LangChain/LangGraph, and OpenAI Agents SDK actually read and write.</p><small class="featured-read-meta">10 min read · 2,058 words</small></div></li><li><time datetime="2026-11-19">2026-11-19</time><div><a href="/en/writing/agent-sandbox-economics/">One Agent Sandbox per User: How Many Machines Need to Stay On?<span aria-hidden="true"> ↗</span></a><p>Starting with Lester’s personal workspaces and Google Agent Substrate’s multi-sandbox Pods, estimate the fleet for 300 people starting at staggered times or all at once. Then trace what happens to files, processes, and publication receipts when a sandbox changes hosts.</p><small class="featured-read-meta">12 min read · 2,524 words</small></div></li><li><time datetime="2026-11-14">2026-11-14</time><div><a href="/en/writing/agent-sandbox-workspace/">Why Does an Agent Need a Sandbox? From Compute to Deliverables<span aria-hidden="true"> ↗</span></a><p>The model proposes a sequence of steps. Where does the program actually run? Files, processes, dependencies, and state explain how a sandbox lets an agent carry more tasks through to completion.</p><small class="featured-read-meta">12 min read · 2,463 words</small></div></li></ul></section>
           <section class="project" id="projects" aria-labelledby="project-title"><h2 id="project-title" lang="en">Lester</h2><p>Lester is an open-source AI agent workspace I&#x27;m building. You can self-host it and work on tasks, files, and code through conversation.</p><p class="project-name-story">The name comes from Lester Crest, the resourceful mind behind the scenes in GTA V. I hope it can bring that same calm, practical approach to understanding a goal and getting things done.</p><a class="text-link" href="https://github.com/biubiuqiu/lester-agent" target="_blank" rel="noopener noreferrer">View source<span class="icon icon-arrow" aria-hidden="true"></span></a></section>
         </div>
       <section class="leisure" id="interests" aria-labelledby="leisure-title"><h2 class="accent-title" id="leisure-title">Other things I love</h2>

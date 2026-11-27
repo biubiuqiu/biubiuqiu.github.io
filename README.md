@@ -14,6 +14,7 @@
 
 - `src/locales.json`：三种语言的文案，使用统一的翻译字段。
 - `src/template.html`：共享页面结构。
+- 文章原文在 `src/posts/`，英文和日文译稿分别在 `src/posts/en/` 与 `src/posts/ja/`。同一篇文章使用同一个文件名，各语言的标题、摘要和标签写入对应的 `metadata.json`。构建时会同时生成三套文章目录、正文和 Atom 订阅源。
 - `styles.css`：白底/陶红浅色主题与炭黑深色主题，以及响应式排版。
 - `theme.js`：外观菜单、系统外观变化与跨标签页同步。
 - `src/theme-init.js`：首屏渲染前恢复主题，避免跨语言导航时闪烁。

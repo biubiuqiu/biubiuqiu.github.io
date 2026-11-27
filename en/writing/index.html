@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed">
+<title>Writing &amp; notes — Denis Wen</title><meta name="description" content="Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates."><link rel="canonical" href="https://biubiuqiu.github.io/en/writing/">
+<link rel="alternate" hreflang="zh-CN" href="https://biubiuqiu.github.io/writing/">
+<link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/writing/">
+<link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/writing/">
+<link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/writing/">
+<meta property="og:type" content="website"><meta property="og:title" content="Writing &amp; notes"><meta property="og:description" content="Research on agents, engineering notes and investigations. Earlier posts keep their original publication dates."><meta property="og:url" content="https://biubiuqiu.github.io/en/writing/"><meta property="og:locale" content="en_US">
+<link rel="alternate" type="application/atom+xml" title="Writing &amp; notes" href="/en/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=14"><link rel="stylesheet" href="/liquid-nav.css?v=3">
+<script id="writing-messages" type="application/json">{"manual_copy": "Select and copy the text manually.", "link_copied": "Article link copied", "share_copied": "Article link copied and ready to share", "share_failed": "Sharing is unavailable. Use Copy article link instead.", "copy_code": "Copy code", "copy_block": "Copy code block", "copied": "Copied ✓", "code_copied": "Code copied", "results": "{n} articles", "matches": "{n} articles found", "single_result": "1 article", "single_match": "1 article found", "filter_count": "Filters, {n} selected", "filters": "Filters", "saved_position": "Saved position", "estimate": "About {n} min", "remaining": "About {n} min left", "finished": "Finished reading"}</script><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=7" defer></script>
+<link rel="stylesheet" href="/archive-filter.css?v=1"></head><body class="writing-page archive-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="writing-header writing-width"><a class="writing-brand" href="/en/" aria-label="Denis Wen home">Denis Wen<span class="writing-brand-sub"> / Writing &amp; notes</span></a>
+<div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="Writing navigation"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="/en/writing/" aria-current="page">Writing</a><a href="/en/atom.xml" aria-label="Subscribe to the Atom feed">RSS</a></nav>          <details class="language-switcher">
+            <summary aria-label="Language: English"><span>English</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
+            <div class="language-menu">
+              <a href="/writing/" lang="zh-CN" hreflang="zh-CN">中文</a>
+              <a href="/en/writing/" lang="en" hreflang="en" aria-current="page">English</a>
+              <a href="/ja/writing/" lang="ja" hreflang="ja">日本語</a>
+            </div>
+          </details>            <details class="theme-switcher" data-theme-control data-theme-menu-label="Appearance" hidden>
+              <summary aria-label="Appearance" title="Appearance"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="Appearance">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>System</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>Light</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>Dark</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header>
+<main class="writing-width writing-main" id="main"><div class="archive-masthead"><h1>Writing &amp; notes</h1><form class="archive-filters" id="archive-search" role="search" hidden>
+  <div class="filter-bar"><label class="archive-search"><span class="sr-only">Search articles</span>
+    <input type="search" name="q" placeholder="Search titles, summaries or tags" enterkeyhint="search" autocomplete="off"></label>
+    <button type="button" class="filter-toggle glass-control" aria-expanded="false" aria-controls="archive-options"><span class="filter-adjust" aria-hidden="true"></span>Filters<span class="filter-count" hidden></span></button></div>
+  <div class="filter-panel" id="archive-options" hidden>
+    <div class="filter-field"><span class="filter-label" id="category-label">Category</span>
+      <select name="category" aria-labelledby="category-label"><option value="">All categories</option><option>Agent research</option><option>Engineering practice</option><option>Systems diagnostics</option><option>Troubleshooting</option></select></div>
+    <div class="filter-field"><span class="filter-label" id="tag-label">Tags</span>
+      <select name="tag" aria-labelledby="tag-label"><option value="">All tags</option><option>Agent</option><option>Architecture</option><option>Architecture design</option><option>Claude Code</option><option>Context</option><option>Context management</option><option>Data synchronization</option><option>Engineering practice</option><option>Kubernetes</option><option>Linux</option><option>PostgreSQL</option><option>Processes</option><option>Runtime</option><option>Sandbox</option><option>Spark</option><option>Sqoop</option><option>Tool design</option><option>Troubleshooting</option></select></div>
+  </div>
+</form>
+<div class="archive-state"><p class="archive-result" role="status" aria-live="polite" aria-atomic="true">9 articles</p>
+  <button class="filter-clear" type="reset" form="archive-search" hidden>Clear filters</button></div>
+</div><ul class="archive-grid"><li class="archive-card issue-lead" data-search="Inside an Agent Runtime: Three Quotes, One Email, and No Duplicate Send Follow a quote comparison through approval and delivery to see how the execution loop, model interface, tools, sandbox, and scheduler fit together. Then kill the process before it persists the receipt. What does the next machine need to take over? Agent research Agent Runtime Architecture design Tool design" data-category="Agent research" data-tags="[&quot;Agent&quot;, &quot;Runtime&quot;, &quot;Architecture design&quot;, &quot;Tool design&quot;]">
+          <div class="card-meta"><span class="card-category">Agent research</span><time datetime="2026-11-24">2026-11-24</time>
+            <span>13 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/inside-an-agent-runtime/"><span class="card-title-phrase">Inside an Agent Runtime:</span><wbr><span class="card-title-phrase">Three Quotes, One Email, and No Duplicate Send</span></a></h2><p>Follow a quote comparison through approval and delivery to see how the execution loop, model interface, tools, sandbox, and scheduler fit together. Then kill the process before it persists the receipt. What does the next machine need to take over?</p>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Agent"># Agent</a><a href="/en/writing/?tag=Runtime"># Runtime</a><a href="/en/writing/?tag=Architecture%20design"># Architecture design</a><a href="/en/writing/?tag=Tool%20design"># Tool design</a></div><figure class="issue-diagram"><figcaption>The execution record for one email</figcaption><ol><li><strong>Approve</strong><span>Confirm quote sheet v3 and its recipients</span></li><li><strong>Send</strong><span>Retry with the same operation ID</span></li><li><strong>Receipt</strong><span>The mail service accepts one send; persist the receipt</span></li></ol></figure>
+        </li><li class="archive-card" data-search="Storing Agent Transcripts: From a Tool Call to Recovery on Another Machine Where should a 2 MB order breakdown live: the database, object storage, or the next prompt? Follow an order as it is created and compare what the Claude Agent SDK, LangChain/LangGraph, and OpenAI Agents SDK actually read and write. Agent research Agent Context management Runtime PostgreSQL" data-category="Agent research" data-tags="[&quot;Agent&quot;, &quot;Context management&quot;, &quot;Runtime&quot;, &quot;PostgreSQL&quot;]">
+          <div class="card-meta"><span class="card-category">Agent research</span><time datetime="2026-11-24">2026-11-24</time>
+            <span>10 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/agent-transcript-storage/"><span class="card-title-phrase">Storing Agent Transcripts:</span><wbr><span class="card-title-phrase">From a Tool Call to Recovery on Another Machine</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Agent"># Agent</a><a href="/en/writing/?tag=Context%20management"># Context management</a><a href="/en/writing/?tag=Runtime"># Runtime</a><a href="/en/writing/?tag=PostgreSQL"># PostgreSQL</a></div>
+        </li><li class="archive-card" data-search="One Agent Sandbox per User: How Many Machines Need to Stay On? Starting with Lester’s personal workspaces and Google Agent Substrate’s multi-sandbox Pods, estimate the fleet for 300 people starting at staggered times or all at once. Then trace what happens to files, processes, and publication receipts when a sandbox changes hosts. Agent research Agent Sandbox Runtime Kubernetes" data-category="Agent research" data-tags="[&quot;Agent&quot;, &quot;Sandbox&quot;, &quot;Runtime&quot;, &quot;Kubernetes&quot;]">
+          <div class="card-meta"><span class="card-category">Agent research</span><time datetime="2026-11-19">2026-11-19</time>
+            <span>12 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/agent-sandbox-economics/"><span class="card-title-phrase">One Agent Sandbox per User:</span><wbr><span class="card-title-phrase">How Many Machines Need to Stay On?</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Agent"># Agent</a><a href="/en/writing/?tag=Sandbox"># Sandbox</a><a href="/en/writing/?tag=Runtime"># Runtime</a><a href="/en/writing/?tag=Kubernetes"># Kubernetes</a></div>
+        </li><li class="archive-card" data-search="Why Does an Agent Need a Sandbox? From Compute to Deliverables The model proposes a sequence of steps. Where does the program actually run? Files, processes, dependencies, and state explain how a sandbox lets an agent carry more tasks through to completion. Agent research Agent Sandbox Runtime" data-category="Agent research" data-tags="[&quot;Agent&quot;, &quot;Sandbox&quot;, &quot;Runtime&quot;]">
+          <div class="card-meta"><span class="card-category">Agent research</span><time datetime="2026-11-14">2026-11-14</time>
+            <span>12 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/agent-sandbox-workspace/"><span class="card-title-phrase">Why Does an Agent Need a Sandbox?</span><wbr><span class="card-title-phrase">From Compute to Deliverables</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Agent"># Agent</a><a href="/en/writing/?tag=Sandbox"># Sandbox</a><a href="/en/writing/?tag=Runtime"># Runtime</a></div>
+        </li><li class="archive-card" data-search="Read, Edit, Write, Bash: The Design of Agent Tools If an agent has Bash, why does it also need Read, Edit, and Write? Exact matching, pagination, output budgets, and execution status show how a tool can shape an agent’s next decision. Agent research Agent Tool design Claude Code" data-category="Agent research" data-tags="[&quot;Agent&quot;, &quot;Tool design&quot;, &quot;Claude Code&quot;]">
+          <div class="card-meta"><span class="card-category">Agent research</span><time datetime="2026-11-13">2026-11-13</time>
+            <span>21 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/agent-tool-design/"><span class="card-title-phrase">Read, Edit, Write, Bash:</span><wbr><span class="card-title-phrase">The Design of Agent Tools</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Agent"># Agent</a><a href="/en/writing/?tag=Tool%20design"># Tool design</a><a href="/en/writing/?tag=Claude%20Code"># Claude Code</a></div>
+        </li><li class="archive-card" data-search="How Agents Stay on Track During Long Tasks: Context Management in Claude Code, Pi, and OpenCode Using official documentation and pinned source snapshots, distinguish history, context, and memory. Then sketch a context layer with replay, explicit budgets, and verifiable behavior. Agent research Agent Context Claude Code" data-category="Agent research" data-tags="[&quot;Agent&quot;, &quot;Context&quot;, &quot;Claude Code&quot;]">
+          <div class="card-meta"><span class="card-category">Agent research</span><time datetime="2026-11-13">2026-11-13</time>
+            <span>15 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/agent-context-management/"><span class="card-title-phrase">How Agents Stay on Track During Long Tasks:</span><wbr><span class="card-title-phrase">Context Management in Claude Code, Pi, and OpenCode</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Agent"># Agent</a><a href="/en/writing/?tag=Context"># Context</a><a href="/en/writing/?tag=Claude%20Code"># Claude Code</a></div>
+        </li><li class="archive-card" data-search="Investigating a Cryptominer Disguised as sshd High CPU usage led from a suspicious process to its executable, scheduled jobs, and configuration file. Systems diagnostics Linux Processes Troubleshooting" data-category="Systems diagnostics" data-tags="[&quot;Linux&quot;, &quot;Processes&quot;, &quot;Troubleshooting&quot;]">
+          <div class="card-meta"><span class="card-category">Systems diagnostics</span><time datetime="2024-05-28">2024-05-28</time>
+            <span>2 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/linux-mining-process/"><span class="card-title-phrase">Investigating a Cryptominer Disguised as sshd</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Linux"># Linux</a><a href="/en/writing/?tag=Processes"># Processes</a><a href="/en/writing/?tag=Troubleshooting"># Troubleshooting</a></div>
+        </li><li class="archive-card" data-search="How an Invisible Character Shifted the Columns in a Data Export A manual binary search narrowed the failure to a single row. Following the parser’s state transitions explained how a NUL character shifted the columns. Troubleshooting Data synchronization Sqoop Troubleshooting" data-category="Troubleshooting" data-tags="[&quot;Data synchronization&quot;, &quot;Sqoop&quot;, &quot;Troubleshooting&quot;]">
+          <div class="card-meta"><span class="card-category">Troubleshooting</span><time datetime="2022-02-09">2022-02-09</time>
+            <span>3 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/sqoop-null-character/"><span class="card-title-phrase">How an Invisible Character Shifted the Columns in a Data Export</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Data%20synchronization"># Data synchronization</a><a href="/en/writing/?tag=Sqoop"># Sqoop</a><a href="/en/writing/?tag=Troubleshooting"># Troubleshooting</a></div>
+        </li><li class="archive-card" data-search="Resolving Dependency Conflicts by Moving Spark into a Separate Service Spark and the application’s existing libraries needed incompatible dependencies. Moving SQL execution into a separate service gave the caller a clear interface. Engineering practice Spark Architecture Engineering practice" data-category="Engineering practice" data-tags="[&quot;Spark&quot;, &quot;Architecture&quot;, &quot;Engineering practice&quot;]">
+          <div class="card-meta"><span class="card-category">Engineering practice</span><time datetime="2021-10-08">2021-10-08</time>
+            <span>2 min read</span></div>
+          <div class="archive-entry">
+            <h2><a href="/en/writing/spark-remote-service/"><span class="card-title-phrase">Resolving Dependency Conflicts by Moving Spark into a Separate Service</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/en/writing/?tag=Spark"># Spark</a><a href="/en/writing/?tag=Architecture"># Architecture</a><a href="/en/writing/?tag=Engineering%20practice"># Engineering practice</a></div>
+        </li></ul><div class="archive-empty" hidden><p>No matching articles</p><button type="reset" form="archive-search">Show all articles</button></div></main>
+<footer class="writing-footer writing-width"><a href="/en/">← Back to home</a><span>© Denis Wen · Stay curious. Keep exploring.</span><a href="/en/atom.xml">RSS feed ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>

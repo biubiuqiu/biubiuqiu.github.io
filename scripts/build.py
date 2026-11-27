@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import xml.etree.ElementTree as ET
 from albums import album_content
+from demo_locales import build_demo_locales
 from writing import featured_writing, build_writing, load_posts, title_phrases
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -95,13 +96,18 @@ def build() -> None:
     template = template.replace("{{viewer}}", viewer)
     album_template = (ROOT / "src/album.html").read_text().replace("{{viewer}}", viewer)
     translations = json.loads((ROOT / "src" / "locales.json").read_text(encoding="utf-8"))
-    posts = load_posts(ROOT)
-    latest = posts[0]
+    writing_ui = json.loads((ROOT / "src/writing/ui.json").read_text())
+    writing_routes = []
+    build_demo_locales(ROOT)
     required = (set(TOKENS.findall(template + album_template)) - SYSTEM_KEYS) | {"gallery_hint", "switch_label", "theme_label", "theme_system", "theme_light", "theme_dark", "read_time_format", "album_count_format"}
     if set(translations) != set(LANGUAGES):
         raise ValueError("Translations and configured language routes must match")
     for language, meta in LANGUAGES.items():
         copy = translations[language]
+        ui = writing_ui[language]
+        home = "/" + (meta["path"] + "/" if meta["path"] else "")
+        posts = load_posts(ROOT, language, ui)
+        latest = posts[0]
         if set(copy) != required:
             raise ValueError(f"{language}: missing={required - set(copy)}, extra={set(copy) - required}")
         if not all(isinstance(value, str) and value for value in copy.values()):
@@ -118,7 +124,7 @@ def build() -> None:
         values = {
             **copy,
             "lang": language,
-            "home_path": "/" + (meta["path"] + "/" if meta["path"] else ""),
+            "home_path": home,
             "album_path": url_for(language).removeprefix(BASE_URL.rstrip("/")) + "gallery/",
             "canonical": url_for(language),
             "asset_prefix": "../" if meta["path"] else "./",
@@ -128,10 +134,10 @@ def build() -> None:
             "locale_menu": menu_for(language, copy),
             "theme_menu": theme_menu_for(copy),
             "hiking_gallery": gallery_for(language, copy),
-            "featured_writing": featured_writing(posts[1:]),
+            "featured_writing": featured_writing(posts[1:], home, ui),
             "latest_slug": latest["slug"],
             "latest_title": title_phrases(latest["title"], "card-title-phrase"),
-            "latest_excerpt": re.split(r"(?<=[。！？])", latest["excerpt"], maxsplit=1)[0],
+            "latest_excerpt": re.split(r"(?<=[。！？])|(?<=[.!?])\s+", latest["excerpt"], maxsplit=1)[0],
             "latest_read_time": copy["read_time_format"].format(minutes=latest["minutes"]),
             "theme_bootstrap": (ROOT / "src" / "theme-init.js").read_text(encoding="utf-8"),
         }
@@ -157,7 +163,7 @@ def build() -> None:
         album_dir.mkdir(exist_ok=True)
         (album_dir / "index.html").write_text(TOKENS.sub(substitute, album_template), encoding="utf-8")
         print(f"Built {output.relative_to(ROOT)} ({language})")
-    writing_routes = build_writing(ROOT, BASE_URL, theme_menu_for, translations["zh-CN"], posts)
+        writing_routes.extend(build_writing(ROOT, BASE_URL, language, LANGUAGES, menu_for, theme_menu_for, copy, ui, posts))
     namespace = "http://www.sitemaps.org/schemas/sitemap/0.9"
     ET.register_namespace("", namespace)
     sitemap = ET.Element(f"{{{namespace}}}urlset")

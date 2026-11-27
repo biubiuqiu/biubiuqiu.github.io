@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed">
+<title>記事とノート — Denis Wen</title><meta name="description" content="Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。"><link rel="canonical" href="https://biubiuqiu.github.io/ja/writing/">
+<link rel="alternate" hreflang="zh-CN" href="https://biubiuqiu.github.io/writing/">
+<link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/writing/">
+<link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/writing/">
+<link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/writing/">
+<meta property="og:type" content="website"><meta property="og:title" content="記事とノート"><meta property="og:description" content="Agentの研究、技術実践、問題調査の記録。旧記事は初公開の日付を残しています。"><meta property="og:url" content="https://biubiuqiu.github.io/ja/writing/"><meta property="og:locale" content="ja_JP">
+<link rel="alternate" type="application/atom+xml" title="記事とノート" href="/ja/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=14"><link rel="stylesheet" href="/liquid-nav.css?v=3">
+<script id="writing-messages" type="application/json">{"manual_copy": "文字を選択して手動でコピーしてください。", "link_copied": "記事のリンクをコピーしました", "share_copied": "共有用リンクをコピーしました", "share_failed": "共有できません。記事のリンクをコピーしてください。", "copy_code": "コードをコピー", "copy_block": "コードブロックをコピー", "copied": "コピー済み ✓", "code_copied": "コードをコピーしました", "results": "全 {n} 件", "matches": "該当する記事 {n} 件", "single_result": "全 1 件", "single_match": "該当する記事 1 件", "filter_count": "絞り込み、{n} 件選択中", "filters": "絞り込み", "saved_position": "前回の位置", "estimate": "約 {n} 分", "remaining": "残り約 {n} 分", "finished": "読了"}</script><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=7" defer></script>
+<link rel="stylesheet" href="/archive-filter.css?v=1"></head><body class="writing-page archive-page">
+<a class="skip-link" href="#main">本文へ移動</a>
+<header class="writing-header writing-width"><a class="writing-brand" href="/ja/" aria-label="Denis Wen ホーム">Denis Wen<span class="writing-brand-sub"> / 記事とノート</span></a>
+<div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="記事ナビゲーション"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="/ja/writing/" aria-current="page">記事</a><a href="/ja/atom.xml" aria-label="Atom フィードを購読">RSS</a></nav>          <details class="language-switcher">
+            <summary aria-label="言語: 日本語"><span>日本語</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
+            <div class="language-menu">
+              <a href="/writing/" lang="zh-CN" hreflang="zh-CN">中文</a>
+              <a href="/en/writing/" lang="en" hreflang="en">English</a>
+              <a href="/ja/writing/" lang="ja" hreflang="ja" aria-current="page">日本語</a>
+            </div>
+          </details>            <details class="theme-switcher" data-theme-control data-theme-menu-label="外観" hidden>
+              <summary aria-label="外観" title="外観"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="外観">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>システムに合わせる</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>ライト</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>ダーク</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header>
+<main class="writing-width writing-main" id="main"><div class="archive-masthead"><h1>記事とノート</h1><form class="archive-filters" id="archive-search" role="search" hidden>
+  <div class="filter-bar"><label class="archive-search"><span class="sr-only">記事を検索</span>
+    <input type="search" name="q" placeholder="タイトル・概要・タグを検索" enterkeyhint="search" autocomplete="off"></label>
+    <button type="button" class="filter-toggle glass-control" aria-expanded="false" aria-controls="archive-options"><span class="filter-adjust" aria-hidden="true"></span>絞り込み<span class="filter-count" hidden></span></button></div>
+  <div class="filter-panel" id="archive-options" hidden>
+    <div class="filter-field"><span class="filter-label" id="category-label">カテゴリー</span>
+      <select name="category" aria-labelledby="category-label"><option value="">すべてのカテゴリー</option><option>エージェント研究</option><option>システム調査</option><option>トラブルシューティング</option><option>開発実践</option></select></div>
+    <div class="filter-field"><span class="filter-label" id="tag-label">タグ</span>
+      <select name="tag" aria-labelledby="tag-label"><option value="">すべてのタグ</option><option>Claude Code</option><option>Kubernetes</option><option>Linux</option><option>PostgreSQL</option><option>Spark</option><option>Sqoop</option><option>アーキテクチャ</option><option>アーキテクチャ設計</option><option>エージェント</option><option>コンテキスト</option><option>コンテキスト管理</option><option>サンドボックス</option><option>ツール設計</option><option>データ同期</option><option>トラブルシューティング</option><option>プロセス</option><option>ランタイム</option><option>開発実践</option></select></div>
+  </div>
+</form>
+<div class="archive-state"><p class="archive-result" role="status" aria-live="polite" aria-atomic="true">全 9 件</p>
+  <button class="filter-clear" type="reset" form="archive-search" hidden>条件をクリア</button></div>
+</div><ul class="archive-grid"><li class="archive-card issue-lead" data-search="エージェントランタイムの仕組み：3件の見積もりから、メールを一度だけ送るまで 見積もりの比較から承認、メール送信までを追い、実行ループ、モデルとの接続、ツール、サンドボックス、スケジューラの役割を読み解く。送信結果の保存直前にプロセスを停止したとき、別のマシンは何を手掛かりに処理を引き継げるのか。 エージェント研究 エージェント ランタイム アーキテクチャ設計 ツール設計" data-category="エージェント研究" data-tags="[&quot;エージェント&quot;, &quot;ランタイム&quot;, &quot;アーキテクチャ設計&quot;, &quot;ツール設計&quot;]">
+          <div class="card-meta"><span class="card-category">エージェント研究</span><time datetime="2026-11-24">2026-11-24</time>
+            <span>読了目安 22 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/inside-an-agent-runtime/"><span class="card-title-phrase">エージェントランタイムの仕組み：</span><wbr><span class="card-title-phrase">3件の見積もりから、メールを一度だけ送るまで</span></a></h2><p>見積もりの比較から承認、メール送信までを追い、実行ループ、モデルとの接続、ツール、サンドボックス、スケジューラの役割を読み解く。送信結果の保存直前にプロセスを停止したとき、別のマシンは何を手掛かりに処理を引き継げるのか。</p>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88"># エージェント</a><a href="/ja/writing/?tag=%E3%83%A9%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0"># ランタイム</a><a href="/ja/writing/?tag=%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E8%A8%AD%E8%A8%88"># アーキテクチャ設計</a><a href="/ja/writing/?tag=%E3%83%84%E3%83%BC%E3%83%AB%E8%A8%AD%E8%A8%88"># ツール設計</a></div><figure class="issue-diagram"><figcaption>1通のメールの実行記録</figcaption><ol><li><strong>承認</strong><span>見積表v3と送信先を確認する</span></li><li><strong>送信</strong><span>同じ操作IDで再試行する</span></li><li><strong>受領記録</strong><span>メールサービスが一度受理し、その応答を保存する</span></li></ol></figure>
+        </li><li class="archive-card" data-search="エージェントの会話記録をどう保存するか：ツール呼び出しから別のマシンでの再開まで 2 MBの注文明細はデータベース、オブジェクトストレージ、次のプロンプトのどこに置くべきか。受注処理を例に、Claude Agent SDK、LangChain／LangGraph、OpenAI Agents SDKが実際に読み書きする範囲を比較する。 エージェント研究 エージェント コンテキスト管理 ランタイム PostgreSQL" data-category="エージェント研究" data-tags="[&quot;エージェント&quot;, &quot;コンテキスト管理&quot;, &quot;ランタイム&quot;, &quot;PostgreSQL&quot;]">
+          <div class="card-meta"><span class="card-category">エージェント研究</span><time datetime="2026-11-24">2026-11-24</time>
+            <span>読了目安 17 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/agent-transcript-storage/"><span class="card-title-phrase">エージェントの会話記録をどう保存するか：</span><wbr><span class="card-title-phrase">ツール呼び出しから別のマシンでの再開まで</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88"># エージェント</a><a href="/ja/writing/?tag=%E3%82%B3%E3%83%B3%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E7%AE%A1%E7%90%86"># コンテキスト管理</a><a href="/ja/writing/?tag=%E3%83%A9%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0"># ランタイム</a><a href="/ja/writing/?tag=PostgreSQL"># PostgreSQL</a></div>
+        </li><li class="archive-card" data-search="1人に1つのエージェントサンドボックスを用意すると、何台を常時稼働させるのか Lesterの個人用ワークスペースとGoogle Agent Substrateの複数サンドボックスを収容するPodを題材に、300人が時間をずらして利用する場合と一斉に利用する場合の必要台数を試算する。さらに、ホストが替わったとき、ファイル、プロセス、公開処理の受領記録をどう引き継ぐかを追う。 エージェント研究 エージェント サンドボックス ランタイム Kubernetes" data-category="エージェント研究" data-tags="[&quot;エージェント&quot;, &quot;サンドボックス&quot;, &quot;ランタイム&quot;, &quot;Kubernetes&quot;]">
+          <div class="card-meta"><span class="card-category">エージェント研究</span><time datetime="2026-11-19">2026-11-19</time>
+            <span>読了目安 20 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/agent-sandbox-economics/"><span class="card-title-phrase">1人に1つのエージェントサンドボックスを用意すると、何台を常時稼働させるのか</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88"># エージェント</a><a href="/ja/writing/?tag=%E3%82%B5%E3%83%B3%E3%83%89%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9"># サンドボックス</a><a href="/ja/writing/?tag=%E3%83%A9%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0"># ランタイム</a><a href="/ja/writing/?tag=Kubernetes"># Kubernetes</a></div>
+        </li><li class="archive-card" data-search="なぜエージェントにサンドボックスが必要なのか：実行環境から成果物まで モデルが手順を立てたあと、プログラムはどこで動くのか。ファイル、プロセス、依存関係、状態という切り口から、サンドボックスがエージェントの手の届く仕事をどう広げるかを考える。 エージェント研究 エージェント サンドボックス ランタイム" data-category="エージェント研究" data-tags="[&quot;エージェント&quot;, &quot;サンドボックス&quot;, &quot;ランタイム&quot;]">
+          <div class="card-meta"><span class="card-category">エージェント研究</span><time datetime="2026-11-14">2026-11-14</time>
+            <span>読了目安 21 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/agent-sandbox-workspace/"><span class="card-title-phrase">なぜエージェントにサンドボックスが必要なのか：</span><wbr><span class="card-title-phrase">実行環境から成果物まで</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88"># エージェント</a><a href="/ja/writing/?tag=%E3%82%B5%E3%83%B3%E3%83%89%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9"># サンドボックス</a><a href="/ja/writing/?tag=%E3%83%A9%E3%83%B3%E3%82%BF%E3%82%A4%E3%83%A0"># ランタイム</a></div>
+        </li><li class="archive-card" data-search="Read・Edit・Write・Bashから読み解くエージェントツールの設計 BashがあってもRead、Edit、Writeを個別に用意するのはなぜか。完全一致、ページ分割、出力の上限、実行状態を通して、ツールの設計がエージェントの判断に与える影響を考える。 エージェント研究 エージェント ツール設計 Claude Code" data-category="エージェント研究" data-tags="[&quot;エージェント&quot;, &quot;ツール設計&quot;, &quot;Claude Code&quot;]">
+          <div class="card-meta"><span class="card-category">エージェント研究</span><time datetime="2026-11-13">2026-11-13</time>
+            <span>読了目安 35 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/agent-tool-design/"><span class="card-title-phrase">Read・Edit・Write・Bashから読み解くエージェントツールの設計</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88"># エージェント</a><a href="/ja/writing/?tag=%E3%83%84%E3%83%BC%E3%83%AB%E8%A8%AD%E8%A8%88"># ツール設計</a><a href="/ja/writing/?tag=Claude%20Code"># Claude Code</a></div>
+        </li><li class="archive-card" data-search="長いタスクでエージェントはどう文脈を保つのか：Claude Code・Pi・OpenCodeのコンテキスト管理 公式ドキュメントと特定時点のソースコードを手掛かりに、履歴、コンテキスト、メモリの役割を整理する。その上で、再生でき、使用量を管理でき、動作を検証できるコンテキスト層の設計を考える。 エージェント研究 エージェント コンテキスト Claude Code" data-category="エージェント研究" data-tags="[&quot;エージェント&quot;, &quot;コンテキスト&quot;, &quot;Claude Code&quot;]">
+          <div class="card-meta"><span class="card-category">エージェント研究</span><time datetime="2026-11-13">2026-11-13</time>
+            <span>読了目安 27 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/agent-context-management/"><span class="card-title-phrase">長いタスクでエージェントはどう文脈を保つのか：</span><wbr><span class="card-title-phrase">Claude Code・Pi・OpenCodeのコンテキスト管理</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%82%A8%E3%83%BC%E3%82%B8%E3%82%A7%E3%83%B3%E3%83%88"># エージェント</a><a href="/ja/writing/?tag=%E3%82%B3%E3%83%B3%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88"># コンテキスト</a><a href="/ja/writing/?tag=Claude%20Code"># Claude Code</a></div>
+        </li><li class="archive-card" data-search="sshdを装った暗号資産マイニングプロセスの調査 CPU使用率の異常をきっかけに、実行ファイル、定期ジョブ、設定ファイルを順に調べ、プロセスの出所をたどった。 システム調査 Linux プロセス トラブルシューティング" data-category="システム調査" data-tags="[&quot;Linux&quot;, &quot;プロセス&quot;, &quot;トラブルシューティング&quot;]">
+          <div class="card-meta"><span class="card-category">システム調査</span><time datetime="2024-05-28">2024-05-28</time>
+            <span>読了目安 4 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/linux-mining-process/"><span class="card-title-phrase">sshdを装った暗号資産マイニングプロセスの調査</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=Linux"># Linux</a><a href="/ja/writing/?tag=%E3%83%97%E3%83%AD%E3%82%BB%E3%82%B9"># プロセス</a><a href="/ja/writing/?tag=%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0"># トラブルシューティング</a></div>
+        </li><li class="archive-card" data-search="見えない1文字がデータ同期の列をずらした理由 手作業の二分探索で問題の行を絞り込み、パーサーの状態遷移をたどる。同期時の列ずれを引き起こしたNUL文字の調査記録。 トラブルシューティング データ同期 Sqoop トラブルシューティング" data-category="トラブルシューティング" data-tags="[&quot;データ同期&quot;, &quot;Sqoop&quot;, &quot;トラブルシューティング&quot;]">
+          <div class="card-meta"><span class="card-category">トラブルシューティング</span><time datetime="2022-02-09">2022-02-09</time>
+            <span>読了目安 4 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/sqoop-null-character/"><span class="card-title-phrase">見えない1文字がデータ同期の列をずらした理由</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E6%9C%9F"># データ同期</a><a href="/ja/writing/?tag=Sqoop"># Sqoop</a><a href="/ja/writing/?tag=%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0"># トラブルシューティング</a></div>
+        </li><li class="archive-card" data-search="依存関係の衝突をきっかけにSparkを別サービスに切り出した話 既存のライブラリとSparkの依存関係を両立させるのが難しくなり、SQLの実行を独立したサービスに移した。呼び出し側との境界をインターフェースで定めたときの記録。 開発実践 Spark アーキテクチャ 開発実践" data-category="開発実践" data-tags="[&quot;Spark&quot;, &quot;アーキテクチャ&quot;, &quot;開発実践&quot;]">
+          <div class="card-meta"><span class="card-category">開発実践</span><time datetime="2021-10-08">2021-10-08</time>
+            <span>読了目安 4 分</span></div>
+          <div class="archive-entry">
+            <h2><a href="/ja/writing/spark-remote-service/"><span class="card-title-phrase">依存関係の衝突をきっかけにSparkを別サービスに切り出した話</span></a></h2>
+          </div>
+          <div class="post-tags"><a href="/ja/writing/?tag=Spark"># Spark</a><a href="/ja/writing/?tag=%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3"># アーキテクチャ</a><a href="/ja/writing/?tag=%E9%96%8B%E7%99%BA%E5%AE%9F%E8%B7%B5"># 開発実践</a></div>
+        </li></ul><div class="archive-empty" hidden><p>条件に合う記事がありません</p><button type="reset" form="archive-search">すべての記事を表示</button></div></main>
+<footer class="writing-footer writing-width"><a href="/ja/">← ホームに戻る</a><span>© Denis Wen · 好奇心を持って、探究を続ける。</span><a href="/ja/atom.xml">RSS 購読 ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>

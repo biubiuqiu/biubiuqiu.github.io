@@ -1,0 +1,21 @@
+<p class="article-lead">Most tables exported successfully with the same command. Only a handful kept producing type conversion errors. The clue turned out to be a character that was normally invisible.</p>
+<h2>The same configuration, but values landed in the wrong fields</h2>
+<p>We were running Sqoop 1.4.7 and Hive 2.1.1. When exporting from Hive to MySQL, values in a few tables shifted into the wrong columns and triggered type conversion errors. Other tables exported with the same settings, so I turned to the input data.</p>
+<h2>Narrowing the failure down to a single record</h2>
+<p>It took two days to isolate the problem row. I used a manual binary search. For a set of 10,000 records, for example, I would try exporting 5,000, then keep narrowing the failing subset until I had a record that reproduced the error.</p>
+<p>I retrieved the Hive data file from HDFS. It looked normal in <code>cat</code>, but <code>vim</code> displayed a <code>^@</code> within the data. Further comparison showed that rows containing this character failed, while rows without it exported successfully.</p>
+<p>The <code>^@</code> represents NUL, Unicode <code>U+0000</code>. An empty string has zero characters. This value actually contains a character, even though it is usually invisible.</p>
+<h2>Why did the parser treat NUL as special?</h2>
+<p>I had already specified a field separator with <code>--fields-terminated-by</code>. Why would NUL affect parsing instead of passing through as ordinary text?</p>
+<p>I read the Sqoop 1.4.7 source to find out. Its record parser uses a state machine that distinguishes four kinds of characters.</p>
+<table><thead><tr><th>Option</th><th>Role in the parser</th></tr></thead><tbody><tr><td><code>--enclosed-by</code></td><td>Field enclosure character</td></tr><tr><td><code>--escaped-by</code></td><td>Escape character</td></tr><tr><td><code>--fields-terminated-by</code></td><td>Field terminator</td></tr><tr><td><code>--lines-terminated-by</code></td><td>Record terminator</td></tr></tbody></table>
+<p>The clue was in the comment on the method that returns the enclosure character. When no enclosure was specified, it used <code>\000</code> to mean “none.” The NUL character in the input can be written in Java as <code>\u0000</code>. The two spellings have exactly the same value.</p>
+<pre><code>char a = '\u0000';
+char b = '\000';
+System.out.println(a == b); // true</code></pre>
+<p>I read the failing file, inspected the character values in a debugger, and followed the state machine’s checks for the enclosure and escape characters. That traced the shifted fields to a collision between an actual input character and the parser’s defaults.</p>
+<h2>The fix we used</h2>
+<p>We set both <code>--enclosed-by</code> and <code>--escaped-by</code> explicitly to avoid the defaults that collided with the input. The choice of values depends on the input format and needs to be verified against the data. An arbitrary replacement character can introduce another collision.</p>
+<h2>What I took away from the investigation</h2>
+<p>The most useful part was reducing the scope at each step. Compare a successful row with a failing one, use the difference between two displays to identify the invisible character, and then follow the parser’s state transitions. The error surfaced during type conversion, but the fields had already shifted during parsing.</p>
+<p class="article-reference">Source code examined in the original investigation: <a href="https://github.com/apache/sqoop/tree/branch-1.4.7" target="_blank" rel="noopener noreferrer">Apache Sqoop · branch-1.4.7 ↗</a></p>

@@ -1,0 +1,22 @@
+<p class="article-lead">In <code>top</code>, a process named sshd was consistently consuming a large share of the CPU. Starting with the file the process was actually running led me to its scheduled jobs and, eventually, a mining configuration.</p>
+<h2>A familiar process name with unusual CPU usage</h2>
+<p>The first clue was CPU usage. The name looked like the standard SSH service, but its resource consumption warranted a closer look. A process’s display name says little about where its executable came from, so I checked the files associated with its PID.</p>
+<pre><code># List the files opened by this process
+lsof -p &lt;PID&gt;
+
+# Find the executable the process is actually running
+ls -l /proc/&lt;PID&gt;/exe</code></pre>
+<h2>What kept starting it?</h2>
+<p>Next, I inspected the cron jobs for the user in question.</p>
+<pre><code>crontab -l -u &lt;username&gt;</code></pre>
+<p>The original investigation found two suspicious jobs. One attempted to download a program and its configuration every six hours. The other tried to start the program masquerading as <code>sshd</code> every minute. The program lived in a temporary directory, and the job used a file lock to prevent overlapping executions.</p>
+<p>This explained why killing the running process might only provide brief relief. The scheduler could start it again. Finding the executable and finding what launched it were both necessary.</p>
+<h2>What the configuration revealed</h2>
+<p>The configuration included CPU computation settings, RandomX options, and mining pool connection information. Taken together with the high resource usage and the cron jobs, these details identified the program as a cryptominer.</p>
+<p>I have omitted the malicious download URL, mining pool addresses, and original cron commands. The public account documents the investigation without reproducing a working malicious download command.</p>
+<h2>Where the investigation stopped</h2>
+<p>The original account ends with removal of the affected user’s scheduled jobs. It contains no complete investigation of the initial entry point, review of other persistence mechanisms, or verification of recovery. The evidence identifies an abnormal process but cannot establish that the host was fully cleaned.</p>
+<p>The removal operation in the original account deleted the user’s entire crontab. That scope matters. In an actual incident, preserve the evidence first and distinguish legitimate jobs from malicious entries before removing anything.</p>
+<h2>The sequence I kept</h2>
+<ol><li>Use the CPU anomaly to identify the process that needs investigation.</li><li>Resolve its actual executable instead of relying on its name.</li><li>Find the scheduler or other source repeatedly starting it.</li><li>Use configuration and behavior together to infer its purpose, and document how far remediation was verified.</li></ol>
+<p>What stayed with me was how much a familiar name can conceal. Following the executable path and the launch chain one step further was what made this case understandable.</p>

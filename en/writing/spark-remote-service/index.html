@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="theme-color" content="#f8f3ed">
+<title>Resolving Dependency Conflicts by Moving Spark into a Separate Service — Denis Wen</title><meta name="description" content="Spark and the application’s existing libraries needed incompatible dependencies. Moving SQL execution into a separate service gave the caller a clear interface."><link rel="canonical" href="https://biubiuqiu.github.io/en/writing/spark-remote-service/">
+<link rel="alternate" hreflang="zh-CN" href="https://biubiuqiu.github.io/writing/spark-remote-service/">
+<link rel="alternate" hreflang="en" href="https://biubiuqiu.github.io/en/writing/spark-remote-service/">
+<link rel="alternate" hreflang="ja" href="https://biubiuqiu.github.io/ja/writing/spark-remote-service/">
+<link rel="alternate" hreflang="x-default" href="https://biubiuqiu.github.io/writing/spark-remote-service/">
+<meta property="og:type" content="article"><meta property="og:title" content="Resolving Dependency Conflicts by Moving Spark into a Separate Service"><meta property="og:description" content="Spark and the application’s existing libraries needed incompatible dependencies. Moving SQL execution into a separate service gave the caller a clear interface."><meta property="og:url" content="https://biubiuqiu.github.io/en/writing/spark-remote-service/"><meta property="og:locale" content="en_US">
+<link rel="alternate" type="application/atom+xml" title="Writing &amp; notes" href="/en/atom.xml"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<script>(function () {
+  var preference = "light";
+  try {
+    var stored = localStorage.getItem("denis-theme");
+    if (stored === "light" || stored === "dark" || stored === "system") preference = stored;
+  } catch (error) {}
+  var systemDark = false;
+  try { systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches; } catch (error) {}
+  var theme = preference === "system" ? (systemDark ? "dark" : "light") : preference;
+  var root = document.documentElement;
+  root.dataset.theme = theme;
+  root.dataset.themePreference = preference;
+  root.style.colorScheme = theme;
+  var color = theme === "dark" ? "#201e26" : "#f8f3ed";
+  document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) { meta.content = color; });
+})();
+
+</script><link rel="stylesheet" href="/styles.css?v=24"><link rel="stylesheet" href="/writing.css?v=14"><link rel="stylesheet" href="/liquid-nav.css?v=3">
+<script id="writing-messages" type="application/json">{"manual_copy": "Select and copy the text manually.", "link_copied": "Article link copied", "share_copied": "Article link copied and ready to share", "share_failed": "Sharing is unavailable. Use Copy article link instead.", "copy_code": "Copy code", "copy_block": "Copy code block", "copied": "Copied ✓", "code_copied": "Code copied", "results": "{n} articles", "matches": "{n} articles found", "single_result": "1 article", "single_match": "1 article found", "filter_count": "Filters, {n} selected", "filters": "Filters", "saved_position": "Saved position", "estimate": "About {n} min", "remaining": "About {n} min left", "finished": "Finished reading"}</script><script src="/liquid-nav.js?v=3" defer></script><script src="/theme.js?v=7" defer></script><script src="/writing.js?v=7" defer></script>
+<meta property="article:published_time" content="2021-10-08"><meta property="article:author" content="Denis Wen"><meta property="og:image" content="https://biubiuqiu.github.io/assets/hiking/originals/DSC02731.jpeg"><meta name="twitter:card" content="summary_large_image"><script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Resolving Dependency Conflicts by Moving Spark into a Separate Service", "description": "Spark and the application’s existing libraries needed incompatible dependencies. Moving SQL execution into a separate service gave the caller a clear interface.", "datePublished": "2021-10-08", "author": {"@type": "Person", "name": "Denis Wen", "url": "https://biubiuqiu.github.io/"}, "mainEntityOfPage": "https://biubiuqiu.github.io/en/writing/spark-remote-service/", "image": "https://biubiuqiu.github.io/assets/hiking/originals/DSC02731.jpeg", "wordCount": 395, "timeRequired": "PT2M", "inLanguage": "en", "keywords": ["Spark", "Architecture", "Engineering practice"], "dateModified": "2026-11-13"}</script></head><body class="writing-page post-page">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="writing-header writing-width"><a class="writing-brand" href="/en/" aria-label="Denis Wen home">Denis Wen<span class="writing-brand-sub"> / Writing &amp; notes</span></a>
+<div class="writing-controls"><nav class="liquid-nav writing-nav" aria-label="Writing navigation"><canvas class="liquid-optics" aria-hidden="true"></canvas><span class="liquid-lens" aria-hidden="true"><canvas></canvas></span><a class="writing-index-link" href="/en/writing/">Writing</a><a href="/en/atom.xml" aria-label="Subscribe to the Atom feed">RSS</a></nav>          <details class="language-switcher">
+            <summary aria-label="Language: English"><span>English</span><span class="icon icon-caret language-chevron" aria-hidden="true"></span></summary>
+            <div class="language-menu">
+              <a href="/writing/spark-remote-service/" lang="zh-CN" hreflang="zh-CN">中文</a>
+              <a href="/en/writing/spark-remote-service/" lang="en" hreflang="en" aria-current="page">English</a>
+              <a href="/ja/writing/spark-remote-service/" lang="ja" hreflang="ja">日本語</a>
+            </div>
+          </details>            <details class="theme-switcher" data-theme-control data-theme-menu-label="Appearance" hidden>
+              <summary aria-label="Appearance" title="Appearance"><span class="icon icon-appearance" aria-hidden="true"></span></summary>
+              <div class="theme-menu" role="group" aria-label="Appearance">
+                <button type="button" data-theme-choice="system" aria-pressed="false"><span>System</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="light" aria-pressed="false"><span>Light</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+                <button type="button" data-theme-choice="dark" aria-pressed="false"><span>Dark</span><span class="icon icon-check theme-check" aria-hidden="true"></span></button>
+              </div>
+            </details></div></header>
+<header class="post-hero" id="article-top"><picture class="post-hero-media"><source media="(max-width: 700px)" type="image/webp" srcset="/assets/hiking/reading/DSC02731.webp"><img class="post-hero-photo" src="/assets/hiking/originals/DSC02731.jpeg" alt="A bridge in a valley, with mountains reflected in the river" style="object-position:center 56%" width="1536" height="1024" fetchpriority="high"></picture><div class="post-hero-shade" aria-hidden="true"></div><div class="article-header post-hero-content"><p class="writing-eyebrow">Engineering practice / From the archives</p><h1><span class="hero-title-part">Resolving Dependency Conflicts by Moving Spark into a Separate Service</span></h1><div class="article-meta"><span>Originally published <time datetime="2021-10-08T14:04:33">2021-10-08</time></span><span aria-hidden="true">·</span><span title="Estimated at 220 words per minute, excluding time spent on demos and code.">2 min read</span></div><div class="post-tags"><a class="glass-control" href="/en/writing/?tag=Spark"># Spark</a><a class="glass-control" href="/en/writing/?tag=Architecture"># Architecture</a><a class="glass-control" href="/en/writing/?tag=Engineering%20practice"># Engineering practice</a></div></div></header><main class="writing-width writing-main" id="main"><div class="reading-progress-track" role="progressbar" aria-label="Reading progress" aria-valuenow="0" hidden><span></span></div>
+<div class="article-layout"><aside class="reading-sidebar"><details class="toc-panel glass-panel" open><summary><span>Contents</span><span class="toc-chevron" aria-hidden="true">⌄</span></summary>
+<div class="toc-content"><nav aria-label="Contents"><ol><li class="toc-h2"><a class="glass-row" href="#section-1"><span class="toc-number">01</span><span>What we wanted to integrate</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-2"><span class="toc-number">02</span><span>Giving SQL execution its own service</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-3"><span class="toc-number">03</span><span>Initializing SparkSession</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-4"><span class="toc-number">04</span><span>Returning results</span></a></li><li class="toc-h2"><a class="glass-row" href="#section-5"><span class="toc-number">05</span><span>What the split cost us</span></a></li></ol></nav><div class="reading-status"><span data-remaining>About 2 min</span></div>
+<div class="toc-actions"><a href="/en/writing/">← All articles</a><a href="#article-top">↑ Back to top</a></div></div></details></aside>
+<div class="article-column" data-reading-minutes="2">
+<div class="article-intro"><nav class="article-breadcrumb" aria-label="Breadcrumbs"><a href="/en/">Home</a><span aria-hidden="true">/</span><a href="/en/writing/">Writing &amp; notes</a><span aria-hidden="true">/</span><a href="/en/writing/?category=Engineering%20practice">Engineering practice</a></nav>
+<p class="article-context">Spark SQL / Hive Metastore · Engineering archive</p><div class="post-byline"><a href="/en/">Denis Wen</a><span>395 words</span><span>Updated <time datetime="2026-11-13">2026-11-13</time></span></div>
+<div class="reading-resume" hidden><span>Last read <strong></strong></span><button type="button" data-resume>Resume reading →</button><button type="button" data-dismiss-resume aria-label="Dismiss saved reading position">×</button></div></div>
+<article class="article-body" aria-label="Article body"><p class="article-lead">Dependency conflicts kept resurfacing during a Spark integration. We eventually moved execution into a separate service and called it through an API.</p>
+<h2 id="section-1">What we wanted to integrate<a class="heading-anchor" href="#section-1" aria-label="Link to: What we wanted to integrate">#</a></h2>
+<p>The goal was to introduce Spark SQL into an existing data processing application. We wanted to try a different execution path for some SQL workloads and leave room for other types of computation later.</p>
+<p>The first obstacle turned out to be the dependency graph. The application already depended on Hive and Hadoop. Adding Spark brought incompatible versions, and fixing one conflict could break code that had worked before.</p>
+<h2 id="section-2">Giving SQL execution its own service<a class="heading-anchor" href="#section-2" aria-label="Link to: Giving SQL execution its own service">#</a></h2>
+<p>We moved the Spark code into its own project. The caller submitted SQL through an API and received the outcome. The service could manage its own Spark dependencies, and the request and response defined what the caller needed to know.</p>
+<ol><li>The caller supplied a database, the SQL statement, and whether it needed the query results.</li><li>The execution service initialized a <code>SparkSession</code> and connected to Hive Metastore.</li><li>It ran the statement and returned column names and rows, or just the execution status.</li></ol>
+<h2 id="section-3">Initializing SparkSession<a class="heading-anchor" href="#section-3" aria-label="Link to: Initializing SparkSession">#</a></h2>
+<p>The original implementation initialized the session as follows. The settings came from external configuration.</p>
+<pre><code>SparkSession sparkSession = SparkSession.builder()
+    .appName(sparkProperties.getAppName())
+    .config("spark.ui.port", sparkProperties.getUiPort())
+    .config("hive.metastore.uris", sparkProperties.getMetastoreUris())
+    .config("spark.master", sparkProperties.getMaster())
+    .config("spark.sql.hive.metastore.version", sparkProperties.getHiveVersion())
+    .config("spark.sql.hive.metastore.jars", sparkProperties.getHiveJarsPath())
+    .enableHiveSupport()
+    .getOrCreate();</code></pre>
+<p>One issue worth recording was Hive Metastore version compatibility. When we saw <code>Invalid method name: 'get_table_req'</code>, the relevant checks were the version of the Metastore we had connected to and the corresponding client JAR configuration. Looking only at the SQL would have missed the cause.</p>
+<h2 id="section-4">Returning results<a class="heading-anchor" href="#section-4" aria-label="Link to: Returning results">#</a></h2>
+<p>The query returned a <code>Dataset&lt;Row&gt;</code>. We extracted its column names, converted each row to a list of strings, and packaged the fields, rows, and execution status in the response. The example collected at most 5,000 rows.</p>
+<pre><code>Dataset&lt;Row&gt; result = sparkSession.sql(sql).limit(5000);
+String[] columns = result.columns();
+List&lt;Row&gt; rows = result.collectAsList();</code></pre>
+<p>This is the core of the original implementation. A separate service also needs policies for authorization, permitted statements, concurrent sessions, timeouts, and result size. The original account did not cover all of those concerns.</p>
+<h2 id="section-5">What the split cost us<a class="heading-anchor" href="#section-5" aria-label="Link to: What the split cost us">#</a></h2>
+<p>Splitting out the service isolated its dependencies. It also introduced another deployment to maintain and an API contract to manage. The complexity was still there, but its ownership became clearer.</p>
+<p>The question I kept from this project was one of placement. When most of the friction comes from the runtime environment and its dependencies, where should execution live, and how much of its implementation does a caller really need to know?</p>
+</article><aside class="article-notice"><strong>About this archived post</strong><p>The date is from the original blog. This edition preserves the investigation, clarifies its scope and omits environment-specific details and external screenshots. Original title: “A Design for Remote Spark Execution”. The examples have not been retested on current versions.</p></aside>
+<section class="article-end"><p class="end-mark">— End of article —</p><div class="article-attribution"><strong>Denis Wen</strong><p>Notes on agents, engineering and what I learn along the way.</p><small>Permalink</small><a class="canonical-link" href="https://biubiuqiu.github.io/en/writing/spark-remote-service/">https://biubiuqiu.github.io/en/writing/spark-remote-service/</a><p class="copyright-note">© Denis Wen · Please credit the author and link to the original when republishing. Quoted material belongs to its respective authors.</p></div>
+<div class="article-share"><button type="button" data-copy-link>Copy article link ↗</button><button type="button" data-share>Share article</button><a href="#article-top">Back to top ↑</a></div></section>
+<nav class="article-pagination" aria-label="Adjacent articles"><a href="/en/writing/sqoop-null-character/"><span>Newer article →</span><strong>How an Invisible Character Shifted the Columns in a Data Export</strong></a></nav><section class="article-related"><div class="related-heading"><h2>Further reading</h2><a href="/en/writing/">All articles ↗</a></div><div class="related-grid"><a class="related-card" href="/en/writing/inside-an-agent-runtime/"><img src="/assets/hiking/img_2146.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent research · 13 min</span><strong>Inside an Agent Runtime: Three Quotes, One Email, and No Duplicate Send</strong></a><a class="related-card" href="/en/writing/agent-transcript-storage/"><img src="/assets/hiking/dsc02281.webp" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent research · 10 min</span><strong>Storing Agent Transcripts: From a Tool Call to Recovery on Another Machine</strong></a><a class="related-card" href="/en/writing/agent-sandbox-economics/"><img src="/assets/writing/thumbs/agent-sandbox-economics.svg" alt="" width="480" height="360" loading="lazy" decoding="async"><span>Agent research · 12 min</span><strong>One Agent Sandbox per User: How Many Machines Need to Stay On?</strong></a></div></section></div></div>
+</main>
+<footer class="writing-footer writing-width"><a href="/en/">← Back to home</a><span>© Denis Wen · Stay curious. Keep exploring.</span><a href="/en/atom.xml">RSS feed ↗</a></footer><p class="writing-toast" role="status" aria-live="polite"></p></body></html>

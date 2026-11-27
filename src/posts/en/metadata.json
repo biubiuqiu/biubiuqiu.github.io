@@ -1,0 +1,146 @@
+{
+  "inside-an-agent-runtime": {
+    "title": "Inside an Agent Runtime: Three Quotes, One Email, and No Duplicate Send",
+    "original_title": "Inside an Agent Runtime: Three Quotes, One Email, and No Duplicate Send",
+    "category": "Agent research",
+    "excerpt": "Follow a quote comparison through approval and delivery to see how the execution loop, model interface, tools, sandbox, and scheduler fit together. Then kill the process before it persists the receipt. What does the next machine need to take over?",
+    "context": "Anatomy of a runtime · Three SDKs compared · Reproducible crash test",
+    "tags": [
+      "Agent",
+      "Runtime",
+      "Architecture design",
+      "Tool design"
+    ],
+    "cover_alt": "Snowy peaks and a glacier among the clouds",
+    "archive_diagram": {
+      "title": "The execution record for one email",
+      "steps": [
+        [
+          "Approve",
+          "Confirm quote sheet v3 and its recipients"
+        ],
+        [
+          "Send",
+          "Retry with the same operation ID"
+        ],
+        [
+          "Receipt",
+          "The mail service accepts one send; persist the receipt"
+        ]
+      ]
+    }
+  },
+  "agent-transcript-storage": {
+    "title": "Storing Agent Transcripts: From a Tool Call to Recovery on Another Machine",
+    "original_title": "Storing Agent Transcripts: From a Tool Call to Recovery on Another Machine",
+    "category": "Agent research",
+    "excerpt": "Where should a 2 MB order breakdown live: the database, object storage, or the next prompt? Follow an order as it is created and compare what the Claude Agent SDK, LangChain/LangGraph, and OpenAI Agents SDK actually read and write.",
+    "context": "Official SDK interfaces compared · Enterprise runtime design and capacity estimates",
+    "tags": [
+      "Agent",
+      "Context management",
+      "Runtime",
+      "PostgreSQL"
+    ],
+    "cover_alt": "Buildings below a mountain glacier"
+  },
+  "agent-sandbox-economics": {
+    "title": "One Agent Sandbox per User: How Many Machines Need to Stay On?",
+    "original_title": "One Agent Sandbox per User: How Many Machines Need to Stay On?",
+    "category": "Agent research",
+    "excerpt": "Starting with Lester’s personal workspaces and Google Agent Substrate’s multi-sandbox Pods, estimate the fleet for 300 people starting at staggered times or all at once. Then trace what happens to files, processes, and publication receipts when a sandbox changes hosts.",
+    "context": "Lester source code and production traces · Interactive capacity model",
+    "tags": [
+      "Agent",
+      "Sandbox",
+      "Runtime",
+      "Kubernetes"
+    ],
+    "cover_alt": "Snowy peaks and a glacier between valley walls",
+    "banner_alt": "Snowy peaks and a glacier between valley walls"
+  },
+  "agent-sandbox-workspace": {
+    "title": "Why Does an Agent Need a Sandbox? From Compute to Deliverables",
+    "original_title": "Why Does an Agent Need a Sandbox? From Compute to Deliverables",
+    "category": "Agent research",
+    "excerpt": "The model proposes a sequence of steps. Where does the program actually run? Files, processes, dependencies, and state explain how a sandbox lets an agent carry more tasks through to completion.",
+    "context": "Core concepts · Step-by-step animations and workspace diagrams · Implementation walkthrough",
+    "tags": [
+      "Agent",
+      "Sandbox",
+      "Runtime"
+    ],
+    "cover_alt": "Clouds, a sunlit peak, and a valley campsite",
+    "banner_alt": "Clouds, a sunlit peak, and a valley campsite"
+  },
+  "agent-tool-design": {
+    "title": "Read, Edit, Write, Bash: The Design of Agent Tools",
+    "original_title": "Read, Edit, Write, Bash: The Design of Agent Tools",
+    "category": "Agent research",
+    "excerpt": "If an agent has Bash, why does it also need Read, Edit, and Write? Exact matching, pagination, output budgets, and execution status show how a tool can shape an agent’s next decision.",
+    "context": "Public documentation and pinned source revisions · Interactive diagrams and implementation walkthrough",
+    "tags": [
+      "Agent",
+      "Tool design",
+      "Claude Code"
+    ],
+    "cover_alt": "A mountain pass overlooking a distant valley",
+    "banner_alt": "A mountain pass overlooking a distant valley"
+  },
+  "agent-context-management": {
+    "title": "How Agents Stay on Track During Long Tasks: Context Management in Claude Code, Pi, and OpenCode",
+    "original_title": "How Agents Stay on Track During Long Tasks: Context Management in Claude Code, Pi, and OpenCode",
+    "category": "Agent research",
+    "excerpt": "Using official documentation and pinned source snapshots, distinguish history, context, and memory. Then sketch a context layer with replay, explicit budgets, and verifiable behavior.",
+    "context": "Documentation and source code study · Implementation walkthrough · Verified November 13, 2026",
+    "tags": [
+      "Agent",
+      "Context",
+      "Claude Code"
+    ],
+    "cover_alt": "Pink morning clouds over snow-covered mountains",
+    "banner_alt": "Pink morning clouds over snow-covered mountains"
+  },
+  "sqoop-null-character": {
+    "title": "How an Invisible Character Shifted the Columns in a Data Export",
+    "original_title": "Fixing a Special-Character Error When Exporting from Hive to MySQL with Sqoop 1.4.7",
+    "category": "Troubleshooting",
+    "excerpt": "A manual binary search narrowed the failure to a single row. Following the parser’s state transitions explained how a NUL character shifted the columns.",
+    "context": "Sqoop 1.4.7 / Hive 2.1.1 · Engineering archive",
+    "tags": [
+      "Data synchronization",
+      "Sqoop",
+      "Troubleshooting"
+    ],
+    "cover_alt": "Snowy peaks and ridges in the mist",
+    "banner_alt": "Snowy peaks and ridges in the mist"
+  },
+  "spark-remote-service": {
+    "title": "Resolving Dependency Conflicts by Moving Spark into a Separate Service",
+    "original_title": "A Design for Remote Spark Execution",
+    "category": "Engineering practice",
+    "excerpt": "Spark and the application’s existing libraries needed incompatible dependencies. Moving SQL execution into a separate service gave the caller a clear interface.",
+    "context": "Spark SQL / Hive Metastore · Engineering archive",
+    "tags": [
+      "Spark",
+      "Architecture",
+      "Engineering practice"
+    ],
+    "cover_alt": "A bridge in a valley, with mountains reflected in the river",
+    "banner_alt": "A bridge in a valley, with mountains reflected in the river"
+  },
+  "linux-mining-process": {
+    "title": "Investigating a Cryptominer Disguised as sshd",
+    "original_title": "Notes on a Linux Cryptomining Infection",
+    "category": "Systems diagnostics",
+    "excerpt": "High CPU usage led from a suspicious process to its executable, scheduled jobs, and configuration file.",
+    "context": "Linux / Processes and cron jobs · Investigation archive",
+    "tags": [
+      "Linux",
+      "Processes",
+      "Troubleshooting"
+    ],
+    "cover_alt": "Snowy mountains under a starry sky and lights in the valley",
+    "banner_alt": "Snowy mountains under a starry sky and lights in the valley"
+  }
+}
